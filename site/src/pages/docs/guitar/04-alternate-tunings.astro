@@ -1,0 +1,12 @@
+---
+import Doc from '../../../layouts/Doc.astro';
+import Markdown from '../../../components/Markdown.astro';
+import { readFileSync } from 'node:fs';
+
+const mdPath = '/home/daytona/codebase/music-theory-reference/03-instrument-mappings/guitar/04-alternate-tunings.md';
+const raw = readFileSync(mdPath, 'utf-8');
+---
+
+<Doc title="04 Alternate Tunings" description="" section="foundations">
+  <Markdown content={raw} />
+</Doc>

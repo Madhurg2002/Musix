@@ -1,0 +1,276 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>01 Fretboard Layout and Standard Tuning — Music Theory Reference</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><style>:root{--bg: #faf9f7;--surface: #ffffff;--ink: #1a1a1a;--muted: #6b6b6b;--line: #e4e2df;--accent: #44516e;--accent-soft: #e7eaf0;--mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent)}a:hover{text-decoration-thickness:2px;text-decoration-color:var(--accent)}.wrap{max-width:920px;margin:0 auto;padding:0 24px}.muted{color:var(--muted)}code,pre,.mono{font-family:var(--mono)}pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}pre code{background:transparent;padding:0;color:var(--ink)}p code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}h1,h2,h3{line-height:1.25;margin-top:1.6em;margin-bottom:.4em}h1{font-size:2rem}h2{font-size:1.45rem}h3{font-size:1.15rem}ul,ol{padding-left:1.4em}li{margin:.25em 0}hr{border:0;border-top:1px solid var(--line);margin:2em 0}.footer{border-top:1px solid var(--line);margin-top:4em;padding-top:1.4em;color:var(--muted);font-size:.9em}.prose{color:var(--ink);max-width:70ch}.prose h1,.prose h2,.prose h3,.prose h4{scroll-margin-top:90px}.prose a{color:var(--accent)}.prose code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}.prose pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}.prose blockquote{border-left:3px solid var(--accent);padding-left:14px;color:var(--muted);margin:1.2em 0}.prose table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.95em}.prose th,.prose td{border:1px solid var(--line);padding:6px 10px;text-align:left}.prose th{background:var(--accent-soft)}.prose ul,.prose ol{padding-left:1.4em}
+</style></head> <body> <header class="wrap" style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:14px;border-bottom:1px solid var(--line);"> <div style="display:flex;align-items:center;gap:10px;"> <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"> <path d="M9 18V5l12-2v13"></path> <circle cx="6" cy="18" r="3"></circle> <circle cx="18" cy="16" r="3"></circle> </svg> <span style="font-weight:600;letter-spacing:-0.02em;">Music Theory Reference</span> </div> <nav style="display:flex;gap:14px;font-size:13px;color:var(--muted);"> <a href="/" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Docs</a> <a href="/data" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Data</a> </nav> </header> <main class="wrap" style="padding-top:40px;padding-bottom:60px;"> <nav style="font-size:13px;color:var(--muted);margin-bottom:24px;border-left:3px solid var(--accent);padding-left:12px;"> <span>foundations</span> </nav> <h1 style="margin-top:0;">01 Fretboard Layout and Standard Tuning</h1>   <div class="prose"><h1>01 Fretboard Layout and Standard Tuning</h1>
+<p>This module is the guitar-specific entry point for the <code>music-theory-reference</code> project. Unlike the instrument-agnostic core modules, here the focus is the physical geometry of the six-string guitar: open-string pitches, fret math, coordinates, and the unique major-third shift built into standard tuning.</p>
+<h2>1. The Guitar Fretboard as a Coordinate System</h2>
+<p>Think of the fretboard as a 2D grid:</p>
+<ul>
+<li><strong>Strings</strong> run horizontally in most tab/ASCII representations. String 1 is the high E (thinnest), string 6 is the low E (thickest).</li>
+<li><strong>Frets</strong> run vertically. Fret 0 is the nut (open string). Each successive fret raises the pitch by one semitone in 12-tone equal temperament.</li>
+</ul>
+<p>Coordinates are written as <strong>(string, fret)</strong>, where:</p>
+<ul>
+<li>String 1 = high E</li>
+<li>String 6 = low E</li>
+</ul>
+<p>For example, (2, 3) means 2nd string (B), 3rd fret.</p>
+<p>The grid is the foundation for scale diagrams, chord shapes, CAGED, and every other fretboard system in this repo.</p>
+<h2>2. Standard Tuning: EADGBE</h2>
+<p>Standard tuning assigns the following open-string pitches:</p>
+<table>
+<thead>
+<tr>
+<th>String (number)</th>
+<th>String (name convention)</th>
+<th>Open pitch</th>
+<th>Scientific pitch</th>
+<th>Octave (C-based numbering)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>high E</td>
+<td>E</td>
+<td>E₄</td>
+<td>4</td>
+</tr>
+<tr>
+<td>2</td>
+<td>B</td>
+<td>B</td>
+<td>B₃</td>
+<td>3</td>
+</tr>
+<tr>
+<td>3</td>
+<td>G</td>
+<td>G</td>
+<td>G₃</td>
+<td>3</td>
+</tr>
+<tr>
+<td>4</td>
+<td>D</td>
+<td>D</td>
+<td>D₃</td>
+<td>3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>A</td>
+<td>A</td>
+<td>A₂</td>
+<td>2</td>
+</tr>
+<tr>
+<td>6</td>
+<td>low E</td>
+<td>E</td>
+<td>E₂</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>So standard tuning is written top string to bottom string as:</p>
+<pre><code>E4 — B3 — G3 — D3 — A2 — E2
+</code></pre>
+<p>That is:</p>
+<ul>
+<li>String 1: E₄</li>
+<li>String 2: B₃</li>
+<li>String 3: G₃</li>
+<li>String 4: D₃</li>
+<li>String 5: A₂</li>
+<li>String 6: E₂</li>
+</ul>
+<p>In guitar tab conventions, the high E is drawn at the top of the diagram and the low E at the bottom, so the diagram's vertical axis corresponds to pitch height from high (top) to low (bottom).</p>
+<h2>3. Why EADGBE Is What It Is</h2>
+<p>Standard tuning is a practical compromise between:</p>
+<ul>
+<li>Diatonic and chordal reach across the fretboard</li>
+<li>Scale playing efficiency</li>
+<li>The historical evolution of tunings for polyphony, melody, and chordal playing on a six-string, fretted instrument</li>
+</ul>
+<p>One of its most important structural features is the <strong>major third between the G and B strings</strong>.</p>
+<h2>4. The Major Third Shift: G → B</h2>
+<p>Most adjacent string pairs in standard tuning are tuned a perfect fourth apart:</p>
+<table>
+<thead>
+<tr>
+<th>Pair</th>
+<th>Interval</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6 → 5</td>
+<td>P4</td>
+</tr>
+<tr>
+<td>5 → 4</td>
+<td>P4</td>
+</tr>
+<tr>
+<td>4 → 3</td>
+<td>P4</td>
+</tr>
+<tr>
+<td>3 → 2</td>
+<td>P4</td>
+</tr>
+</tbody>
+</table>
+<p>But the pair 3 → 2 (G → B) is a <strong>major third</strong>, not a perfect fourth.</p>
+<p>That one exception has huge consequences:</p>
+<ul>
+<li>It shifts how scales, arpeggios, and chord shapes are voiced across the G/B boundary.</li>
+<li>It is the reason CAGED shapes, scale boxes, and many voicings do not simply “stack” in one uniform pattern across the whole neck.</li>
+<li>It also makes many chord shapes and scale fingerings ergonomically favorable by spreading interval content differently across the hand.</li>
+</ul>
+<p>In ASCII representation:</p>
+<pre><code>String 6: E
+          P4
+String 5: A
+          P4
+String 4: D
+          P4
+String 3: G
+          M3  &#x3C;-- the shift
+String 2: B
+          P4
+String 1: E
+</code></pre>
+<p>The G/B major third is the single most important asymmetry in standard tuning and should be top-of-mind whenever you reason about the fretboard.</p>
+<h2>5. Fret Math: How Semitones Map to Frets</h2>
+<p>Each fret is one semitone higher than the previous fret on the same string. With 12-TET, the frequency of the note at fret <em>f</em> on a string with open frequency <em>f₀</em> is:</p>
+<p>$$ f_{\text{note}} = f_0 \cdot 2^{,f/12} $$</p>
+<p>So:</p>
+<ul>
+<li>Fret 0 = open string</li>
+<li>Fret 1 = +1 semitone</li>
+<li>Fret 12 = +12 semitones = one octave above the open string</li>
+</ul>
+<p>Because each octave is 12 frets, the 12th fret repeats the open string pitch class one octave higher. This makes the octave a natural reference point for learning the fretboard.</p>
+<p>For example, on the low E string (string 6):</p>
+<ul>
+<li>Fret 0 = E₂</li>
+<li>Fret 12 = E₃</li>
+</ul>
+<h2>6. Reading Fretboard Coordinates</h2>
+<p>A compact coordinate for any fretboard location is:</p>
+<p>$$ (\text{string}, \text{fret}) \rightarrow \text{note} $$</p>
+<p>Mapping examples in standard tuning:</p>
+<table>
+<thead>
+<tr>
+<th>(string, fret)</th>
+<th>Note</th>
+<th>Scientific pitch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(6, 0)</td>
+<td>E</td>
+<td>E₂</td>
+</tr>
+<tr>
+<td>(6, 1)</td>
+<td>F</td>
+<td>F₂</td>
+</tr>
+<tr>
+<td>(6, 2)</td>
+<td>F♯/G♭</td>
+<td>F♯₂ / G♭₂</td>
+</tr>
+<tr>
+<td>(6, 12)</td>
+<td>E</td>
+<td>E₃</td>
+</tr>
+<tr>
+<td>(1, 0)</td>
+<td>E</td>
+<td>E₄</td>
+</tr>
+<tr>
+<td>(1, 12)</td>
+<td>E</td>
+<td>E₅</td>
+</tr>
+<tr>
+<td>(2, 0)</td>
+<td>B</td>
+<td>B₃</td>
+</tr>
+<tr>
+<td>(3, 0)</td>
+<td>G</td>
+<td>G₃</td>
+</tr>
+</tbody>
+</table>
+<p>Because of the G/B shift, the note layout across frets is not a uniform “striped” pattern between all string pairs; the B string sits one semitone closer to the G string than the other fourths.</p>
+<h2>7. ASCII Fretboard Snippet (Open Position)</h2>
+<p>A compact vertical ASCII layout of open strings (read top = 1st string, bottom = 6th string):</p>
+<pre><code>E4 ─────────────────────────
+B3 ─────────────────────────
+G3 ─────────────────────────
+D3 ─────────────────────────
+A2 ─────────────────────────
+E2 ─────────────────────────
+</code></pre>
+<p>With frets labeled at the left edge:</p>
+<pre><code>      0   1   2   3   4   5   6   7   8   9  10  11  12
+E4 ───●──────────────────────────────────────────────────
+B3 ──────●────────────────────────────────────────────────
+G3 ──────────●────────────────────────────────────────────
+D3 ──────────────●────────────────────────────────────────
+A2 ──────────────────●────────────────────────────────────
+E2 ──────────────────────●────────────────────────────────
+</code></pre>
+<p>The <code>●</code> marks here are placeholders illustrating that each open string starts at fret 0 on its own line — not a real position map.</p>
+<p>A more realistic “open position on each string” view uses one marker per string at fret 0:</p>
+<pre><code>E4 ●
+B3 ●
+G3 ●
+D3 ●
+A2 ●
+E2 ●
+</code></pre>
+<p>This is the “zero fret” axis from which all positions are counted.</p>
+<h2>8. Octave Shapes and Fretboard Landmarks</h2>
+<p>Because frets repeat pitch classes every 12 frets, octave relationships create useful landmarks:</p>
+<ul>
+<li>Fret 12 = open string pitch one octave higher</li>
+<li>Fret 7 on a lower string often relates to an octave of a note found on an adjacent higher string, depending on the tuning interval</li>
+</ul>
+<p>These relationships are best learned positionally and note-by-note rather than as simple numeric formulas, precisely because the G/B major third shifts the “expected” pattern.</p>
+<h2>9. Position Thinking</h2>
+<p>Guitarists often think in <strong>positions</strong>: a hand placement covering a few frets at a time, with a designated “position” number (often defined by where the first finger sits relative to a fret).</p>
+<p>Positions are a practical abstraction over the coordinate grid:</p>
+<ul>
+<li>They make scale and chord shapes portable.</li>
+<li>They connect naturally to CAGED and 5-box / 3NPS systems (see later modules).</li>
+<li>They coexist with the true underlying (string, fret) → note mapping.</li>
+</ul>
+<p>A position does <em>not</em> change the tuning; it is just a way of grouping notes close together under one hand frame.</p>
+<h2>10. Practical Navigation Tips</h2>
+<ul>
+<li>Learn open-string pitches by name and octave first.</li>
+<li>Learn the 5th and 7th frets as landmarks — especially the “octave from open string” at fret 12 and the common “fifth” relationship across strings under fourths.</li>
+<li>Always be aware of where the 3rd string meets the 2nd string; the major third changes the pattern there.</li>
+<li>Practice reading coordinates out loud: “string 5, fret 7, that’s …” rather than just “that shape.”</li>
+</ul>
+<p>The coordinate view is what turns memorized shapes into an actual fretboard map.</p>
+<h2>11. What Comes Next</h2>
+<p>This module defines the board itself. The remaining guitar modules build on it:</p>
+<ul>
+<li><strong>02 CAGED system and movable shapes</strong> — the five chord-shape families and how they move across this grid</li>
+<li><strong>03 Scale box patterns and 3NPS</strong> — how scales are chunked and diagrammed on this board</li>
+<li><strong>04 Alternate tunings</strong> — how the coordinate map changes when open-string pitches change</li>
+<li><strong>05 Triads and drop chords</strong> — how chord tones are arranged and re-voiced across string groups</li>
+</ul>
+<p>All of them assume the coordinate/tuning foundation established here.</p></div>  </main> <footer class="footer wrap"> <div>Music Theory Reference — open source documentation library.</div> <div style="margin-top:6px;"> <a href="/" style="color:var(--muted);">Home</a> ·
+<a href="/data" style="color:var(--muted);">Data</a> </div> </footer> </body></html>

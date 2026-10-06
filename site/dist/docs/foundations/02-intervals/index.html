@@ -1,0 +1,366 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>02 Intervals — Music Theory Reference</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><style>:root{--bg: #faf9f7;--surface: #ffffff;--ink: #1a1a1a;--muted: #6b6b6b;--line: #e4e2df;--accent: #44516e;--accent-soft: #e7eaf0;--mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent)}a:hover{text-decoration-thickness:2px;text-decoration-color:var(--accent)}.wrap{max-width:920px;margin:0 auto;padding:0 24px}.muted{color:var(--muted)}code,pre,.mono{font-family:var(--mono)}pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}pre code{background:transparent;padding:0;color:var(--ink)}p code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}h1,h2,h3{line-height:1.25;margin-top:1.6em;margin-bottom:.4em}h1{font-size:2rem}h2{font-size:1.45rem}h3{font-size:1.15rem}ul,ol{padding-left:1.4em}li{margin:.25em 0}hr{border:0;border-top:1px solid var(--line);margin:2em 0}.footer{border-top:1px solid var(--line);margin-top:4em;padding-top:1.4em;color:var(--muted);font-size:.9em}.prose{color:var(--ink);max-width:70ch}.prose h1,.prose h2,.prose h3,.prose h4{scroll-margin-top:90px}.prose a{color:var(--accent)}.prose code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}.prose pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}.prose blockquote{border-left:3px solid var(--accent);padding-left:14px;color:var(--muted);margin:1.2em 0}.prose table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.95em}.prose th,.prose td{border:1px solid var(--line);padding:6px 10px;text-align:left}.prose th{background:var(--accent-soft)}.prose ul,.prose ol{padding-left:1.4em}
+</style></head> <body> <header class="wrap" style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:14px;border-bottom:1px solid var(--line);"> <div style="display:flex;align-items:center;gap:10px;"> <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"> <path d="M9 18V5l12-2v13"></path> <circle cx="6" cy="18" r="3"></circle> <circle cx="18" cy="16" r="3"></circle> </svg> <span style="font-weight:600;letter-spacing:-0.02em;">Music Theory Reference</span> </div> <nav style="display:flex;gap:14px;font-size:13px;color:var(--muted);"> <a href="/" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Docs</a> <a href="/data" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Data</a> </nav> </header> <main class="wrap" style="padding-top:40px;padding-bottom:60px;"> <nav style="font-size:13px;color:var(--muted);margin-bottom:24px;border-left:3px solid var(--accent);padding-left:12px;"> <span>foundations</span> </nav> <h1 style="margin-top:0;">02 Intervals</h1>   <div class="prose"><h1>02 Intervals</h1>
+<p>An <strong>interval</strong> is the distance in pitch between two notes. Intervals are the atomic units of melody and harmony — every scale, chord, and voice-leading motion is built from interval relationships.</p>
+<p>This module is instrument-agnostic. It applies to any sound-producing system.</p>
+<h2>1. Interval Fundamentals</h2>
+<p>An interval is defined by:</p>
+<ol>
+<li><strong>Quantity (generic size):</strong> How many letter names apart the two notes are (e.g., C to G spans five letters — C, D, E, F, G — so it is some kind of fifth).</li>
+<li><strong>Quality:</strong> Whether the interval is major, minor, perfect, augmented, or diminished.</li>
+</ol>
+<p>Quantity and quality together uniquely identify an interval. For example, "minor third" and "major third" are both thirds (quantity = 3) but differ in quality and size.</p>
+<h2>2. Measuring Intervals: Semitones</h2>
+<p>The most basic measurement of interval size is the <strong>semitone</strong> (or half step) — the smallest standard unit in 12-tone equal temperament. One semitone is the distance between adjacent pitches in the chromatic scale.</p>
+<p>In 12-TET, the frequency ratio of one semitone is:</p>
+<p>$$ r = \sqrt[12]{2} \approx 1.059463094 $$</p>
+<p>An interval of <em>n</em> semitones has the frequency ratio:</p>
+<p>$$ \text{ratio} = 2^{n/12} $$</p>
+<table>
+<thead>
+<tr>
+<th>Interval name</th>
+<th>Semitones</th>
+<th>Ratio (12-TET)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unison</td>
+<td>0</td>
+<td>1.0000</td>
+</tr>
+<tr>
+<td>Minor second (m2)</td>
+<td>1</td>
+<td>1.0595</td>
+</tr>
+<tr>
+<td>Major second (M2)</td>
+<td>2</td>
+<td>1.1225</td>
+</tr>
+<tr>
+<td>Minor third (m3)</td>
+<td>3</td>
+<td>1.1892</td>
+</tr>
+<tr>
+<td>Major third (M3)</td>
+<td>4</td>
+<td>1.2599</td>
+</tr>
+<tr>
+<td>Perfect fourth (P4)</td>
+<td>5</td>
+<td>1.3348</td>
+</tr>
+<tr>
+<td>Tritone (TT)</td>
+<td>6</td>
+<td>1.4142</td>
+</tr>
+<tr>
+<td>Perfect fifth (P5)</td>
+<td>7</td>
+<td>1.4983</td>
+</tr>
+<tr>
+<td>Minor sixth (m6)</td>
+<td>8</td>
+<td>1.5874</td>
+</tr>
+<tr>
+<td>Major sixth (M6)</td>
+<td>9</td>
+<td>1.6818</td>
+</tr>
+<tr>
+<td>Minor seventh (m7)</td>
+<td>10</td>
+<td>1.7818</td>
+</tr>
+<tr>
+<td>Major seventh (M7)</td>
+<td>11</td>
+<td>1.8877</td>
+</tr>
+<tr>
+<td>Octave (P8)</td>
+<td>12</td>
+<td>2.0000</td>
+</tr>
+</tbody>
+</table>
+<h2>3. Interval Quality and Spelling</h2>
+<p>Interval quality is not arbitrary — it is determined by the spelling (which letter names are used) and by the number of semitones.</p>
+<h3>Perfect Intervals</h3>
+<p>The unison, fourth, fifth, and octave are classified as <strong>perfect</strong> intervals. They have especially simple frequency ratios and strong consonance:</p>
+<table>
+<thead>
+<tr>
+<th>Interval</th>
+<th>Semitones</th>
+<th>Just Ratio (approx.)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Perfect unison (P1)</td>
+<td>0</td>
+<td>1 : 1</td>
+</tr>
+<tr>
+<td>Perfect fourth (P4)</td>
+<td>5</td>
+<td>4 : 3</td>
+</tr>
+<tr>
+<td>Perfect fifth (P5)</td>
+<td>7</td>
+<td>3 : 2</td>
+</tr>
+<tr>
+<td>Perfect octave (P8)</td>
+<td>12</td>
+<td>2 : 1</td>
+</tr>
+</tbody>
+</table>
+<h3>Major and Minor Intervals</h3>
+<p>Seconds, thirds, sixths, and sevenths come in major and minor forms. A minor interval is one semitone smaller than the corresponding major interval:</p>
+<ul>
+<li>Minor third (m3) = 3 semitones; Major third (M3) = 4 semitones</li>
+<li>Minor seventh (m7) = 10 semitones; Major seventh (M7) = 11 semitones</li>
+</ul>
+<h2>4. Enharmonic Equivalence</h2>
+<p>Two intervals may sound identical but be spelled differently. For example:</p>
+<ul>
+<li>An augmented fourth (A4) and a diminished fifth (d5) both span 6 semitones (the tritone).</li>
+</ul>
+<p>Their spellings matter for harmonic function and voice leading even though they are enharmonically equivalent in 12-TET.</p>
+<h2>5. Augmented and Diminished Intervals</h2>
+<ul>
+<li><strong>Augmented:</strong> One semitone larger than a major or perfect interval.</li>
+<li><strong>Diminished:</strong> One semitone smaller than a minor or perfect interval.</li>
+</ul>
+<p>Examples:</p>
+<table>
+<thead>
+<tr>
+<th>Interval</th>
+<th>Semitones</th>
+<th>From...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Diminished fifth (d5)</td>
+<td>6</td>
+<td>Perfect fifth lowered by a semitone</td>
+</tr>
+<tr>
+<td>Augmented fourth (A4)</td>
+<td>6</td>
+<td>Perfect fourth raised by a semitone</td>
+</tr>
+<tr>
+<td>Augmented fifth (A5)</td>
+<td>8</td>
+<td>Perfect fifth raised by a semitone</td>
+</tr>
+</tbody>
+</table>
+<h2>6. Simple and Compound Intervals</h2>
+<ul>
+<li><strong>Simple intervals</strong> are within one octave (0–12 semitones).</li>
+<li><strong>Compound intervals</strong> exceed one octave and are the simple interval plus one or more octaves.</li>
+</ul>
+<p>For example, a compound major third (15 semitones) is a major third plus an octave. In functional terms, compound intervals are often treated as equivalent to their simple counterparts in many harmonic contexts, though the octave displacement can matter in voice leading and texture.</p>
+<h2>7. The Tritone</h2>
+<p>The <strong>tritone</strong> is an interval of 6 semitones: exactly half an octave. It can be spelled as:</p>
+<ul>
+<li>Augmented fourth (e.g., F to B)</li>
+<li>Diminished fifth (e.g., B to F)</li>
+</ul>
+<p>Historically, the tritone was called <em>diabolus in musica</em> ("the devil in music") because of its instability and strong tendency to resolve. In dominant seventh chords, the tritone between the third and seventh drives the chord's resolution.</p>
+<h2>8. Harmonic, Melodic, and Compound Intervals</h2>
+<ul>
+<li><strong>Harmonic intervals:</strong> Two pitches sounded simultaneously.</li>
+<li><strong>Melodic intervals:</strong> Two pitches sounded in sequence.</li>
+<li>The same interval name applies in both cases; the difference is in how they are perceived and used.</li>
+</ul>
+<h2>9. Interval Inversion</h2>
+<p><strong>Inverting</strong> an interval means moving the lower note up an octave (or the upper note down an octave). Inversion follows these rules:</p>
+<ul>
+<li>Size: An interval's inversion spans (9 − original quantity) letter names. Example: a third inverts to a sixth.</li>
+<li>Quality:
+<ul>
+<li>Perfect stays perfect.</li>
+<li>Major becomes minor (and vice versa).</li>
+<li>Augmented becomes diminished (and vice versa).</li>
+</ul>
+</li>
+</ul>
+<p>For example:</p>
+<ul>
+<li>Major third (M3) inverts to minor sixth (m6).</li>
+<li>Perfect fifth (P5) inverts to perfect fourth (P4).</li>
+</ul>
+<p>In semitones, an interval and its inversion always sum to 12 (within one octave).</p>
+<h2>10. Consonance and Dissonance</h2>
+<p>Intervals are loosely categorized by how stable or tense they sound:</p>
+<ul>
+<li><strong>Perfect consonances:</strong> Unison, octave, perfect fifth, perfect fourth (though the fourth can function as a dissonance against the bass in some contexts).</li>
+<li><strong>Imperfect consonances:</strong> Major and minor thirds, major and minor sixths.</li>
+<li><strong>Dissonances:</strong> Seconds, sevenths, and the tritone (and their compounds), along with augmented and diminished intervals.</li>
+</ul>
+<p>Consonance and dissonance are context-dependent and culturally shaped, but these categories are a useful starting point for Western tonal harmony.</p>
+<h2>11. Frequency Ratios for Common Intervals</h2>
+<p>Interval quality is closely tied to simple integer frequency ratios. Here are approximate <strong>just intonation</strong> ratios for key intervals:</p>
+<table>
+<thead>
+<tr>
+<th>Interval</th>
+<th>Semitones</th>
+<th>Just Ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Minor second (m2)</td>
+<td>1</td>
+<td>16 : 15</td>
+</tr>
+<tr>
+<td>Major second (M2)</td>
+<td>2</td>
+<td>9 : 8</td>
+</tr>
+<tr>
+<td>Minor third (m3)</td>
+<td>3</td>
+<td>6 : 5</td>
+</tr>
+<tr>
+<td>Major third (M3)</td>
+<td>4</td>
+<td>5 : 4</td>
+</tr>
+<tr>
+<td>Perfect fourth (P4)</td>
+<td>5</td>
+<td>4 : 3</td>
+</tr>
+<tr>
+<td>Tritone (TT)</td>
+<td>6</td>
+<td>45 : 32 / 64 : 45</td>
+</tr>
+<tr>
+<td>Perfect fifth (P5)</td>
+<td>7</td>
+<td>3 : 2</td>
+</tr>
+<tr>
+<td>Minor sixth (m6)</td>
+<td>8</td>
+<td>8 : 5</td>
+</tr>
+<tr>
+<td>Major sixth (M6)</td>
+<td>9</td>
+<td>5 : 3</td>
+</tr>
+<tr>
+<td>Minor seventh (m7)</td>
+<td>10</td>
+<td>16 : 9 / 9 : 5</td>
+</tr>
+<tr>
+<td>Major seventh (M7)</td>
+<td>11</td>
+<td>15 : 8</td>
+</tr>
+<tr>
+<td>Octave (P8)</td>
+<td>12</td>
+<td>2 : 1</td>
+</tr>
+</tbody>
+</table>
+<p>In 12-TET, these ratios are approximated by $2^{n/12}$.</p>
+<h2>12. Interval Notation and Shorthand</h2>
+<p>A compact shorthand is widely used:</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td>Perfect unison</td>
+</tr>
+<tr>
+<td>m2</td>
+<td>Minor second</td>
+</tr>
+<tr>
+<td>M2</td>
+<td>Major second</td>
+</tr>
+<tr>
+<td>m3</td>
+<td>Minor third</td>
+</tr>
+<tr>
+<td>M3</td>
+<td>Major third</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>Perfect fourth</td>
+</tr>
+<tr>
+<td>TT</td>
+<td>Tritone</td>
+</tr>
+<tr>
+<td>P5</td>
+<td>Perfect fifth</td>
+</tr>
+<tr>
+<td>m6</td>
+<td>Minor sixth</td>
+</tr>
+<tr>
+<td>M6</td>
+<td>Major sixth</td>
+</tr>
+<tr>
+<td>m7</td>
+<td>Minor seventh</td>
+</tr>
+<tr>
+<td>M7</td>
+<td>Major seventh</td>
+</tr>
+<tr>
+<td>P8</td>
+<td>Perfect octave</td>
+</tr>
+</tbody>
+</table>
+<p>Brackets such as ♭3 (flat three) and ♯5 (sharp five) are used in chord formulas to indicate alterations relative to a scale or chord.</p>
+<h2>13. Summary</h2>
+<ul>
+<li>Intervals are defined by <strong>quantity</strong> (number of letter names) and <strong>quality</strong> (pitch size in semitones).</li>
+<li>The semitone is the basic unit; the frequency ratio of <em>n</em> semitones is $2^{n/12}$ in 12-TET.</li>
+<li>Qualities include perfect, major, minor, augmented, and diminished.</li>
+<li>Inversion swaps quantity to (9 − quantity) and flips major/minor and augmented/diminished.</li>
+<li>Simple frequency ratios explain consonance; the tritone and other dissonances create tension and motion.</li>
+<li>Interval concepts here are fully instrument-agnostic and form the basis for scales and chords.</li>
+</ul></div>  </main> <footer class="footer wrap"> <div>Music Theory Reference — open source documentation library.</div> <div style="margin-top:6px;"> <a href="/" style="color:var(--muted);">Home</a> ·
+<a href="/data" style="color:var(--muted);">Data</a> </div> </footer> </body></html>

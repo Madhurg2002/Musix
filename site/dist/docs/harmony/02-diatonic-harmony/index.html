@@ -1,0 +1,207 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>02 Diatonic Harmony — Music Theory Reference</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><style>:root{--bg: #faf9f7;--surface: #ffffff;--ink: #1a1a1a;--muted: #6b6b6b;--line: #e4e2df;--accent: #44516e;--accent-soft: #e7eaf0;--mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent)}a:hover{text-decoration-thickness:2px;text-decoration-color:var(--accent)}.wrap{max-width:920px;margin:0 auto;padding:0 24px}.muted{color:var(--muted)}code,pre,.mono{font-family:var(--mono)}pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}pre code{background:transparent;padding:0;color:var(--ink)}p code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}h1,h2,h3{line-height:1.25;margin-top:1.6em;margin-bottom:.4em}h1{font-size:2rem}h2{font-size:1.45rem}h3{font-size:1.15rem}ul,ol{padding-left:1.4em}li{margin:.25em 0}hr{border:0;border-top:1px solid var(--line);margin:2em 0}.footer{border-top:1px solid var(--line);margin-top:4em;padding-top:1.4em;color:var(--muted);font-size:.9em}.prose{color:var(--ink);max-width:70ch}.prose h1,.prose h2,.prose h3,.prose h4{scroll-margin-top:90px}.prose a{color:var(--accent)}.prose code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}.prose pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}.prose blockquote{border-left:3px solid var(--accent);padding-left:14px;color:var(--muted);margin:1.2em 0}.prose table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.95em}.prose th,.prose td{border:1px solid var(--line);padding:6px 10px;text-align:left}.prose th{background:var(--accent-soft)}.prose ul,.prose ol{padding-left:1.4em}
+</style></head> <body> <header class="wrap" style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:14px;border-bottom:1px solid var(--line);"> <div style="display:flex;align-items:center;gap:10px;"> <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"> <path d="M9 18V5l12-2v13"></path> <circle cx="6" cy="18" r="3"></circle> <circle cx="18" cy="16" r="3"></circle> </svg> <span style="font-weight:600;letter-spacing:-0.02em;">Music Theory Reference</span> </div> <nav style="display:flex;gap:14px;font-size:13px;color:var(--muted);"> <a href="/" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Docs</a> <a href="/data" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Data</a> </nav> </header> <main class="wrap" style="padding-top:40px;padding-bottom:60px;"> <nav style="font-size:13px;color:var(--muted);margin-bottom:24px;border-left:3px solid var(--accent);padding-left:12px;"> <span>foundations</span> </nav> <h1 style="margin-top:0;">02 Diatonic Harmony</h1>   <div class="prose"><h1>02 Diatonic Harmony</h1>
+<p><strong>Diatonic harmony</strong> is the system of chords and harmonic relationships built from the notes of a single scale — typically a major or minor scale. It is the foundation of tonal music and the starting point for chord analysis, progressions, and voice leading.</p>
+<p>This module is instrument-agnostic.</p>
+<h2>1. Diatonic Scale and Diatonic Chords</h2>
+<p>A <strong>diatonic</strong> set contains only notes from the parent scale, with no chromatic alterations. Diatonic chords are built by stacking thirds on each scale degree using only scale tones.</p>
+<p>In a major scale, for example, the diatonic triads are:</p>
+<ul>
+<li>i (I): root, 3, 5</li>
+<li>ii (ii): 2, 4, 6</li>
+<li>iii (iii): 3, 5, 7</li>
+<li>IV: 4, 6, 1</li>
+<li>V: 5, 7, 2</li>
+<li>vi (vi): 6, 1, 3</li>
+<li>vii° (vii°): 7, 2, 4</li>
+</ul>
+<p>Each chord has a distinct quality:</p>
+<table>
+<thead>
+<tr>
+<th>Degree</th>
+<th>Triad quality</th>
+<th>Seventh chord (diatonic)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>I</td>
+<td>Major</td>
+<td>Maj7</td>
+</tr>
+<tr>
+<td>ii</td>
+<td>Minor</td>
+<td>m7</td>
+</tr>
+<tr>
+<td>iii</td>
+<td>Minor</td>
+<td>m7</td>
+</tr>
+<tr>
+<td>IV</td>
+<td>Major</td>
+<td>Maj7</td>
+</tr>
+<tr>
+<td>V</td>
+<td>Major</td>
+<td>Dominant 7th</td>
+</tr>
+<tr>
+<td>vi</td>
+<td>Minor</td>
+<td>m7</td>
+</tr>
+<tr>
+<td>vii°</td>
+<td>Diminished</td>
+<td>m7♭5 (half-diminished)</td>
+</tr>
+</tbody>
+</table>
+<p>In a minor key, the diatonic chords are adjusted depending on whether the harmonic or melodic minor is in play, especially for the V and vii°.</p>
+<h2>2. Primary Triads</h2>
+<p>The <strong>primary triads</strong> in a major key are:</p>
+<ul>
+<li><strong>I (tonic):</strong> stable, centering</li>
+<li><strong>IV (subdominant):</strong> somewhat less stable, often moves toward V</li>
+<li><strong>V (dominant):</strong> unstable, strongly resolves to I</li>
+</ul>
+<p>These three chords dominate much of Western tonal harmony because they include the most important scale degrees: 1, 3, 5, and 7, and they express the major–minor contrast and the leading-tone pull.</p>
+<h2>3. Secondary Triads and Their Roles</h2>
+<p>The secondary triads are:</p>
+<ul>
+<li><strong>ii:</strong> often functions as a predominant, leading to V</li>
+<li><strong>iii:</strong> can serve as a tonic substitute or a passing function</li>
+<li><strong>vi:</strong> often a submediant; frequently used as a predominant or a tonic substitute</li>
+</ul>
+<p>These chords expand the palette beyond I, IV, V while remaining diatonic.</p>
+<h2>4. Diatonic Seventh Chords</h2>
+<p>Adding a seventh to each diatonic triad produces seventh chords that are central to functional harmony:</p>
+<table>
+<thead>
+<tr>
+<th>Degree</th>
+<th>Seventh chord</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>I</td>
+<td>Maj7</td>
+<td>Tonic stability, color</td>
+</tr>
+<tr>
+<td>ii</td>
+<td>m7</td>
+<td>Predominant</td>
+</tr>
+<tr>
+<td>iii</td>
+<td>m7</td>
+<td>Tonic substitute, passing</td>
+</tr>
+<tr>
+<td>IV</td>
+<td>Maj7</td>
+<td>Predominant/plagal area</td>
+</tr>
+<tr>
+<td>V</td>
+<td>Dom7</td>
+<td>Dominant tension and resolution</td>
+</tr>
+<tr>
+<td>vi</td>
+<td>m7</td>
+<td>Predominant/tonic substitute</td>
+</tr>
+<tr>
+<td>vii°7</td>
+<td>m7♭5 (ø7)</td>
+<td>Dominant area, less common than V7</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>dominant seventh</strong> (V7) is especially important because its tritone (3 ↔ ♭7) creates strong leading-tone motion back to the tonic.</p>
+<h2>5. Diatonic Function: Tonic, Predominant, Dominant</h2>
+<p>Functional harmony organizes chords into three broad roles:</p>
+<ul>
+<li><strong>Tonic (T):</strong> identity, stability (I, vi often)</li>
+<li><strong>Predominant (PD):</strong> moves from tonic toward dominant (ii, IV, vi, iii sometimes)</li>
+<li><strong>Dominant (D):</strong> prepares and creates tension for resolution to tonic (V, vii°)</li>
+</ul>
+<p>A typical functional progression might be:</p>
+<p>$$ T \rightarrow PD \rightarrow D \rightarrow T $$</p>
+<p>For example:</p>
+<ul>
+<li>I → ii → V → I</li>
+<li>I → IV → V → I</li>
+<li>I → vi → ii → V → I</li>
+</ul>
+<h2>6. Cadence Types</h2>
+<p>A <strong>cadence</strong> is a melodic/harmonic conclusion to a phrase. Diatonic cadences include:</p>
+<ul>
+<li><strong>Authentic cadence (V → I):</strong> strongest, most conclusive.</li>
+<li><strong>Plagal cadence (IV → I):</strong> softer, "Amen" feel.</li>
+<li><strong>Half cadence (ends on V):</strong> open, needs continuation.</li>
+<li><strong>Deceptive cadence (V → vi):</strong> expected resolution diverted.</li>
+</ul>
+<p>Cadences combine harmonic function with melodic resolution and are central to phrase structure.</p>
+<h2>7. Diatonicism and Chromaticism</h2>
+<p>Diatonic harmony is strictly limited to scale tones, but real music frequently departs:</p>
+<ul>
+<li>Chromatic mediants</li>
+<li>Borrowed chords from parallel mode</li>
+<li>Secondary dominants</li>
+<li>Altered dominants and extensions</li>
+</ul>
+<p>Understanding diatonic basics is essential before analyzing how and why chromatic alterations work.</p>
+<h2>8. Diatonic Modulation and Related Keys</h2>
+<p>Because diatonic sets are restricted to scale tones, modulating means shifting which scale is in play. The circle of fifths identifies closely related keys, where many diatonic chords are shared or nearly shared.</p>
+<p>For example, moving from C major to G major keeps most chords diatonic in both keys except where G’s signature sharp enters. This makes such modulations smooth.</p>
+<h2>9. Voice Leading Within Diatonic Harmony</h2>
+<p>Diatonic harmony strongly rewards smooth voice leading:</p>
+<ul>
+<li>Common tones are retained between adjacent chords.</li>
+<li>The smallest possible motion (often stepwise) is preferred.</li>
+<li>Leading tones resolve where possible (especially 7̂ → 1̂ in V → I).</li>
+<li>Fifths and octaves between adjacent voices are managed to avoid forbidden parallel motion in strict styles.</li>
+</ul>
+<p>Although voice-leading rules vary by style, the principle of minimal, logical motion is constant.</p>
+<h2>10. Roman Numeral Analysis and Diatonicism</h2>
+<p>Diatonic harmony is the basis for <strong>Roman numeral analysis</strong>:</p>
+<ul>
+<li>Numerals indicate a chord's scale degree.</li>
+<li>Upper/lowercases indicate major/minor quality.</li>
+<li>Accidentals indicate chromatic alterations relative to the key.</li>
+</ul>
+<p>For example, in C major:</p>
+<ul>
+<li>Cmaj7 = Imaj7</li>
+<li>Dm7 = ii7</li>
+<li>G7 = V7</li>
+<li>B♭maj7 = ♭IIImaj7 (chromatic, borrowed from parallel minor)</li>
+</ul>
+<p>Roman numeral analysis is explained in detail in the next module.</p>
+<h2>11. Diatonic Harmony in Minor Keys</h2>
+<p>Minor keys complicate diatonic analysis because the scale is often altered in use:</p>
+<ul>
+<li>The harmonic minor raises ♭7 to 7 to create a leading tone, producing a major V and a diminished vii°.</li>
+<li>The melodic minor may raise ♭6 and ♭7 ascending.</li>
+<li>Natural minor preserves the pure diatonic set.</li>
+</ul>
+<p>Common minor-key diatonic functions still follow T–PD–D patterns, but the dominant function is usually supplied by the raised-7 form.</p>
+<h2>12. Summary</h2>
+<ul>
+<li>Diatonic harmony uses only scale tones, generating a fixed set of chords per key.</li>
+<li>Primary triads (I, IV, V) and their seventh chords (especially V7) drive functional harmony.</li>
+<li>Functional categories — tonic, predominant, dominant — organize logical progression.</li>
+<li>Cadences articulate phrase endings through predictable harmonic motion.</li>
+<li>Roman numeral analysis depends on diatonic baseline plus chromatic alterations.</li>
+<li>Diatonic harmony is the necessary foundation for analysis, composition, and voice leading.</li>
+</ul></div>  </main> <footer class="footer wrap"> <div>Music Theory Reference — open source documentation library.</div> <div style="margin-top:6px;"> <a href="/" style="color:var(--muted);">Home</a> ·
+<a href="/data" style="color:var(--muted);">Data</a> </div> </footer> </body></html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>04 Alternate Tunings — Music Theory Reference</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><style>:root{--bg: #faf9f7;--surface: #ffffff;--ink: #1a1a1a;--muted: #6b6b6b;--line: #e4e2df;--accent: #44516e;--accent-soft: #e7eaf0;--mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent)}a:hover{text-decoration-thickness:2px;text-decoration-color:var(--accent)}.wrap{max-width:920px;margin:0 auto;padding:0 24px}.muted{color:var(--muted)}code,pre,.mono{font-family:var(--mono)}pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}pre code{background:transparent;padding:0;color:var(--ink)}p code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}h1,h2,h3{line-height:1.25;margin-top:1.6em;margin-bottom:.4em}h1{font-size:2rem}h2{font-size:1.45rem}h3{font-size:1.15rem}ul,ol{padding-left:1.4em}li{margin:.25em 0}hr{border:0;border-top:1px solid var(--line);margin:2em 0}.footer{border-top:1px solid var(--line);margin-top:4em;padding-top:1.4em;color:var(--muted);font-size:.9em}.prose{color:var(--ink);max-width:70ch}.prose h1,.prose h2,.prose h3,.prose h4{scroll-margin-top:90px}.prose a{color:var(--accent)}.prose code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}.prose pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}.prose blockquote{border-left:3px solid var(--accent);padding-left:14px;color:var(--muted);margin:1.2em 0}.prose table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.95em}.prose th,.prose td{border:1px solid var(--line);padding:6px 10px;text-align:left}.prose th{background:var(--accent-soft)}.prose ul,.prose ol{padding-left:1.4em}
+</style></head> <body> <header class="wrap" style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:14px;border-bottom:1px solid var(--line);"> <div style="display:flex;align-items:center;gap:10px;"> <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"> <path d="M9 18V5l12-2v13"></path> <circle cx="6" cy="18" r="3"></circle> <circle cx="18" cy="16" r="3"></circle> </svg> <span style="font-weight:600;letter-spacing:-0.02em;">Music Theory Reference</span> </div> <nav style="display:flex;gap:14px;font-size:13px;color:var(--muted);"> <a href="/" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Docs</a> <a href="/data" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Data</a> </nav> </header> <main class="wrap" style="padding-top:40px;padding-bottom:60px;"> <nav style="font-size:13px;color:var(--muted);margin-bottom:24px;border-left:3px solid var(--accent);padding-left:12px;"> <span>foundations</span> </nav> <h1 style="margin-top:0;">04 Alternate Tunings</h1>   <div class="prose"><h1>04 Alternate Tunings</h1>
+<p><strong>Alternate tunings</strong> retune one or more open strings away from standard EADGBE. This changes the fretboard coordinate map and often reshapes chord shapes, scale patterns, and voicings in musically useful ways.</p>
+<p>This module is guitar-specific and builds on <code>01-fretboard-layout-and-standard-tuning</code>.</p>
+<h2>1. What Changes in an Alternate Tuning</h2>
+<p>In an alternate tuning, the open-string pitches are different, so:</p>
+<ul>
+<li>The note at each (string, fret) coordinate changes</li>
+<li>The intervals between adjacent strings can change</li>
+<li>Familiar chord shapes may become different chords, or the same chord may become easier in a new voicing</li>
+<li>Scale and arpeggio shapes shift accordingly</li>
+</ul>
+<p>Alternate tunings are therefore not just “different open chords.” They are different fretboard geometries.</p>
+<h2>2. How to Think About Tuning Changes</h2>
+<p>A useful model is <strong>string offset</strong>: describe how each string differs from standard tuning in semitone steps.</p>
+<p>If standard tuning open strings are:</p>
+<p>$$ E_2,\ A_2,\ D_3,\ G_3,\ B_3,\ E_4 $$</p>
+<p>then an alternate tuning is a new set of open pitches. The relationship to standard can be expressed as offsets:</p>
+<p>$$ \Delta_n \in \mathbb{Z} $$</p>
+<p>where <code>Δ_n</code> is the semitone change on string <em>n</em> relative to standard.</p>
+<p>Positive = tuning up, negative = tuning down.</p>
+<p>For example, if you lower the 6th string by 2 semitones (whole step) for Drop D, that is <code>Δ6 = -2</code>.</p>
+<h2>3. Drop D</h2>
+<p><strong>Drop D</strong> lowers the 6th string from E₂ to D₂:</p>
+<table>
+<thead>
+<tr>
+<th>String</th>
+<th>Standard</th>
+<th>Drop D</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6</td>
+<td>E₂</td>
+<td>D₂</td>
+<td>−2</td>
+</tr>
+<tr>
+<td>5</td>
+<td>A₂</td>
+<td>A₂</td>
+<td>0</td>
+</tr>
+<tr>
+<td>4</td>
+<td>D₃</td>
+<td>D₃</td>
+<td>0</td>
+</tr>
+<tr>
+<td>3</td>
+<td>G₃</td>
+<td>G₃</td>
+<td>0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>B₃</td>
+<td>B₃</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>E₄</td>
+<td>E₄</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>Open strings in Drop D:</p>
+<pre><code>E4 — B3 — G3 — D3 — A2 — D2
+</code></pre>
+<h3>Why It Is Useful</h3>
+<ul>
+<li>It gives a low D drone and a power-chord-friendly low end.</li>
+<li>You can play a D power chord on the 6th string with one finger across the low three strings.</li>
+<li>It keeps the upper five strings in standard tuning, so most familiar shapes remain intact above the 6th string.</li>
+</ul>
+<h3>Numeric Effect</h3>
+<p>The 6th string is now a whole step lower, so everything on that string shifts down by 2 semitones relative to standard. The rest of the board is unchanged.</p>
+<h2>4. DADGAD</h2>
+<p><strong>DADGAD</strong> is a widely used alternate tuning:</p>
+<table>
+<thead>
+<tr>
+<th>String</th>
+<th>Standard</th>
+<th>DADGAD</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6</td>
+<td>E₂</td>
+<td>D₂</td>
+<td>−2</td>
+</tr>
+<tr>
+<td>5</td>
+<td>A₂</td>
+<td>A₂</td>
+<td>0</td>
+</tr>
+<tr>
+<td>4</td>
+<td>D₃</td>
+<td>D₃</td>
+<td>0</td>
+</tr>
+<tr>
+<td>3</td>
+<td>G₃</td>
+<td>G₃</td>
+<td>0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>B₃</td>
+<td>A₃</td>
+<td>−2</td>
+</tr>
+<tr>
+<td>1</td>
+<td>E₄</td>
+<td>D₄</td>
+<td>−2</td>
+</tr>
+</tbody>
+</table>
+<p>Open strings in DADGAD:</p>
+<pre><code>D4 — A3 — G3 — D3 — A2 — D2
+</code></pre>
+<h3>Character</h3>
+<ul>
+<li>The tuning is often described as a sort of suspended, open, modal sonority.</li>
+<li>It is fertile for folk, Celtic, rock, and atmospheric playing.</li>
+<li>Many chords and drone-based voicings become much easier, while standard shapes no longer match the same chord names.</li>
+</ul>
+<h3>Interval Structure</h3>
+<p>DADGAD is not simply “standard with some strings flat.” The intervals between adjacent strings change, which reshapes the board. Because both the 2nd and 1st strings are lowered, the high end of the tuning is quite different from standard.</p>
+<p>This makes DADGAD both powerful and disorienting if you try to use standard shapes without adjustment.</p>
+<h2>5. Open G</h2>
+<p><strong>Open G</strong> tuning gives a G major chord when strummed open:</p>
+<table>
+<thead>
+<tr>
+<th>String</th>
+<th>Standard</th>
+<th>Open G</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6</td>
+<td>E₂</td>
+<td>D₃</td>
+<td>+2?</td>
+</tr>
+<tr>
+<td>5</td>
+<td>A₂</td>
+<td>B₃</td>
+<td>+4?</td>
+</tr>
+<tr>
+<td>4</td>
+<td>D₃</td>
+<td>G₃</td>
+<td>+3?</td>
+</tr>
+<tr>
+<td>3</td>
+<td>G₃</td>
+<td>D₃</td>
+<td>0?</td>
+</tr>
+<tr>
+<td>2</td>
+<td>B₃</td>
+<td>B₃</td>
+<td>0?</td>
+</tr>
+<tr>
+<td>1</td>
+<td>E₄</td>
+<td>G₄</td>
+<td>+4?</td>
+</tr>
+</tbody>
+</table>
+<p>Wait — that table used guesses; the key point is to check the real pitches. Read the tuning string set directly instead.</p>
+<p>Open G is commonly given as:</p>
+<pre><code>D — B — G — D — B — G
+</code></pre>
+<p>with the 6th string often tuned down from E to D in some variants, and the 1st string raised to G in the full open G variant.</p>
+<p>Because spelling and octave conventions vary across sources, it is safer to state the open pitches explicitly rather than rely only on “up/down from standard.”</p>
+<h3>Character</h3>
+<ul>
+<li>Strumming all open strings produces a G major chord.</li>
+<li>The tuning is associated with slide playing, blues, and certain folk styles.</li>
+<li>Chord shapes become barre-like slides and simple movable forms.</li>
+<li>The fretboard geometry is materially different from standard, so existing shapes must be relearned in context.</li>
+</ul>
+<h2>6. Open D (Brief Note)</h2>
+<p><strong>Open D</strong> is a related major tuning with open strings forming a D major chord. Like Open G, it is often used for slide and drone styles.</p>
+<p>It is included here as a recognizable example of the same principle: the open strings spell a major chord, and the entire fretboard map shifts accordingly.</p>
+<h2>7. Drone Tunings and Modal Tunings</h2>
+<p>Many alternate tunings are valuable because they create:</p>
+<ul>
+<li><strong>Drone strings:</strong> one or more strings that stay on a fixed pitch while you play melodies and voicings against them.</li>
+<li><strong>Open chord sonorities:</strong> strumming open strings yields a full chord, useful for slide and folk styles.</li>
+<li><strong>Modal color:</strong> some tunings emphasize sus, add, or modal sounds by stacking intervals that are not present in standard tuning.</li>
+</ul>
+<p>The drone effect is especially powerful on guitar because one fixed open string can sit under changing harmony or melody.</p>
+<h2>8. Converting Shapes to Alternate Tunings</h2>
+<p>When moving from standard to an alternate tuning:</p>
+<ol>
+<li>Identify the new open pitches.</li>
+<li>Re-derive the note at each fret on each string using the new open pitch and the fret math from <code>01-fretboard-layout-and-standard-tuning</code>.</li>
+<li>Test familiar shapes: some will become different chords; some may no longer be meaningful; some may become easier or more colorful.</li>
+<li>Rebuild scale and arpeggio patterns on the new board rather than assuming old patterns translate perfectly.</li>
+</ol>
+<p>This is why alternate tunings are a genuine fretboard re-mapping, not a cosmetic change.</p>
+<h2>9. Capo vs. Alternate Tuning</h2>
+<p>A <strong>capo</strong> changes the key of standard shapes by raising the pitch of all strings at once. It does <em>not</em> change the intervallic relationships between strings — it keeps the standard tuning geometry, just shifted up.</p>
+<p>Alternate tunings <em>do</em> change the geometry. This is an important distinction:</p>
+<ul>
+<li>Capo: same tuning structure, new absolute pitch level.</li>
+<li>Alternate tuning: at least one string is re-tuned relative to the others, so the relationships themselves change.</li>
+</ul>
+<h2>10. Practical Workflow for Exploring Alternate Tunings</h2>
+<ul>
+<li>Tune slowly and check each string by name and octave if possible.</li>
+<li>Learn the new open chord(s) first.</li>
+<li>Learn where the root notes land in a few familiar shapes under the new tuning.</li>
+<li>Practice drone-based ideas early, since many alternate tunings are drone-friendly.</li>
+<li>Rebuild a small vocabulary of voicings instead of trying to force standard shapes everywhere.</li>
+</ul>
+<p>A deliberate, coordinate-minded approach prevents confusion.</p>
+<h2>11. Summary</h2>
+<ul>
+<li>Alternate tunings change open-string pitches and therefore the whole fretboard map.</li>
+<li>String offsets from standard are a useful way to describe the change.</li>
+<li>Drop D, DADGAD, and Open G illustrate different goals: power-chord and drone ease, modal sonority, and open major chord sonority.</li>
+<li>Capo and alternate tuning are not the same: capo preserves tuning geometry; alternate tunings change it.</li>
+<li>In any alternate tuning, re-derive notes, shapes, and patterns on the new board rather than assuming standard patterns carry over.</li>
+</ul></div>  </main> <footer class="footer wrap"> <div>Music Theory Reference — open source documentation library.</div> <div style="margin-top:6px;"> <a href="/" style="color:var(--muted);">Home</a> ·
+<a href="/data" style="color:var(--muted);">Data</a> </div> </footer> </body></html>

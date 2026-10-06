@@ -1,0 +1,2457 @@
+{
+  "meta": {
+    "version": 1,
+    "referencePitch": {
+      "name": "A4",
+      "midi": 69,
+      "frequencyHz": 440.0
+    },
+    "temperament": "12-TET",
+    "stringsHighToLow": [
+      {
+        "string": 1,
+        "tuningToken": "E4"
+      },
+      {
+        "string": 2,
+        "tuningToken": "B3"
+      },
+      {
+        "string": 3,
+        "tuningToken": "G3"
+      },
+      {
+        "string": 4,
+        "tuningToken": "D3"
+      },
+      {
+        "string": 5,
+        "tuningToken": "A2"
+      },
+      {
+        "string": 6,
+        "tuningToken": "E2"
+      }
+    ],
+    "fretRange": {
+      "min": 0,
+      "max": 24
+    }
+  },
+  "byString": {
+    "1": [
+      {
+        "string": 1,
+        "fret": 0,
+        "note": "E",
+        "scientificPitch": "E4",
+        "midi": 64,
+        "frequencyHz": 329.63
+      },
+      {
+        "string": 1,
+        "fret": 1,
+        "note": "F",
+        "scientificPitch": "F4",
+        "midi": 65,
+        "frequencyHz": 349.23
+      },
+      {
+        "string": 1,
+        "fret": 2,
+        "note": "F#",
+        "scientificPitch": "F#4",
+        "midi": 66,
+        "frequencyHz": 369.99
+      },
+      {
+        "string": 1,
+        "fret": 3,
+        "note": "G",
+        "scientificPitch": "G4",
+        "midi": 67,
+        "frequencyHz": 392.0
+      },
+      {
+        "string": 1,
+        "fret": 4,
+        "note": "G#",
+        "scientificPitch": "G#4",
+        "midi": 68,
+        "frequencyHz": 415.3
+      },
+      {
+        "string": 1,
+        "fret": 5,
+        "note": "A",
+        "scientificPitch": "A4",
+        "midi": 69,
+        "frequencyHz": 440.0
+      },
+      {
+        "string": 1,
+        "fret": 6,
+        "note": "A#",
+        "scientificPitch": "A#4",
+        "midi": 70,
+        "frequencyHz": 466.16
+      },
+      {
+        "string": 1,
+        "fret": 7,
+        "note": "B",
+        "scientificPitch": "B4",
+        "midi": 71,
+        "frequencyHz": 493.88
+      },
+      {
+        "string": 1,
+        "fret": 8,
+        "note": "C",
+        "scientificPitch": "C5",
+        "midi": 72,
+        "frequencyHz": 523.25
+      },
+      {
+        "string": 1,
+        "fret": 9,
+        "note": "C#",
+        "scientificPitch": "C#5",
+        "midi": 73,
+        "frequencyHz": 554.37
+      },
+      {
+        "string": 1,
+        "fret": 10,
+        "note": "D",
+        "scientificPitch": "D5",
+        "midi": 74,
+        "frequencyHz": 587.33
+      },
+      {
+        "string": 1,
+        "fret": 11,
+        "note": "D#",
+        "scientificPitch": "D#5",
+        "midi": 75,
+        "frequencyHz": 622.25
+      },
+      {
+        "string": 1,
+        "fret": 12,
+        "note": "E",
+        "scientificPitch": "E5",
+        "midi": 76,
+        "frequencyHz": 659.26
+      },
+      {
+        "string": 1,
+        "fret": 13,
+        "note": "F",
+        "scientificPitch": "F5",
+        "midi": 77,
+        "frequencyHz": 698.46
+      },
+      {
+        "string": 1,
+        "fret": 14,
+        "note": "F#",
+        "scientificPitch": "F#5",
+        "midi": 78,
+        "frequencyHz": 739.99
+      },
+      {
+        "string": 1,
+        "fret": 15,
+        "note": "G",
+        "scientificPitch": "G5",
+        "midi": 79,
+        "frequencyHz": 783.99
+      },
+      {
+        "string": 1,
+        "fret": 16,
+        "note": "G#",
+        "scientificPitch": "G#5",
+        "midi": 80,
+        "frequencyHz": 830.61
+      },
+      {
+        "string": 1,
+        "fret": 17,
+        "note": "A",
+        "scientificPitch": "A5",
+        "midi": 81,
+        "frequencyHz": 880.0
+      },
+      {
+        "string": 1,
+        "fret": 18,
+        "note": "A#",
+        "scientificPitch": "A#5",
+        "midi": 82,
+        "frequencyHz": 932.33
+      },
+      {
+        "string": 1,
+        "fret": 19,
+        "note": "B",
+        "scientificPitch": "B5",
+        "midi": 83,
+        "frequencyHz": 987.77
+      },
+      {
+        "string": 1,
+        "fret": 20,
+        "note": "C",
+        "scientificPitch": "C6",
+        "midi": 84,
+        "frequencyHz": 1046.5
+      },
+      {
+        "string": 1,
+        "fret": 21,
+        "note": "C#",
+        "scientificPitch": "C#6",
+        "midi": 85,
+        "frequencyHz": 1108.73
+      },
+      {
+        "string": 1,
+        "fret": 22,
+        "note": "D",
+        "scientificPitch": "D6",
+        "midi": 86,
+        "frequencyHz": 1174.66
+      },
+      {
+        "string": 1,
+        "fret": 23,
+        "note": "D#",
+        "scientificPitch": "D#6",
+        "midi": 87,
+        "frequencyHz": 1244.51
+      },
+      {
+        "string": 1,
+        "fret": 24,
+        "note": "E",
+        "scientificPitch": "E6",
+        "midi": 88,
+        "frequencyHz": 1318.51
+      }
+    ],
+    "2": [
+      {
+        "string": 2,
+        "fret": 0,
+        "note": "B",
+        "scientificPitch": "B3",
+        "midi": 59,
+        "frequencyHz": 246.94
+      },
+      {
+        "string": 2,
+        "fret": 1,
+        "note": "C",
+        "scientificPitch": "C4",
+        "midi": 60,
+        "frequencyHz": 261.63
+      },
+      {
+        "string": 2,
+        "fret": 2,
+        "note": "C#",
+        "scientificPitch": "C#4",
+        "midi": 61,
+        "frequencyHz": 277.18
+      },
+      {
+        "string": 2,
+        "fret": 3,
+        "note": "D",
+        "scientificPitch": "D4",
+        "midi": 62,
+        "frequencyHz": 293.66
+      },
+      {
+        "string": 2,
+        "fret": 4,
+        "note": "D#",
+        "scientificPitch": "D#4",
+        "midi": 63,
+        "frequencyHz": 311.13
+      },
+      {
+        "string": 2,
+        "fret": 5,
+        "note": "E",
+        "scientificPitch": "E4",
+        "midi": 64,
+        "frequencyHz": 329.63
+      },
+      {
+        "string": 2,
+        "fret": 6,
+        "note": "F",
+        "scientificPitch": "F4",
+        "midi": 65,
+        "frequencyHz": 349.23
+      },
+      {
+        "string": 2,
+        "fret": 7,
+        "note": "F#",
+        "scientificPitch": "F#4",
+        "midi": 66,
+        "frequencyHz": 369.99
+      },
+      {
+        "string": 2,
+        "fret": 8,
+        "note": "G",
+        "scientificPitch": "G4",
+        "midi": 67,
+        "frequencyHz": 392.0
+      },
+      {
+        "string": 2,
+        "fret": 9,
+        "note": "G#",
+        "scientificPitch": "G#4",
+        "midi": 68,
+        "frequencyHz": 415.3
+      },
+      {
+        "string": 2,
+        "fret": 10,
+        "note": "A",
+        "scientificPitch": "A4",
+        "midi": 69,
+        "frequencyHz": 440.0
+      },
+      {
+        "string": 2,
+        "fret": 11,
+        "note": "A#",
+        "scientificPitch": "A#4",
+        "midi": 70,
+        "frequencyHz": 466.16
+      },
+      {
+        "string": 2,
+        "fret": 12,
+        "note": "B",
+        "scientificPitch": "B4",
+        "midi": 71,
+        "frequencyHz": 493.88
+      },
+      {
+        "string": 2,
+        "fret": 13,
+        "note": "C",
+        "scientificPitch": "C5",
+        "midi": 72,
+        "frequencyHz": 523.25
+      },
+      {
+        "string": 2,
+        "fret": 14,
+        "note": "C#",
+        "scientificPitch": "C#5",
+        "midi": 73,
+        "frequencyHz": 554.37
+      },
+      {
+        "string": 2,
+        "fret": 15,
+        "note": "D",
+        "scientificPitch": "D5",
+        "midi": 74,
+        "frequencyHz": 587.33
+      },
+      {
+        "string": 2,
+        "fret": 16,
+        "note": "D#",
+        "scientificPitch": "D#5",
+        "midi": 75,
+        "frequencyHz": 622.25
+      },
+      {
+        "string": 2,
+        "fret": 17,
+        "note": "E",
+        "scientificPitch": "E5",
+        "midi": 76,
+        "frequencyHz": 659.26
+      },
+      {
+        "string": 2,
+        "fret": 18,
+        "note": "F",
+        "scientificPitch": "F5",
+        "midi": 77,
+        "frequencyHz": 698.46
+      },
+      {
+        "string": 2,
+        "fret": 19,
+        "note": "F#",
+        "scientificPitch": "F#5",
+        "midi": 78,
+        "frequencyHz": 739.99
+      },
+      {
+        "string": 2,
+        "fret": 20,
+        "note": "G",
+        "scientificPitch": "G5",
+        "midi": 79,
+        "frequencyHz": 783.99
+      },
+      {
+        "string": 2,
+        "fret": 21,
+        "note": "G#",
+        "scientificPitch": "G#5",
+        "midi": 80,
+        "frequencyHz": 830.61
+      },
+      {
+        "string": 2,
+        "fret": 22,
+        "note": "A",
+        "scientificPitch": "A5",
+        "midi": 81,
+        "frequencyHz": 880.0
+      },
+      {
+        "string": 2,
+        "fret": 23,
+        "note": "A#",
+        "scientificPitch": "A#5",
+        "midi": 82,
+        "frequencyHz": 932.33
+      },
+      {
+        "string": 2,
+        "fret": 24,
+        "note": "B",
+        "scientificPitch": "B5",
+        "midi": 83,
+        "frequencyHz": 987.77
+      }
+    ],
+    "3": [
+      {
+        "string": 3,
+        "fret": 0,
+        "note": "F",
+        "scientificPitch": "F3",
+        "midi": 53,
+        "frequencyHz": 174.61
+      },
+      {
+        "string": 3,
+        "fret": 1,
+        "note": "F#",
+        "scientificPitch": "F#3",
+        "midi": 54,
+        "frequencyHz": 185.0
+      },
+      {
+        "string": 3,
+        "fret": 2,
+        "note": "G",
+        "scientificPitch": "G3",
+        "midi": 55,
+        "frequencyHz": 196.0
+      },
+      {
+        "string": 3,
+        "fret": 3,
+        "note": "G#",
+        "scientificPitch": "G#3",
+        "midi": 56,
+        "frequencyHz": 207.65
+      },
+      {
+        "string": 3,
+        "fret": 4,
+        "note": "A",
+        "scientificPitch": "A3",
+        "midi": 57,
+        "frequencyHz": 220.0
+      },
+      {
+        "string": 3,
+        "fret": 5,
+        "note": "A#",
+        "scientificPitch": "A#3",
+        "midi": 58,
+        "frequencyHz": 233.08
+      },
+      {
+        "string": 3,
+        "fret": 6,
+        "note": "B",
+        "scientificPitch": "B3",
+        "midi": 59,
+        "frequencyHz": 246.94
+      },
+      {
+        "string": 3,
+        "fret": 7,
+        "note": "C",
+        "scientificPitch": "C4",
+        "midi": 60,
+        "frequencyHz": 261.63
+      },
+      {
+        "string": 3,
+        "fret": 8,
+        "note": "C#",
+        "scientificPitch": "C#4",
+        "midi": 61,
+        "frequencyHz": 277.18
+      },
+      {
+        "string": 3,
+        "fret": 9,
+        "note": "D",
+        "scientificPitch": "D4",
+        "midi": 62,
+        "frequencyHz": 293.66
+      },
+      {
+        "string": 3,
+        "fret": 10,
+        "note": "D#",
+        "scientificPitch": "D#4",
+        "midi": 63,
+        "frequencyHz": 311.13
+      },
+      {
+        "string": 3,
+        "fret": 11,
+        "note": "E",
+        "scientificPitch": "E4",
+        "midi": 64,
+        "frequencyHz": 329.63
+      },
+      {
+        "string": 3,
+        "fret": 12,
+        "note": "F",
+        "scientificPitch": "F4",
+        "midi": 65,
+        "frequencyHz": 349.23
+      },
+      {
+        "string": 3,
+        "fret": 13,
+        "note": "F#",
+        "scientificPitch": "F#4",
+        "midi": 66,
+        "frequencyHz": 369.99
+      },
+      {
+        "string": 3,
+        "fret": 14,
+        "note": "G",
+        "scientificPitch": "G4",
+        "midi": 67,
+        "frequencyHz": 392.0
+      },
+      {
+        "string": 3,
+        "fret": 15,
+        "note": "G#",
+        "scientificPitch": "G#4",
+        "midi": 68,
+        "frequencyHz": 415.3
+      },
+      {
+        "string": 3,
+        "fret": 16,
+        "note": "A",
+        "scientificPitch": "A4",
+        "midi": 69,
+        "frequencyHz": 440.0
+      },
+      {
+        "string": 3,
+        "fret": 17,
+        "note": "A#",
+        "scientificPitch": "A#4",
+        "midi": 70,
+        "frequencyHz": 466.16
+      },
+      {
+        "string": 3,
+        "fret": 18,
+        "note": "B",
+        "scientificPitch": "B4",
+        "midi": 71,
+        "frequencyHz": 493.88
+      },
+      {
+        "string": 3,
+        "fret": 19,
+        "note": "C",
+        "scientificPitch": "C5",
+        "midi": 72,
+        "frequencyHz": 523.25
+      },
+      {
+        "string": 3,
+        "fret": 20,
+        "note": "C#",
+        "scientificPitch": "C#5",
+        "midi": 73,
+        "frequencyHz": 554.37
+      },
+      {
+        "string": 3,
+        "fret": 21,
+        "note": "D",
+        "scientificPitch": "D5",
+        "midi": 74,
+        "frequencyHz": 587.33
+      },
+      {
+        "string": 3,
+        "fret": 22,
+        "note": "D#",
+        "scientificPitch": "D#5",
+        "midi": 75,
+        "frequencyHz": 622.25
+      },
+      {
+        "string": 3,
+        "fret": 23,
+        "note": "E",
+        "scientificPitch": "E5",
+        "midi": 76,
+        "frequencyHz": 659.26
+      },
+      {
+        "string": 3,
+        "fret": 24,
+        "note": "F",
+        "scientificPitch": "F5",
+        "midi": 77,
+        "frequencyHz": 698.46
+      }
+    ],
+    "4": [
+      {
+        "string": 4,
+        "fret": 0,
+        "note": "D",
+        "scientificPitch": "D3",
+        "midi": 50,
+        "frequencyHz": 146.83
+      },
+      {
+        "string": 4,
+        "fret": 1,
+        "note": "D#",
+        "scientificPitch": "D#3",
+        "midi": 51,
+        "frequencyHz": 155.56
+      },
+      {
+        "string": 4,
+        "fret": 2,
+        "note": "E",
+        "scientificPitch": "E3",
+        "midi": 52,
+        "frequencyHz": 164.81
+      },
+      {
+        "string": 4,
+        "fret": 3,
+        "note": "F",
+        "scientificPitch": "F3",
+        "midi": 53,
+        "frequencyHz": 174.61
+      },
+      {
+        "string": 4,
+        "fret": 4,
+        "note": "F#",
+        "scientificPitch": "F#3",
+        "midi": 54,
+        "frequencyHz": 185.0
+      },
+      {
+        "string": 4,
+        "fret": 5,
+        "note": "G",
+        "scientificPitch": "G3",
+        "midi": 55,
+        "frequencyHz": 196.0
+      },
+      {
+        "string": 4,
+        "fret": 6,
+        "note": "G#",
+        "scientificPitch": "G#3",
+        "midi": 56,
+        "frequencyHz": 207.65
+      },
+      {
+        "string": 4,
+        "fret": 7,
+        "note": "A",
+        "scientificPitch": "A3",
+        "midi": 57,
+        "frequencyHz": 220.0
+      },
+      {
+        "string": 4,
+        "fret": 8,
+        "note": "A#",
+        "scientificPitch": "A#3",
+        "midi": 58,
+        "frequencyHz": 233.08
+      },
+      {
+        "string": 4,
+        "fret": 9,
+        "note": "B",
+        "scientificPitch": "B3",
+        "midi": 59,
+        "frequencyHz": 246.94
+      },
+      {
+        "string": 4,
+        "fret": 10,
+        "note": "C",
+        "scientificPitch": "C4",
+        "midi": 60,
+        "frequencyHz": 261.63
+      },
+      {
+        "string": 4,
+        "fret": 11,
+        "note": "C#",
+        "scientificPitch": "C#4",
+        "midi": 61,
+        "frequencyHz": 277.18
+      },
+      {
+        "string": 4,
+        "fret": 12,
+        "note": "D",
+        "scientificPitch": "D4",
+        "midi": 62,
+        "frequencyHz": 293.66
+      },
+      {
+        "string": 4,
+        "fret": 13,
+        "note": "D#",
+        "scientificPitch": "D#4",
+        "midi": 63,
+        "frequencyHz": 311.13
+      },
+      {
+        "string": 4,
+        "fret": 14,
+        "note": "E",
+        "scientificPitch": "E4",
+        "midi": 64,
+        "frequencyHz": 329.63
+      },
+      {
+        "string": 4,
+        "fret": 15,
+        "note": "F",
+        "scientificPitch": "F4",
+        "midi": 65,
+        "frequencyHz": 349.23
+      },
+      {
+        "string": 4,
+        "fret": 16,
+        "note": "F#",
+        "scientificPitch": "F#4",
+        "midi": 66,
+        "frequencyHz": 369.99
+      },
+      {
+        "string": 4,
+        "fret": 17,
+        "note": "G",
+        "scientificPitch": "G4",
+        "midi": 67,
+        "frequencyHz": 392.0
+      },
+      {
+        "string": 4,
+        "fret": 18,
+        "note": "G#",
+        "scientificPitch": "G#4",
+        "midi": 68,
+        "frequencyHz": 415.3
+      },
+      {
+        "string": 4,
+        "fret": 19,
+        "note": "A",
+        "scientificPitch": "A4",
+        "midi": 69,
+        "frequencyHz": 440.0
+      },
+      {
+        "string": 4,
+        "fret": 20,
+        "note": "A#",
+        "scientificPitch": "A#4",
+        "midi": 70,
+        "frequencyHz": 466.16
+      },
+      {
+        "string": 4,
+        "fret": 21,
+        "note": "B",
+        "scientificPitch": "B4",
+        "midi": 71,
+        "frequencyHz": 493.88
+      },
+      {
+        "string": 4,
+        "fret": 22,
+        "note": "C",
+        "scientificPitch": "C5",
+        "midi": 72,
+        "frequencyHz": 523.25
+      },
+      {
+        "string": 4,
+        "fret": 23,
+        "note": "C#",
+        "scientificPitch": "C#5",
+        "midi": 73,
+        "frequencyHz": 554.37
+      },
+      {
+        "string": 4,
+        "fret": 24,
+        "note": "D",
+        "scientificPitch": "D5",
+        "midi": 74,
+        "frequencyHz": 587.33
+      }
+    ],
+    "5": [
+      {
+        "string": 5,
+        "fret": 0,
+        "note": "A",
+        "scientificPitch": "A2",
+        "midi": 45,
+        "frequencyHz": 110.0
+      },
+      {
+        "string": 5,
+        "fret": 1,
+        "note": "A#",
+        "scientificPitch": "A#2",
+        "midi": 46,
+        "frequencyHz": 116.54
+      },
+      {
+        "string": 5,
+        "fret": 2,
+        "note": "B",
+        "scientificPitch": "B2",
+        "midi": 47,
+        "frequencyHz": 123.47
+      },
+      {
+        "string": 5,
+        "fret": 3,
+        "note": "C",
+        "scientificPitch": "C3",
+        "midi": 48,
+        "frequencyHz": 130.81
+      },
+      {
+        "string": 5,
+        "fret": 4,
+        "note": "C#",
+        "scientificPitch": "C#3",
+        "midi": 49,
+        "frequencyHz": 138.59
+      },
+      {
+        "string": 5,
+        "fret": 5,
+        "note": "D",
+        "scientificPitch": "D3",
+        "midi": 50,
+        "frequencyHz": 146.83
+      },
+      {
+        "string": 5,
+        "fret": 6,
+        "note": "D#",
+        "scientificPitch": "D#3",
+        "midi": 51,
+        "frequencyHz": 155.56
+      },
+      {
+        "string": 5,
+        "fret": 7,
+        "note": "E",
+        "scientificPitch": "E3",
+        "midi": 52,
+        "frequencyHz": 164.81
+      },
+      {
+        "string": 5,
+        "fret": 8,
+        "note": "F",
+        "scientificPitch": "F3",
+        "midi": 53,
+        "frequencyHz": 174.61
+      },
+      {
+        "string": 5,
+        "fret": 9,
+        "note": "F#",
+        "scientificPitch": "F#3",
+        "midi": 54,
+        "frequencyHz": 185.0
+      },
+      {
+        "string": 5,
+        "fret": 10,
+        "note": "G",
+        "scientificPitch": "G3",
+        "midi": 55,
+        "frequencyHz": 196.0
+      },
+      {
+        "string": 5,
+        "fret": 11,
+        "note": "G#",
+        "scientificPitch": "G#3",
+        "midi": 56,
+        "frequencyHz": 207.65
+      },
+      {
+        "string": 5,
+        "fret": 12,
+        "note": "A",
+        "scientificPitch": "A3",
+        "midi": 57,
+        "frequencyHz": 220.0
+      },
+      {
+        "string": 5,
+        "fret": 13,
+        "note": "A#",
+        "scientificPitch": "A#3",
+        "midi": 58,
+        "frequencyHz": 233.08
+      },
+      {
+        "string": 5,
+        "fret": 14,
+        "note": "B",
+        "scientificPitch": "B3",
+        "midi": 59,
+        "frequencyHz": 246.94
+      },
+      {
+        "string": 5,
+        "fret": 15,
+        "note": "C",
+        "scientificPitch": "C4",
+        "midi": 60,
+        "frequencyHz": 261.63
+      },
+      {
+        "string": 5,
+        "fret": 16,
+        "note": "C#",
+        "scientificPitch": "C#4",
+        "midi": 61,
+        "frequencyHz": 277.18
+      },
+      {
+        "string": 5,
+        "fret": 17,
+        "note": "D",
+        "scientificPitch": "D4",
+        "midi": 62,
+        "frequencyHz": 293.66
+      },
+      {
+        "string": 5,
+        "fret": 18,
+        "note": "D#",
+        "scientificPitch": "D#4",
+        "midi": 63,
+        "frequencyHz": 311.13
+      },
+      {
+        "string": 5,
+        "fret": 19,
+        "note": "E",
+        "scientificPitch": "E4",
+        "midi": 64,
+        "frequencyHz": 329.63
+      },
+      {
+        "string": 5,
+        "fret": 20,
+        "note": "F",
+        "scientificPitch": "F4",
+        "midi": 65,
+        "frequencyHz": 349.23
+      },
+      {
+        "string": 5,
+        "fret": 21,
+        "note": "F#",
+        "scientificPitch": "F#4",
+        "midi": 66,
+        "frequencyHz": 369.99
+      },
+      {
+        "string": 5,
+        "fret": 22,
+        "note": "G",
+        "scientificPitch": "G4",
+        "midi": 67,
+        "frequencyHz": 392.0
+      },
+      {
+        "string": 5,
+        "fret": 23,
+        "note": "G#",
+        "scientificPitch": "G#4",
+        "midi": 68,
+        "frequencyHz": 415.3
+      },
+      {
+        "string": 5,
+        "fret": 24,
+        "note": "A",
+        "scientificPitch": "A4",
+        "midi": 69,
+        "frequencyHz": 440.0
+      }
+    ],
+    "6": [
+      {
+        "string": 6,
+        "fret": 0,
+        "note": "E",
+        "scientificPitch": "E2",
+        "midi": 40,
+        "frequencyHz": 82.41
+      },
+      {
+        "string": 6,
+        "fret": 1,
+        "note": "F",
+        "scientificPitch": "F2",
+        "midi": 41,
+        "frequencyHz": 87.31
+      },
+      {
+        "string": 6,
+        "fret": 2,
+        "note": "F#",
+        "scientificPitch": "F#2",
+        "midi": 42,
+        "frequencyHz": 92.5
+      },
+      {
+        "string": 6,
+        "fret": 3,
+        "note": "G",
+        "scientificPitch": "G2",
+        "midi": 43,
+        "frequencyHz": 98.0
+      },
+      {
+        "string": 6,
+        "fret": 4,
+        "note": "G#",
+        "scientificPitch": "G#2",
+        "midi": 44,
+        "frequencyHz": 103.83
+      },
+      {
+        "string": 6,
+        "fret": 5,
+        "note": "A",
+        "scientificPitch": "A2",
+        "midi": 45,
+        "frequencyHz": 110.0
+      },
+      {
+        "string": 6,
+        "fret": 6,
+        "note": "A#",
+        "scientificPitch": "A#2",
+        "midi": 46,
+        "frequencyHz": 116.54
+      },
+      {
+        "string": 6,
+        "fret": 7,
+        "note": "B",
+        "scientificPitch": "B2",
+        "midi": 47,
+        "frequencyHz": 123.47
+      },
+      {
+        "string": 6,
+        "fret": 8,
+        "note": "C",
+        "scientificPitch": "C3",
+        "midi": 48,
+        "frequencyHz": 130.81
+      },
+      {
+        "string": 6,
+        "fret": 9,
+        "note": "C#",
+        "scientificPitch": "C#3",
+        "midi": 49,
+        "frequencyHz": 138.59
+      },
+      {
+        "string": 6,
+        "fret": 10,
+        "note": "D",
+        "scientificPitch": "D3",
+        "midi": 50,
+        "frequencyHz": 146.83
+      },
+      {
+        "string": 6,
+        "fret": 11,
+        "note": "D#",
+        "scientificPitch": "D#3",
+        "midi": 51,
+        "frequencyHz": 155.56
+      },
+      {
+        "string": 6,
+        "fret": 12,
+        "note": "E",
+        "scientificPitch": "E3",
+        "midi": 52,
+        "frequencyHz": 164.81
+      },
+      {
+        "string": 6,
+        "fret": 13,
+        "note": "F",
+        "scientificPitch": "F3",
+        "midi": 53,
+        "frequencyHz": 174.61
+      },
+      {
+        "string": 6,
+        "fret": 14,
+        "note": "F#",
+        "scientificPitch": "F#3",
+        "midi": 54,
+        "frequencyHz": 185.0
+      },
+      {
+        "string": 6,
+        "fret": 15,
+        "note": "G",
+        "scientificPitch": "G3",
+        "midi": 55,
+        "frequencyHz": 196.0
+      },
+      {
+        "string": 6,
+        "fret": 16,
+        "note": "G#",
+        "scientificPitch": "G#3",
+        "midi": 56,
+        "frequencyHz": 207.65
+      },
+      {
+        "string": 6,
+        "fret": 17,
+        "note": "A",
+        "scientificPitch": "A3",
+        "midi": 57,
+        "frequencyHz": 220.0
+      },
+      {
+        "string": 6,
+        "fret": 18,
+        "note": "A#",
+        "scientificPitch": "A#3",
+        "midi": 58,
+        "frequencyHz": 233.08
+      },
+      {
+        "string": 6,
+        "fret": 19,
+        "note": "B",
+        "scientificPitch": "B3",
+        "midi": 59,
+        "frequencyHz": 246.94
+      },
+      {
+        "string": 6,
+        "fret": 20,
+        "note": "C",
+        "scientificPitch": "C4",
+        "midi": 60,
+        "frequencyHz": 261.63
+      },
+      {
+        "string": 6,
+        "fret": 21,
+        "note": "C#",
+        "scientificPitch": "C#4",
+        "midi": 61,
+        "frequencyHz": 277.18
+      },
+      {
+        "string": 6,
+        "fret": 22,
+        "note": "D",
+        "scientificPitch": "D4",
+        "midi": 62,
+        "frequencyHz": 293.66
+      },
+      {
+        "string": 6,
+        "fret": 23,
+        "note": "D#",
+        "scientificPitch": "D#4",
+        "midi": 63,
+        "frequencyHz": 311.13
+      },
+      {
+        "string": 6,
+        "fret": 24,
+        "note": "E",
+        "scientificPitch": "E4",
+        "midi": 64,
+        "frequencyHz": 329.63
+      }
+    ]
+  },
+  "coordinateIndex": {
+    "1,0": {
+      "string": 1,
+      "fret": 0,
+      "note": "E",
+      "scientificPitch": "E4",
+      "midi": 64,
+      "frequencyHz": 329.63
+    },
+    "1,1": {
+      "string": 1,
+      "fret": 1,
+      "note": "F",
+      "scientificPitch": "F4",
+      "midi": 65,
+      "frequencyHz": 349.23
+    },
+    "1,2": {
+      "string": 1,
+      "fret": 2,
+      "note": "F#",
+      "scientificPitch": "F#4",
+      "midi": 66,
+      "frequencyHz": 369.99
+    },
+    "1,3": {
+      "string": 1,
+      "fret": 3,
+      "note": "G",
+      "scientificPitch": "G4",
+      "midi": 67,
+      "frequencyHz": 392.0
+    },
+    "1,4": {
+      "string": 1,
+      "fret": 4,
+      "note": "G#",
+      "scientificPitch": "G#4",
+      "midi": 68,
+      "frequencyHz": 415.3
+    },
+    "1,5": {
+      "string": 1,
+      "fret": 5,
+      "note": "A",
+      "scientificPitch": "A4",
+      "midi": 69,
+      "frequencyHz": 440.0
+    },
+    "1,6": {
+      "string": 1,
+      "fret": 6,
+      "note": "A#",
+      "scientificPitch": "A#4",
+      "midi": 70,
+      "frequencyHz": 466.16
+    },
+    "1,7": {
+      "string": 1,
+      "fret": 7,
+      "note": "B",
+      "scientificPitch": "B4",
+      "midi": 71,
+      "frequencyHz": 493.88
+    },
+    "1,8": {
+      "string": 1,
+      "fret": 8,
+      "note": "C",
+      "scientificPitch": "C5",
+      "midi": 72,
+      "frequencyHz": 523.25
+    },
+    "1,9": {
+      "string": 1,
+      "fret": 9,
+      "note": "C#",
+      "scientificPitch": "C#5",
+      "midi": 73,
+      "frequencyHz": 554.37
+    },
+    "1,10": {
+      "string": 1,
+      "fret": 10,
+      "note": "D",
+      "scientificPitch": "D5",
+      "midi": 74,
+      "frequencyHz": 587.33
+    },
+    "1,11": {
+      "string": 1,
+      "fret": 11,
+      "note": "D#",
+      "scientificPitch": "D#5",
+      "midi": 75,
+      "frequencyHz": 622.25
+    },
+    "1,12": {
+      "string": 1,
+      "fret": 12,
+      "note": "E",
+      "scientificPitch": "E5",
+      "midi": 76,
+      "frequencyHz": 659.26
+    },
+    "1,13": {
+      "string": 1,
+      "fret": 13,
+      "note": "F",
+      "scientificPitch": "F5",
+      "midi": 77,
+      "frequencyHz": 698.46
+    },
+    "1,14": {
+      "string": 1,
+      "fret": 14,
+      "note": "F#",
+      "scientificPitch": "F#5",
+      "midi": 78,
+      "frequencyHz": 739.99
+    },
+    "1,15": {
+      "string": 1,
+      "fret": 15,
+      "note": "G",
+      "scientificPitch": "G5",
+      "midi": 79,
+      "frequencyHz": 783.99
+    },
+    "1,16": {
+      "string": 1,
+      "fret": 16,
+      "note": "G#",
+      "scientificPitch": "G#5",
+      "midi": 80,
+      "frequencyHz": 830.61
+    },
+    "1,17": {
+      "string": 1,
+      "fret": 17,
+      "note": "A",
+      "scientificPitch": "A5",
+      "midi": 81,
+      "frequencyHz": 880.0
+    },
+    "1,18": {
+      "string": 1,
+      "fret": 18,
+      "note": "A#",
+      "scientificPitch": "A#5",
+      "midi": 82,
+      "frequencyHz": 932.33
+    },
+    "1,19": {
+      "string": 1,
+      "fret": 19,
+      "note": "B",
+      "scientificPitch": "B5",
+      "midi": 83,
+      "frequencyHz": 987.77
+    },
+    "1,20": {
+      "string": 1,
+      "fret": 20,
+      "note": "C",
+      "scientificPitch": "C6",
+      "midi": 84,
+      "frequencyHz": 1046.5
+    },
+    "1,21": {
+      "string": 1,
+      "fret": 21,
+      "note": "C#",
+      "scientificPitch": "C#6",
+      "midi": 85,
+      "frequencyHz": 1108.73
+    },
+    "1,22": {
+      "string": 1,
+      "fret": 22,
+      "note": "D",
+      "scientificPitch": "D6",
+      "midi": 86,
+      "frequencyHz": 1174.66
+    },
+    "1,23": {
+      "string": 1,
+      "fret": 23,
+      "note": "D#",
+      "scientificPitch": "D#6",
+      "midi": 87,
+      "frequencyHz": 1244.51
+    },
+    "1,24": {
+      "string": 1,
+      "fret": 24,
+      "note": "E",
+      "scientificPitch": "E6",
+      "midi": 88,
+      "frequencyHz": 1318.51
+    },
+    "2,0": {
+      "string": 2,
+      "fret": 0,
+      "note": "B",
+      "scientificPitch": "B3",
+      "midi": 59,
+      "frequencyHz": 246.94
+    },
+    "2,1": {
+      "string": 2,
+      "fret": 1,
+      "note": "C",
+      "scientificPitch": "C4",
+      "midi": 60,
+      "frequencyHz": 261.63
+    },
+    "2,2": {
+      "string": 2,
+      "fret": 2,
+      "note": "C#",
+      "scientificPitch": "C#4",
+      "midi": 61,
+      "frequencyHz": 277.18
+    },
+    "2,3": {
+      "string": 2,
+      "fret": 3,
+      "note": "D",
+      "scientificPitch": "D4",
+      "midi": 62,
+      "frequencyHz": 293.66
+    },
+    "2,4": {
+      "string": 2,
+      "fret": 4,
+      "note": "D#",
+      "scientificPitch": "D#4",
+      "midi": 63,
+      "frequencyHz": 311.13
+    },
+    "2,5": {
+      "string": 2,
+      "fret": 5,
+      "note": "E",
+      "scientificPitch": "E4",
+      "midi": 64,
+      "frequencyHz": 329.63
+    },
+    "2,6": {
+      "string": 2,
+      "fret": 6,
+      "note": "F",
+      "scientificPitch": "F4",
+      "midi": 65,
+      "frequencyHz": 349.23
+    },
+    "2,7": {
+      "string": 2,
+      "fret": 7,
+      "note": "F#",
+      "scientificPitch": "F#4",
+      "midi": 66,
+      "frequencyHz": 369.99
+    },
+    "2,8": {
+      "string": 2,
+      "fret": 8,
+      "note": "G",
+      "scientificPitch": "G4",
+      "midi": 67,
+      "frequencyHz": 392.0
+    },
+    "2,9": {
+      "string": 2,
+      "fret": 9,
+      "note": "G#",
+      "scientificPitch": "G#4",
+      "midi": 68,
+      "frequencyHz": 415.3
+    },
+    "2,10": {
+      "string": 2,
+      "fret": 10,
+      "note": "A",
+      "scientificPitch": "A4",
+      "midi": 69,
+      "frequencyHz": 440.0
+    },
+    "2,11": {
+      "string": 2,
+      "fret": 11,
+      "note": "A#",
+      "scientificPitch": "A#4",
+      "midi": 70,
+      "frequencyHz": 466.16
+    },
+    "2,12": {
+      "string": 2,
+      "fret": 12,
+      "note": "B",
+      "scientificPitch": "B4",
+      "midi": 71,
+      "frequencyHz": 493.88
+    },
+    "2,13": {
+      "string": 2,
+      "fret": 13,
+      "note": "C",
+      "scientificPitch": "C5",
+      "midi": 72,
+      "frequencyHz": 523.25
+    },
+    "2,14": {
+      "string": 2,
+      "fret": 14,
+      "note": "C#",
+      "scientificPitch": "C#5",
+      "midi": 73,
+      "frequencyHz": 554.37
+    },
+    "2,15": {
+      "string": 2,
+      "fret": 15,
+      "note": "D",
+      "scientificPitch": "D5",
+      "midi": 74,
+      "frequencyHz": 587.33
+    },
+    "2,16": {
+      "string": 2,
+      "fret": 16,
+      "note": "D#",
+      "scientificPitch": "D#5",
+      "midi": 75,
+      "frequencyHz": 622.25
+    },
+    "2,17": {
+      "string": 2,
+      "fret": 17,
+      "note": "E",
+      "scientificPitch": "E5",
+      "midi": 76,
+      "frequencyHz": 659.26
+    },
+    "2,18": {
+      "string": 2,
+      "fret": 18,
+      "note": "F",
+      "scientificPitch": "F5",
+      "midi": 77,
+      "frequencyHz": 698.46
+    },
+    "2,19": {
+      "string": 2,
+      "fret": 19,
+      "note": "F#",
+      "scientificPitch": "F#5",
+      "midi": 78,
+      "frequencyHz": 739.99
+    },
+    "2,20": {
+      "string": 2,
+      "fret": 20,
+      "note": "G",
+      "scientificPitch": "G5",
+      "midi": 79,
+      "frequencyHz": 783.99
+    },
+    "2,21": {
+      "string": 2,
+      "fret": 21,
+      "note": "G#",
+      "scientificPitch": "G#5",
+      "midi": 80,
+      "frequencyHz": 830.61
+    },
+    "2,22": {
+      "string": 2,
+      "fret": 22,
+      "note": "A",
+      "scientificPitch": "A5",
+      "midi": 81,
+      "frequencyHz": 880.0
+    },
+    "2,23": {
+      "string": 2,
+      "fret": 23,
+      "note": "A#",
+      "scientificPitch": "A#5",
+      "midi": 82,
+      "frequencyHz": 932.33
+    },
+    "2,24": {
+      "string": 2,
+      "fret": 24,
+      "note": "B",
+      "scientificPitch": "B5",
+      "midi": 83,
+      "frequencyHz": 987.77
+    },
+    "3,0": {
+      "string": 3,
+      "fret": 0,
+      "note": "F",
+      "scientificPitch": "F3",
+      "midi": 53,
+      "frequencyHz": 174.61
+    },
+    "3,1": {
+      "string": 3,
+      "fret": 1,
+      "note": "F#",
+      "scientificPitch": "F#3",
+      "midi": 54,
+      "frequencyHz": 185.0
+    },
+    "3,2": {
+      "string": 3,
+      "fret": 2,
+      "note": "G",
+      "scientificPitch": "G3",
+      "midi": 55,
+      "frequencyHz": 196.0
+    },
+    "3,3": {
+      "string": 3,
+      "fret": 3,
+      "note": "G#",
+      "scientificPitch": "G#3",
+      "midi": 56,
+      "frequencyHz": 207.65
+    },
+    "3,4": {
+      "string": 3,
+      "fret": 4,
+      "note": "A",
+      "scientificPitch": "A3",
+      "midi": 57,
+      "frequencyHz": 220.0
+    },
+    "3,5": {
+      "string": 3,
+      "fret": 5,
+      "note": "A#",
+      "scientificPitch": "A#3",
+      "midi": 58,
+      "frequencyHz": 233.08
+    },
+    "3,6": {
+      "string": 3,
+      "fret": 6,
+      "note": "B",
+      "scientificPitch": "B3",
+      "midi": 59,
+      "frequencyHz": 246.94
+    },
+    "3,7": {
+      "string": 3,
+      "fret": 7,
+      "note": "C",
+      "scientificPitch": "C4",
+      "midi": 60,
+      "frequencyHz": 261.63
+    },
+    "3,8": {
+      "string": 3,
+      "fret": 8,
+      "note": "C#",
+      "scientificPitch": "C#4",
+      "midi": 61,
+      "frequencyHz": 277.18
+    },
+    "3,9": {
+      "string": 3,
+      "fret": 9,
+      "note": "D",
+      "scientificPitch": "D4",
+      "midi": 62,
+      "frequencyHz": 293.66
+    },
+    "3,10": {
+      "string": 3,
+      "fret": 10,
+      "note": "D#",
+      "scientificPitch": "D#4",
+      "midi": 63,
+      "frequencyHz": 311.13
+    },
+    "3,11": {
+      "string": 3,
+      "fret": 11,
+      "note": "E",
+      "scientificPitch": "E4",
+      "midi": 64,
+      "frequencyHz": 329.63
+    },
+    "3,12": {
+      "string": 3,
+      "fret": 12,
+      "note": "F",
+      "scientificPitch": "F4",
+      "midi": 65,
+      "frequencyHz": 349.23
+    },
+    "3,13": {
+      "string": 3,
+      "fret": 13,
+      "note": "F#",
+      "scientificPitch": "F#4",
+      "midi": 66,
+      "frequencyHz": 369.99
+    },
+    "3,14": {
+      "string": 3,
+      "fret": 14,
+      "note": "G",
+      "scientificPitch": "G4",
+      "midi": 67,
+      "frequencyHz": 392.0
+    },
+    "3,15": {
+      "string": 3,
+      "fret": 15,
+      "note": "G#",
+      "scientificPitch": "G#4",
+      "midi": 68,
+      "frequencyHz": 415.3
+    },
+    "3,16": {
+      "string": 3,
+      "fret": 16,
+      "note": "A",
+      "scientificPitch": "A4",
+      "midi": 69,
+      "frequencyHz": 440.0
+    },
+    "3,17": {
+      "string": 3,
+      "fret": 17,
+      "note": "A#",
+      "scientificPitch": "A#4",
+      "midi": 70,
+      "frequencyHz": 466.16
+    },
+    "3,18": {
+      "string": 3,
+      "fret": 18,
+      "note": "B",
+      "scientificPitch": "B4",
+      "midi": 71,
+      "frequencyHz": 493.88
+    },
+    "3,19": {
+      "string": 3,
+      "fret": 19,
+      "note": "C",
+      "scientificPitch": "C5",
+      "midi": 72,
+      "frequencyHz": 523.25
+    },
+    "3,20": {
+      "string": 3,
+      "fret": 20,
+      "note": "C#",
+      "scientificPitch": "C#5",
+      "midi": 73,
+      "frequencyHz": 554.37
+    },
+    "3,21": {
+      "string": 3,
+      "fret": 21,
+      "note": "D",
+      "scientificPitch": "D5",
+      "midi": 74,
+      "frequencyHz": 587.33
+    },
+    "3,22": {
+      "string": 3,
+      "fret": 22,
+      "note": "D#",
+      "scientificPitch": "D#5",
+      "midi": 75,
+      "frequencyHz": 622.25
+    },
+    "3,23": {
+      "string": 3,
+      "fret": 23,
+      "note": "E",
+      "scientificPitch": "E5",
+      "midi": 76,
+      "frequencyHz": 659.26
+    },
+    "3,24": {
+      "string": 3,
+      "fret": 24,
+      "note": "F",
+      "scientificPitch": "F5",
+      "midi": 77,
+      "frequencyHz": 698.46
+    },
+    "4,0": {
+      "string": 4,
+      "fret": 0,
+      "note": "D",
+      "scientificPitch": "D3",
+      "midi": 50,
+      "frequencyHz": 146.83
+    },
+    "4,1": {
+      "string": 4,
+      "fret": 1,
+      "note": "D#",
+      "scientificPitch": "D#3",
+      "midi": 51,
+      "frequencyHz": 155.56
+    },
+    "4,2": {
+      "string": 4,
+      "fret": 2,
+      "note": "E",
+      "scientificPitch": "E3",
+      "midi": 52,
+      "frequencyHz": 164.81
+    },
+    "4,3": {
+      "string": 4,
+      "fret": 3,
+      "note": "F",
+      "scientificPitch": "F3",
+      "midi": 53,
+      "frequencyHz": 174.61
+    },
+    "4,4": {
+      "string": 4,
+      "fret": 4,
+      "note": "F#",
+      "scientificPitch": "F#3",
+      "midi": 54,
+      "frequencyHz": 185.0
+    },
+    "4,5": {
+      "string": 4,
+      "fret": 5,
+      "note": "G",
+      "scientificPitch": "G3",
+      "midi": 55,
+      "frequencyHz": 196.0
+    },
+    "4,6": {
+      "string": 4,
+      "fret": 6,
+      "note": "G#",
+      "scientificPitch": "G#3",
+      "midi": 56,
+      "frequencyHz": 207.65
+    },
+    "4,7": {
+      "string": 4,
+      "fret": 7,
+      "note": "A",
+      "scientificPitch": "A3",
+      "midi": 57,
+      "frequencyHz": 220.0
+    },
+    "4,8": {
+      "string": 4,
+      "fret": 8,
+      "note": "A#",
+      "scientificPitch": "A#3",
+      "midi": 58,
+      "frequencyHz": 233.08
+    },
+    "4,9": {
+      "string": 4,
+      "fret": 9,
+      "note": "B",
+      "scientificPitch": "B3",
+      "midi": 59,
+      "frequencyHz": 246.94
+    },
+    "4,10": {
+      "string": 4,
+      "fret": 10,
+      "note": "C",
+      "scientificPitch": "C4",
+      "midi": 60,
+      "frequencyHz": 261.63
+    },
+    "4,11": {
+      "string": 4,
+      "fret": 11,
+      "note": "C#",
+      "scientificPitch": "C#4",
+      "midi": 61,
+      "frequencyHz": 277.18
+    },
+    "4,12": {
+      "string": 4,
+      "fret": 12,
+      "note": "D",
+      "scientificPitch": "D4",
+      "midi": 62,
+      "frequencyHz": 293.66
+    },
+    "4,13": {
+      "string": 4,
+      "fret": 13,
+      "note": "D#",
+      "scientificPitch": "D#4",
+      "midi": 63,
+      "frequencyHz": 311.13
+    },
+    "4,14": {
+      "string": 4,
+      "fret": 14,
+      "note": "E",
+      "scientificPitch": "E4",
+      "midi": 64,
+      "frequencyHz": 329.63
+    },
+    "4,15": {
+      "string": 4,
+      "fret": 15,
+      "note": "F",
+      "scientificPitch": "F4",
+      "midi": 65,
+      "frequencyHz": 349.23
+    },
+    "4,16": {
+      "string": 4,
+      "fret": 16,
+      "note": "F#",
+      "scientificPitch": "F#4",
+      "midi": 66,
+      "frequencyHz": 369.99
+    },
+    "4,17": {
+      "string": 4,
+      "fret": 17,
+      "note": "G",
+      "scientificPitch": "G4",
+      "midi": 67,
+      "frequencyHz": 392.0
+    },
+    "4,18": {
+      "string": 4,
+      "fret": 18,
+      "note": "G#",
+      "scientificPitch": "G#4",
+      "midi": 68,
+      "frequencyHz": 415.3
+    },
+    "4,19": {
+      "string": 4,
+      "fret": 19,
+      "note": "A",
+      "scientificPitch": "A4",
+      "midi": 69,
+      "frequencyHz": 440.0
+    },
+    "4,20": {
+      "string": 4,
+      "fret": 20,
+      "note": "A#",
+      "scientificPitch": "A#4",
+      "midi": 70,
+      "frequencyHz": 466.16
+    },
+    "4,21": {
+      "string": 4,
+      "fret": 21,
+      "note": "B",
+      "scientificPitch": "B4",
+      "midi": 71,
+      "frequencyHz": 493.88
+    },
+    "4,22": {
+      "string": 4,
+      "fret": 22,
+      "note": "C",
+      "scientificPitch": "C5",
+      "midi": 72,
+      "frequencyHz": 523.25
+    },
+    "4,23": {
+      "string": 4,
+      "fret": 23,
+      "note": "C#",
+      "scientificPitch": "C#5",
+      "midi": 73,
+      "frequencyHz": 554.37
+    },
+    "4,24": {
+      "string": 4,
+      "fret": 24,
+      "note": "D",
+      "scientificPitch": "D5",
+      "midi": 74,
+      "frequencyHz": 587.33
+    },
+    "5,0": {
+      "string": 5,
+      "fret": 0,
+      "note": "A",
+      "scientificPitch": "A2",
+      "midi": 45,
+      "frequencyHz": 110.0
+    },
+    "5,1": {
+      "string": 5,
+      "fret": 1,
+      "note": "A#",
+      "scientificPitch": "A#2",
+      "midi": 46,
+      "frequencyHz": 116.54
+    },
+    "5,2": {
+      "string": 5,
+      "fret": 2,
+      "note": "B",
+      "scientificPitch": "B2",
+      "midi": 47,
+      "frequencyHz": 123.47
+    },
+    "5,3": {
+      "string": 5,
+      "fret": 3,
+      "note": "C",
+      "scientificPitch": "C3",
+      "midi": 48,
+      "frequencyHz": 130.81
+    },
+    "5,4": {
+      "string": 5,
+      "fret": 4,
+      "note": "C#",
+      "scientificPitch": "C#3",
+      "midi": 49,
+      "frequencyHz": 138.59
+    },
+    "5,5": {
+      "string": 5,
+      "fret": 5,
+      "note": "D",
+      "scientificPitch": "D3",
+      "midi": 50,
+      "frequencyHz": 146.83
+    },
+    "5,6": {
+      "string": 5,
+      "fret": 6,
+      "note": "D#",
+      "scientificPitch": "D#3",
+      "midi": 51,
+      "frequencyHz": 155.56
+    },
+    "5,7": {
+      "string": 5,
+      "fret": 7,
+      "note": "E",
+      "scientificPitch": "E3",
+      "midi": 52,
+      "frequencyHz": 164.81
+    },
+    "5,8": {
+      "string": 5,
+      "fret": 8,
+      "note": "F",
+      "scientificPitch": "F3",
+      "midi": 53,
+      "frequencyHz": 174.61
+    },
+    "5,9": {
+      "string": 5,
+      "fret": 9,
+      "note": "F#",
+      "scientificPitch": "F#3",
+      "midi": 54,
+      "frequencyHz": 185.0
+    },
+    "5,10": {
+      "string": 5,
+      "fret": 10,
+      "note": "G",
+      "scientificPitch": "G3",
+      "midi": 55,
+      "frequencyHz": 196.0
+    },
+    "5,11": {
+      "string": 5,
+      "fret": 11,
+      "note": "G#",
+      "scientificPitch": "G#3",
+      "midi": 56,
+      "frequencyHz": 207.65
+    },
+    "5,12": {
+      "string": 5,
+      "fret": 12,
+      "note": "A",
+      "scientificPitch": "A3",
+      "midi": 57,
+      "frequencyHz": 220.0
+    },
+    "5,13": {
+      "string": 5,
+      "fret": 13,
+      "note": "A#",
+      "scientificPitch": "A#3",
+      "midi": 58,
+      "frequencyHz": 233.08
+    },
+    "5,14": {
+      "string": 5,
+      "fret": 14,
+      "note": "B",
+      "scientificPitch": "B3",
+      "midi": 59,
+      "frequencyHz": 246.94
+    },
+    "5,15": {
+      "string": 5,
+      "fret": 15,
+      "note": "C",
+      "scientificPitch": "C4",
+      "midi": 60,
+      "frequencyHz": 261.63
+    },
+    "5,16": {
+      "string": 5,
+      "fret": 16,
+      "note": "C#",
+      "scientificPitch": "C#4",
+      "midi": 61,
+      "frequencyHz": 277.18
+    },
+    "5,17": {
+      "string": 5,
+      "fret": 17,
+      "note": "D",
+      "scientificPitch": "D4",
+      "midi": 62,
+      "frequencyHz": 293.66
+    },
+    "5,18": {
+      "string": 5,
+      "fret": 18,
+      "note": "D#",
+      "scientificPitch": "D#4",
+      "midi": 63,
+      "frequencyHz": 311.13
+    },
+    "5,19": {
+      "string": 5,
+      "fret": 19,
+      "note": "E",
+      "scientificPitch": "E4",
+      "midi": 64,
+      "frequencyHz": 329.63
+    },
+    "5,20": {
+      "string": 5,
+      "fret": 20,
+      "note": "F",
+      "scientificPitch": "F4",
+      "midi": 65,
+      "frequencyHz": 349.23
+    },
+    "5,21": {
+      "string": 5,
+      "fret": 21,
+      "note": "F#",
+      "scientificPitch": "F#4",
+      "midi": 66,
+      "frequencyHz": 369.99
+    },
+    "5,22": {
+      "string": 5,
+      "fret": 22,
+      "note": "G",
+      "scientificPitch": "G4",
+      "midi": 67,
+      "frequencyHz": 392.0
+    },
+    "5,23": {
+      "string": 5,
+      "fret": 23,
+      "note": "G#",
+      "scientificPitch": "G#4",
+      "midi": 68,
+      "frequencyHz": 415.3
+    },
+    "5,24": {
+      "string": 5,
+      "fret": 24,
+      "note": "A",
+      "scientificPitch": "A4",
+      "midi": 69,
+      "frequencyHz": 440.0
+    },
+    "6,0": {
+      "string": 6,
+      "fret": 0,
+      "note": "E",
+      "scientificPitch": "E2",
+      "midi": 40,
+      "frequencyHz": 82.41
+    },
+    "6,1": {
+      "string": 6,
+      "fret": 1,
+      "note": "F",
+      "scientificPitch": "F2",
+      "midi": 41,
+      "frequencyHz": 87.31
+    },
+    "6,2": {
+      "string": 6,
+      "fret": 2,
+      "note": "F#",
+      "scientificPitch": "F#2",
+      "midi": 42,
+      "frequencyHz": 92.5
+    },
+    "6,3": {
+      "string": 6,
+      "fret": 3,
+      "note": "G",
+      "scientificPitch": "G2",
+      "midi": 43,
+      "frequencyHz": 98.0
+    },
+    "6,4": {
+      "string": 6,
+      "fret": 4,
+      "note": "G#",
+      "scientificPitch": "G#2",
+      "midi": 44,
+      "frequencyHz": 103.83
+    },
+    "6,5": {
+      "string": 6,
+      "fret": 5,
+      "note": "A",
+      "scientificPitch": "A2",
+      "midi": 45,
+      "frequencyHz": 110.0
+    },
+    "6,6": {
+      "string": 6,
+      "fret": 6,
+      "note": "A#",
+      "scientificPitch": "A#2",
+      "midi": 46,
+      "frequencyHz": 116.54
+    },
+    "6,7": {
+      "string": 6,
+      "fret": 7,
+      "note": "B",
+      "scientificPitch": "B2",
+      "midi": 47,
+      "frequencyHz": 123.47
+    },
+    "6,8": {
+      "string": 6,
+      "fret": 8,
+      "note": "C",
+      "scientificPitch": "C3",
+      "midi": 48,
+      "frequencyHz": 130.81
+    },
+    "6,9": {
+      "string": 6,
+      "fret": 9,
+      "note": "C#",
+      "scientificPitch": "C#3",
+      "midi": 49,
+      "frequencyHz": 138.59
+    },
+    "6,10": {
+      "string": 6,
+      "fret": 10,
+      "note": "D",
+      "scientificPitch": "D3",
+      "midi": 50,
+      "frequencyHz": 146.83
+    },
+    "6,11": {
+      "string": 6,
+      "fret": 11,
+      "note": "D#",
+      "scientificPitch": "D#3",
+      "midi": 51,
+      "frequencyHz": 155.56
+    },
+    "6,12": {
+      "string": 6,
+      "fret": 12,
+      "note": "E",
+      "scientificPitch": "E3",
+      "midi": 52,
+      "frequencyHz": 164.81
+    },
+    "6,13": {
+      "string": 6,
+      "fret": 13,
+      "note": "F",
+      "scientificPitch": "F3",
+      "midi": 53,
+      "frequencyHz": 174.61
+    },
+    "6,14": {
+      "string": 6,
+      "fret": 14,
+      "note": "F#",
+      "scientificPitch": "F#3",
+      "midi": 54,
+      "frequencyHz": 185.0
+    },
+    "6,15": {
+      "string": 6,
+      "fret": 15,
+      "note": "G",
+      "scientificPitch": "G3",
+      "midi": 55,
+      "frequencyHz": 196.0
+    },
+    "6,16": {
+      "string": 6,
+      "fret": 16,
+      "note": "G#",
+      "scientificPitch": "G#3",
+      "midi": 56,
+      "frequencyHz": 207.65
+    },
+    "6,17": {
+      "string": 6,
+      "fret": 17,
+      "note": "A",
+      "scientificPitch": "A3",
+      "midi": 57,
+      "frequencyHz": 220.0
+    },
+    "6,18": {
+      "string": 6,
+      "fret": 18,
+      "note": "A#",
+      "scientificPitch": "A#3",
+      "midi": 58,
+      "frequencyHz": 233.08
+    },
+    "6,19": {
+      "string": 6,
+      "fret": 19,
+      "note": "B",
+      "scientificPitch": "B3",
+      "midi": 59,
+      "frequencyHz": 246.94
+    },
+    "6,20": {
+      "string": 6,
+      "fret": 20,
+      "note": "C",
+      "scientificPitch": "C4",
+      "midi": 60,
+      "frequencyHz": 261.63
+    },
+    "6,21": {
+      "string": 6,
+      "fret": 21,
+      "note": "C#",
+      "scientificPitch": "C#4",
+      "midi": 61,
+      "frequencyHz": 277.18
+    },
+    "6,22": {
+      "string": 6,
+      "fret": 22,
+      "note": "D",
+      "scientificPitch": "D4",
+      "midi": 62,
+      "frequencyHz": 293.66
+    },
+    "6,23": {
+      "string": 6,
+      "fret": 23,
+      "note": "D#",
+      "scientificPitch": "D#4",
+      "midi": 63,
+      "frequencyHz": 311.13
+    },
+    "6,24": {
+      "string": 6,
+      "fret": 24,
+      "note": "E",
+      "scientificPitch": "E4",
+      "midi": 64,
+      "frequencyHz": 329.63
+    }
+  }
+}

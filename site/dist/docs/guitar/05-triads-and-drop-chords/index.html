@@ -1,0 +1,177 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>05 Triads and Drop Chords — Music Theory Reference</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><style>:root{--bg: #faf9f7;--surface: #ffffff;--ink: #1a1a1a;--muted: #6b6b6b;--line: #e4e2df;--accent: #44516e;--accent-soft: #e7eaf0;--mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent)}a:hover{text-decoration-thickness:2px;text-decoration-color:var(--accent)}.wrap{max-width:920px;margin:0 auto;padding:0 24px}.muted{color:var(--muted)}code,pre,.mono{font-family:var(--mono)}pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}pre code{background:transparent;padding:0;color:var(--ink)}p code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}h1,h2,h3{line-height:1.25;margin-top:1.6em;margin-bottom:.4em}h1{font-size:2rem}h2{font-size:1.45rem}h3{font-size:1.15rem}ul,ol{padding-left:1.4em}li{margin:.25em 0}hr{border:0;border-top:1px solid var(--line);margin:2em 0}.footer{border-top:1px solid var(--line);margin-top:4em;padding-top:1.4em;color:var(--muted);font-size:.9em}.prose{color:var(--ink);max-width:70ch}.prose h1,.prose h2,.prose h3,.prose h4{scroll-margin-top:90px}.prose a{color:var(--accent)}.prose code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}.prose pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}.prose blockquote{border-left:3px solid var(--accent);padding-left:14px;color:var(--muted);margin:1.2em 0}.prose table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.95em}.prose th,.prose td{border:1px solid var(--line);padding:6px 10px;text-align:left}.prose th{background:var(--accent-soft)}.prose ul,.prose ol{padding-left:1.4em}
+</style></head> <body> <header class="wrap" style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:14px;border-bottom:1px solid var(--line);"> <div style="display:flex;align-items:center;gap:10px;"> <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"> <path d="M9 18V5l12-2v13"></path> <circle cx="6" cy="18" r="3"></circle> <circle cx="18" cy="16" r="3"></circle> </svg> <span style="font-weight:600;letter-spacing:-0.02em;">Music Theory Reference</span> </div> <nav style="display:flex;gap:14px;font-size:13px;color:var(--muted);"> <a href="/" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Docs</a> <a href="/data" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Data</a> </nav> </header> <main class="wrap" style="padding-top:40px;padding-bottom:60px;"> <nav style="font-size:13px;color:var(--muted);margin-bottom:24px;border-left:3px solid var(--accent);padding-left:12px;"> <span>foundations</span> </nav> <h1 style="margin-top:0;">05 Triads and Drop Chords</h1>   <div class="prose"><h1>05 Triads and Drop Chords</h1>
+<p>This module covers two related guitar ideas:</p>
+<ul>
+<li><strong>Triads</strong> as compact chord units across small string groups</li>
+<li><strong>Drop chords</strong>, especially <strong>Drop 2</strong> and <strong>Drop 3</strong>, as a voicing logic used to spread chords across the fretboard</li>
+</ul>
+<p>This module is guitar-specific and assumes the fretboard coordinates and standard tuning from <code>01-fretboard-layout-and-standard-tuning</code>.</p>
+<h2>1. Triads on Guitar</h2>
+<p>A <strong>triad</strong> is a three-note chord: root, third, and fifth. On guitar, triads are especially useful because:</p>
+<ul>
+<li>They are small enough to fit cleanly across fewer strings.</li>
+<li>They reveal the harmonic skeleton of larger chords.</li>
+<li>They can be moved, inverted, and voiced in many ways across the fretboard.</li>
+<li>They connect directly to arpeggios, comping, and melodic harmony.</li>
+</ul>
+<p>A full six-string chord often contains extra notes or doublings beyond the triad; the triad is the minimal harmonic core.</p>
+<h2>2. Triad Types and Formulas</h2>
+<p>Triads are built from the same formulas used in the instrument-agnostic chord construction module:</p>
+<ul>
+<li><strong>Major:</strong> $1 - 3 - 5$</li>
+<li><strong>Minor:</strong> $1 - \flat 3 - 5$</li>
+<li><strong>Diminished:</strong> $1 - \flat 3 - \flat 5$</li>
+<li><strong>Augmented:</strong> $1 - 3 - \sharp 5$</li>
+</ul>
+<p>On guitar, what changes is not the formula but the <em>voicing</em>: which strings carry which notes, in which octave, and in what order.</p>
+<h2>3. Triad String Groups</h2>
+<p>Because triads occupy three notes, guitarists often think in <strong>string groups</strong> of three adjacent strings:</p>
+<ul>
+<li>6–5–4 (low group)</li>
+<li>5–4–3</li>
+<li>4–3–2</li>
+<li>3–2–1 (high group)</li>
+</ul>
+<p>Each group offers different voicing characteristics. Lower groups tend to sound fuller and darker; higher groups tend to sound brighter and more delicate.</p>
+<p>A triad rooted on a given pitch can often be played in multiple string groups. That is one reason the guitar has so many ways to voice the same chord.</p>
+<h2>4. Root Position, First Inversion, Second Inversion</h2>
+<p>Triads can be inverted, and inversions change the bass note:</p>
+<ul>
+<li><strong>Root position:</strong> root is lowest</li>
+<li><strong>First inversion:</strong> third is lowest</li>
+<li><strong>Second inversion:</strong> fifth is lowest</li>
+</ul>
+<p>On guitar, inversions are not just theoretical: they determine which note is in the bass and which shape is playable.</p>
+<p>For a C major triad, for example:</p>
+<ul>
+<li>Root position: C–E–G, bass = C</li>
+<li>First inversion: E–G–C, bass = E</li>
+<li>Second inversion: G–C–E, bass = G</li>
+</ul>
+<p>The same three notes in a different vertical order become a different voicing with a different bass function.</p>
+<h2>5. Triad Voicing Logic</h2>
+<p>When voicing a triad on guitar:</p>
+<ul>
+<li>Keep the notes in correct chord order relative to the bass when inversion matters.</li>
+<li>Avoid muddy low-register spacing when not needed.</li>
+<li>Use open strings or doublings when they suit the musical context.</li>
+<li>Choose the string group that fits the register and the surrounding harmony.</li>
+</ul>
+<p>Triads are often voiced so that the most important harmonic notes — usually the third (quality) and the root (identity) — are clearly present.</p>
+<h2>6. ASCII Triad Sketch</h2>
+<p>A schematic triad across three strings can be drawn as:</p>
+<pre><code>String 3: ●  (third)
+String 2: ●  (fifth)
+String 1: ●  (root)
+</code></pre>
+<p>Or across a lower group:</p>
+<pre><code>String 6: ●  (root)
+String 5: ●  (third)
+String 4: ●  (fifth)
+</code></pre>
+<p>These are abstract sketches showing note order and group, not literal fret numbers. Real locations depend on key, position, and inversion.</p>
+<h2>7. Drop Chords: The General Idea</h2>
+<p><strong>Drop chords</strong> are a voicing method whose name comes from voice-leading: take a close-voiced chord in a given inversion, then “drop” one of the upper voices down an octave.</p>
+<p>In simple terms:</p>
+<ul>
+<li>Start with a compact stack of chord tones.</li>
+<li>Move one voice down an octave to create a wider spread voicing.</li>
+<li>The result is a voicing that occupies more space in the register, often more playable and sonically interesting on guitar.</li>
+</ul>
+<p>On guitar, drop voicings are especially useful because the fretboard is wide and spread across six strings.</p>
+<h2>8. Drop 2 Voicings</h2>
+<p>A <strong>Drop 2</strong> voicing takes a close chord and drops the <strong>second note from the top</strong> down an octave.</p>
+<ul>
+<li>The “second from the top” means the voice just below the highest note in the close stack.</li>
+<li>The resulting voicing is wider and often sits nicely across several strings.</li>
+<li>Drop 2 voicings are a core resource in jazz, arranging, and comping.</li>
+</ul>
+<p>A close-voiced chord is first defined in terms of its voice order; Drop 2 then expands it.</p>
+<h3>Why It Matters on Guitar</h3>
+<ul>
+<li>Drop 2 gives large, usable voicings without stacking every note in a tight cluster.</li>
+<li>It can place chord tones on different strings in a balanced way.</li>
+<li>It creates different bass and inner-voice relationships, affecting both function and color.</li>
+</ul>
+<h3>Example Idea: C Major</h3>
+<p>If a close C major voicing is:</p>
+<p>$$ C - E - G - B $$</p>
+<p>arranged from lowest to highest, Drop 2 might drop the second-from-top voice (G) down an octave, producing a wider voicing whose notes lie in a different register than the original close stack.</p>
+<p>The exact string and fret realization depends on register and the target voicing range; the concept is the octave drop, not a single fixed shape.</p>
+<h2>9. Drop 3 Voicings</h2>
+<p>A <strong>Drop 3</strong> voicing takes a close chord and drops the <strong>third voice from the top</strong> down an octave.</p>
+<ul>
+<li>The selected voice is lower in the stack than the Drop 2 voice.</li>
+<li>The resulting voicing tends to spread the inner structure more than Drop 2 in some contexts.</li>
+<li>Drop 3 voicings can be especially useful for creating a strong bass area and a more open texture.</li>
+</ul>
+<p>Again, the conceptual operation is the same: take a close layout, pick a voice rank from the top, and drop that voice an octave.</p>
+<h2>10. Comparing Drop 2 and Drop 3</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Drop 2</th>
+<th>Drop 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Voice dropped</td>
+<td>Second from top</td>
+<td>Third from top</td>
+</tr>
+<tr>
+<td>Typical spread</td>
+<td>Wide, practical across strings</td>
+<td>More internal expansion</td>
+</tr>
+<tr>
+<td>Common use cases</td>
+<td>Jazz comping, arranging</td>
+<td>Voicings needing broader texture</td>
+</tr>
+<tr>
+<td>Bass effect</td>
+<td>Often strong, controlled</td>
+<td>Often even lower/broader</td>
+</tr>
+</tbody>
+</table>
+<p>Both are tools for turning a compact chord idea into an expansive fretboard voicing while preserving the chord’s identity.</p>
+<h2>11. Triad-Based Drop Voicings on Guitar</h2>
+<p>Because triads are small, they are a natural entry point into drop logic:</p>
+<ul>
+<li>A triad can be voiced in root position, first inversion, or second inversion.</li>
+<li>Adding a seventh or doubling a note expands the range of possible drop voicings.</li>
+<li>Drop voicings derived from triads can then be moved across the neck using the same coordinate logic and string-group thinking.</li>
+</ul>
+<p>In practice, this means the fretboard is populated not only with “open” and “barre” chords, but also with many custom voicings derived from triad + drop logic.</p>
+<h2>12. A Practical Fretboard Approach</h2>
+<p>Work through a chord like this:</p>
+<ol>
+<li>Name the chord quality and extend if needed (triad, 7th, etc.).</li>
+<li>Choose a string group and register.</li>
+<li>Decide on inversion and bass note according to the musical context.</li>
+<li>Convert a close idea into a Drop 2 or Drop 3 voicing if you want more spread.</li>
+<li>Learn the voicing’s notes by name, not just the shape.</li>
+<li>Practice moving the voicing up and down through positions, keeping the notes and function clear.</li>
+</ol>
+<p>This keeps drop voicings tied to harmony instead of becoming isolated shapes.</p>
+<h2>13. Relationship to CAGED and Scale Systems</h2>
+<p>Drop voicings interact with CAGED (see <code>02-caged-system-and-movable-shapes</code>) and scale systems (see <code>03-scale-box-patterns-and-3nps</code>) because:</p>
+<ul>
+<li>The same fretboard regions contain triad fragments and drop voicings.</li>
+<li>Roots and inversions determine where a voicing can sit.</li>
+<li>Voice-leading between drop voicings often follows the same principles as smooth voice leading in harmony (see <code>03-voice-leading</code>).</li>
+</ul>
+<p>CAGED shapes, triads, and drop voicings all live in the same coordinate space; they are different ways to slice it.</p>
+<h2>14. Summary</h2>
+<ul>
+<li>Triads are the compact three-note core of guitar harmony, voiced across small string groups.</li>
+<li>Inversions change the bass note and the playable shape.</li>
+<li>Drop chords expand close voicings by dropping a chosen voice an octave; Drop 2 drops the second-from-top voice, Drop 3 the third-from-top.</li>
+<li>Drop voicings create practical, wide, balanced chords across the fretboard.</li>
+<li>Triad-based drop logic connects directly to CAGED regions, scale patterns, and voice-leading principles.</li>
+</ul></div>  </main> <footer class="footer wrap"> <div>Music Theory Reference — open source documentation library.</div> <div style="margin-top:6px;"> <a href="/" style="color:var(--muted);">Home</a> ·
+<a href="/data" style="color:var(--muted);">Data</a> </div> </footer> </body></html>

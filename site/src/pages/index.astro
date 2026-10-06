@@ -1,0 +1,67 @@
+---
+import Doc from '../layouts/Doc.astro';
+---
+
+<Doc title="Music Theory Reference" description="A modular reference for music theory fundamentals, with instrument-agnostic theory and instrument mappings.">
+  <section style="margin-top:8px;">
+    <p>
+      This is a <b>library</b>, not a single article. The content is organized into two
+      independent layers so the same theory can be reused across instruments:
+    </p>
+    <ul style="margin:14px 0;">
+      <li><b>Instrument-agnostic theory</b> — pitch, intervals, scales, chords, rhythm, harmony, and analysis. These pages never mention frets, strings, valves, or bows.</li>
+      <li><b>Instrument mappings</b> — how abstract theory is realized on a specific instrument. The first mapping is <b>guitar</b>. Other instruments can be added without changing the core theory.</li>
+    </ul>
+  </section>
+
+  <hr />
+
+  <h2 style="margin-top:4px;">Start here</h2>
+  <ul style="margin:12px 0 24px 0;">
+    <li><a href="/docs/foundations/01-pitch-and-frequencies">Pitch and frequencies</a></li>
+    <li><a href="/docs/foundations/02-intervals">Intervals</a></li>
+    <li><a href="/docs/foundations/03-scale-formulas">Scale formulas</a></li>
+    <li><a href="/docs/foundations/04-chord-construction">Chord construction</a></li>
+    <li><a href="/docs/foundations/05-rhythm-and-meter">Rhythm and meter</a></li>
+  </ul>
+
+  <h2 style="margin-top:32px;">Harmony and analysis</h2>
+  <ul style="margin:12px 0 24px 0;">
+    <li><a href="/docs/harmony/01-circle-of-fifths">Circle of fifths</a></li>
+    <li><a href="/docs/harmony/02-diatonic-harmony">Diatonic harmony</a></li>
+    <li><a href="/docs/harmony/03-voice-leading">Voice leading</a></li>
+    <li><a href="/docs/harmony/04-roman-numeral-analysis">Roman numeral analysis</a></li>
+  </ul>
+
+  <h2 style="margin-top:32px;">Instrument mappings</h2>
+  <p class="muted">How abstract theory maps onto a physical instrument.</p>
+  <h3 style="margin-top:4px;margin-bottom:4px;">Guitar</h3>
+  <ul style="margin:8px 0 24px 0;">
+    <li><a href="/docs/guitar/01-fretboard-layout-and-standard-tuning">Fretboard layout and standard tuning</a></li>
+    <li><a href="/docs/guitar/02-caged-system-and-movable-shapes">CAGED system and movable shapes</a></li>
+    <li><a href="/docs/guitar/03-scale-box-patterns-and-3nps">Scale box patterns and 3NPS</a></li>
+    <li><a href="/docs/guitar/04-alternate-tunings">Alternate tunings</a></li>
+    <li><a href="/docs/guitar/05-triads-and-drop-chords">Triads and drop chords</a></li>
+  </ul>
+
+  <hr />
+
+  <h2 style="margin-top:8px;">Raw data for developers</h2>
+  <p>
+    The reference includes machine-readable JSON for intervals, scales, chords, and a full
+    guitar fretboard coordinate map. Use it directly in apps or tooling.
+  </p>
+  <ul style="margin:12px 0 24px 0;">
+    <li><a href="/data">Data index</a></li>
+    <li><a href="/data/scale-formulas.json">scale-formulas.json</a></li>
+    <li><a href="/data/chord-formulas.json">chord-formulas.json</a></li>
+    <li><a href="/data/intervals.json">intervals.json</a></li>
+    <li><a href="/data/guitar-fretboard-map.json">guitar-fretboard-map.json</a></li>
+  </ul>
+
+  <p class="muted" style="margin-top:24px;">
+    Want to add a new instrument, for example piano, bass, or violin? Keep instrument-specific
+    content in its own mapping folder and leave the core theory untouched.
+    See the instrument mapping template in the repo for the recommended workflow.
+  </p>
+</Doc>

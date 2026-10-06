@@ -1,0 +1,170 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>01 Pitch and Frequencies — Music Theory Reference</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><style>:root{--bg: #faf9f7;--surface: #ffffff;--ink: #1a1a1a;--muted: #6b6b6b;--line: #e4e2df;--accent: #44516e;--accent-soft: #e7eaf0;--mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent)}a:hover{text-decoration-thickness:2px;text-decoration-color:var(--accent)}.wrap{max-width:920px;margin:0 auto;padding:0 24px}.muted{color:var(--muted)}code,pre,.mono{font-family:var(--mono)}pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}pre code{background:transparent;padding:0;color:var(--ink)}p code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}h1,h2,h3{line-height:1.25;margin-top:1.6em;margin-bottom:.4em}h1{font-size:2rem}h2{font-size:1.45rem}h3{font-size:1.15rem}ul,ol{padding-left:1.4em}li{margin:.25em 0}hr{border:0;border-top:1px solid var(--line);margin:2em 0}.footer{border-top:1px solid var(--line);margin-top:4em;padding-top:1.4em;color:var(--muted);font-size:.9em}.prose{color:var(--ink);max-width:70ch}.prose h1,.prose h2,.prose h3,.prose h4{scroll-margin-top:90px}.prose a{color:var(--accent)}.prose code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}.prose pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}.prose blockquote{border-left:3px solid var(--accent);padding-left:14px;color:var(--muted);margin:1.2em 0}.prose table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.95em}.prose th,.prose td{border:1px solid var(--line);padding:6px 10px;text-align:left}.prose th{background:var(--accent-soft)}.prose ul,.prose ol{padding-left:1.4em}
+</style></head> <body> <header class="wrap" style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:14px;border-bottom:1px solid var(--line);"> <div style="display:flex;align-items:center;gap:10px;"> <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"> <path d="M9 18V5l12-2v13"></path> <circle cx="6" cy="18" r="3"></circle> <circle cx="18" cy="16" r="3"></circle> </svg> <span style="font-weight:600;letter-spacing:-0.02em;">Music Theory Reference</span> </div> <nav style="display:flex;gap:14px;font-size:13px;color:var(--muted);"> <a href="/" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Docs</a> <a href="/data" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Data</a> </nav> </header> <main class="wrap" style="padding-top:40px;padding-bottom:60px;"> <nav style="font-size:13px;color:var(--muted);margin-bottom:24px;border-left:3px solid var(--accent);padding-left:12px;"> <span>foundations</span> </nav> <h1 style="margin-top:0;">01 Pitch and Frequencies</h1>   <div class="prose"><h1>01 Pitch and Frequencies</h1>
+<p>This module establishes the physics and notation foundations of musical pitch. It is instrument-agnostic and applies equally to any sound-producing system.</p>
+<h2>1. Note Names and Pitch Classes</h2>
+<p>Western music uses an alphabetic naming convention for discrete pitch levels:</p>
+<pre><code>A   B   C   D   E   F   G
+</code></pre>
+<p>After G, the sequence repeats at a higher register. Each discrete pitch within a register is a <strong>note</strong>. The set of twelve distinct pitch classes within an octave is:</p>
+<pre><code>C   C♯/D♭   D   D♯/E♭   E   F   F♯/G♭   G   G♯/A♭   A   A♯/B♭   B
+</code></pre>
+<p>Pitches that share the same pitch class but differ by one or more octaves are <strong>enharmonically equivalent</strong> in equal temperament — for example, C♯ and D♭ occupy the same key on a keyboard but may carry different functional meanings in notation and harmony.</p>
+<h2>2. Pitch Classes and Integers</h2>
+<p>A <strong>pitch class</strong> is the set of all notes with the same name across all octaves. In analytical work, pitch classes are often mapped to integers modulo 12 using <strong>pitch-class set theory</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Pitch Class</th>
+<th>Integer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C</td>
+<td>0</td>
+</tr>
+<tr>
+<td>C♯ / D♭</td>
+<td>1</td>
+</tr>
+<tr>
+<td>D</td>
+<td>2</td>
+</tr>
+<tr>
+<td>D♯ / E♭</td>
+<td>3</td>
+</tr>
+<tr>
+<td>E</td>
+<td>4</td>
+</tr>
+<tr>
+<td>F</td>
+<td>5</td>
+</tr>
+<tr>
+<td>F♯ / G♭</td>
+<td>6</td>
+</tr>
+<tr>
+<td>G</td>
+<td>7</td>
+</tr>
+<tr>
+<td>G♯ / A♭</td>
+<td>8</td>
+</tr>
+<tr>
+<td>A</td>
+<td>9</td>
+</tr>
+<tr>
+<td>A♯ / B♭</td>
+<td>10</td>
+</tr>
+<tr>
+<td>B</td>
+<td>11</td>
+</tr>
+</tbody>
+</table>
+<p>This mapping is typically written with C = 0 and wraps modulo 12. It is the foundation for set-class analysis, serial techniques, and computational music theory.</p>
+<h2>3. The Octave and Frequency Ratios</h2>
+<p>An <strong>octave</strong> is the interval between one pitch and another with double (or half) its frequency. If a pitch has frequency <em>f</em>, the pitch one octave higher has frequency <em>2f</em>, and one octave lower has frequency <em>f</em>/2.</p>
+<p>The octave corresponds to a frequency ratio of:</p>
+<p>$$ \frac{f_2}{f_1} = 2 $$</p>
+<p>This simple ratio is why notes separated by an octave sound highly consonant and are perceived as "the same" note at different registers.</p>
+<h2>4. Equal Temperament</h2>
+<p>Modern Western music predominantly uses <strong>12-tone equal temperament (12-TET)</strong>. In this system:</p>
+<ul>
+<li>The octave is divided into 12 equal semitone steps.</li>
+<li>Each semitone multiplies frequency by the same constant ratio.</li>
+</ul>
+<p>The ratio between adjacent semitones is the <strong>twelfth root of two</strong>:</p>
+<p>$$ r = \sqrt[12]{2} \approx 1.059463094 $$</p>
+<p>If <em>f₀</em> is the frequency of a reference pitch, the frequency <em>n</em> semitones higher is:</p>
+<p>$$ f = f₀ \cdot r^n = f₀ \cdot 2^{n/12} $$</p>
+<h3>Reference Pitch</h3>
+<p>The standard reference is <strong>A₄ = 440 Hz</strong>. Using the formula above, all other pitches in 12-TET can be derived.</p>
+<p>For example, C₄ (middle C) is 9 semitones below A₄:</p>
+<p>$$ f_{C4} = 440 \cdot 2^{-9/12} \approx 261.63 \text{ Hz} $$</p>
+<h2>5. Scientific Pitch Notation</h2>
+<p><strong>Scientific pitch notation</strong> identifies each note by its letter name, accidental, and octave number. The octave number changes at each C:</p>
+<ul>
+<li>C₄ is "middle C"</li>
+<li>A₄ = 440 Hz (standard reference)</li>
+<li>C₀ ≈ 16.35 Hz, near the lower limit of human hearing</li>
+</ul>
+<p>Octave numbering makes it unambiguous which register is intended, independent of the tuning system.</p>
+<h2>6. The Semitone and the Cent</h2>
+<p>The <strong>semitone</strong> is the smallest standard interval in 12-TET — the distance between adjacent keys on a keyboard or adjacent positions in the chromatic scale.</p>
+<p>For finer granularity, the <strong>cent</strong> is used:</p>
+<ul>
+<li>1 octave = 1200 cents</li>
+<li>1 semitone = 100 cents</li>
+</ul>
+<p>A frequency ratio <em>r</em> corresponds to:</p>
+<p>$$ \text{cents} = 1200 \cdot \log_2(r) $$</p>
+<p>This is useful for comparing tunings, intonation, and microtonal intervals.</p>
+<h2>7. Intervals, Frequency Ratios, and Consonance</h2>
+<p>Two pitches sound more consonant when their frequency ratio is simple (small integers). Classic examples include:</p>
+<table>
+<thead>
+<tr>
+<th>Interval</th>
+<th>Frequency Ratio</th>
+<th>Approximate Cents (Just)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Octave</td>
+<td>2 : 1</td>
+<td>1200</td>
+</tr>
+<tr>
+<td>Perfect Fifth</td>
+<td>3 : 2</td>
+<td>≈ 702</td>
+</tr>
+<tr>
+<td>Perfect Fourth</td>
+<td>4 : 3</td>
+<td>≈ 498</td>
+</tr>
+<tr>
+<td>Major Third</td>
+<td>5 : 4</td>
+<td>≈ 386</td>
+</tr>
+<tr>
+<td>Minor Third</td>
+<td>6 : 5</td>
+<td>≈ 316</td>
+</tr>
+</tbody>
+</table>
+<p>In 12-TET, these are approximated by equal-tempered semitone steps; for example, a perfect fifth is 7 semitones:</p>
+<p>$$ 2^{7/12} \approx 1.4983 \approx 3:2 $$</p>
+<h2>8. Absolute vs. Relative Pitch</h2>
+<ul>
+<li><strong>Absolute pitch</strong> (sometimes called perfect pitch) is the ability to identify or reproduce a specific frequency without external reference.</li>
+<li><strong>Relative pitch</strong> is the ability to identify or produce intervals and relationships between pitches.</li>
+</ul>
+<p>Music theory works entirely in relative terms: scales, intervals, and harmony are defined by relationships between pitches, not by any single absolute frequency.</p>
+<h2>9. Pitch, Timbre, and Harmonics</h2>
+<p>A pitched sound is rarely a pure sine wave. Most instruments produce a <strong>harmonic spectrum</strong>:</p>
+<p>$$ f_n = n \cdot f_0, \quad n = 1, 2, 3, \dots $$</p>
+<p>where <em>f₀</em> is the <strong>fundamental frequency</strong> and the higher <em>fₙ</em> are <strong>overtones</strong> or <strong>harmonics</strong>. The fundamental determines the perceived pitch; the harmonic content determines <strong>timbre</strong>.</p>
+<p>This is why a C₄ played on different instruments can sound different while still being perceived as the same pitch.</p>
+<h2>10. Summary</h2>
+<ul>
+<li>Pitch is organized into <strong>pitch classes</strong> that repeat every octave.</li>
+<li>The octave is a 2:1 frequency ratio and the foundation of octave equivalence.</li>
+<li>12-TET divides the octave into 12 equal semitones using the ratio $\sqrt[12]{2}$.</li>
+<li>Scientific pitch notation and the A₄ = 440 Hz standard make pitch unambiguous.</li>
+<li>Simple integer frequency ratios underpin consonance and the harmonic series.</li>
+<li>Interval-based relationships, not absolute frequencies, are the core of music theory.</li>
+</ul></div>  </main> <footer class="footer wrap"> <div>Music Theory Reference — open source documentation library.</div> <div style="margin-top:6px;"> <a href="/" style="color:var(--muted);">Home</a> ·
+<a href="/data" style="color:var(--muted);">Data</a> </div> </footer> </body></html>

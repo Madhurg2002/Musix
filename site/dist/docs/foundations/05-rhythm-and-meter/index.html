@@ -1,0 +1,252 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>05 Rhythm and Meter — Music Theory Reference</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><style>:root{--bg: #faf9f7;--surface: #ffffff;--ink: #1a1a1a;--muted: #6b6b6b;--line: #e4e2df;--accent: #44516e;--accent-soft: #e7eaf0;--mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent)}a:hover{text-decoration-thickness:2px;text-decoration-color:var(--accent)}.wrap{max-width:920px;margin:0 auto;padding:0 24px}.muted{color:var(--muted)}code,pre,.mono{font-family:var(--mono)}pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}pre code{background:transparent;padding:0;color:var(--ink)}p code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}h1,h2,h3{line-height:1.25;margin-top:1.6em;margin-bottom:.4em}h1{font-size:2rem}h2{font-size:1.45rem}h3{font-size:1.15rem}ul,ol{padding-left:1.4em}li{margin:.25em 0}hr{border:0;border-top:1px solid var(--line);margin:2em 0}.footer{border-top:1px solid var(--line);margin-top:4em;padding-top:1.4em;color:var(--muted);font-size:.9em}.prose{color:var(--ink);max-width:70ch}.prose h1,.prose h2,.prose h3,.prose h4{scroll-margin-top:90px}.prose a{color:var(--accent)}.prose code{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-size:.9em;color:var(--ink)}.prose pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.5}.prose blockquote{border-left:3px solid var(--accent);padding-left:14px;color:var(--muted);margin:1.2em 0}.prose table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.95em}.prose th,.prose td{border:1px solid var(--line);padding:6px 10px;text-align:left}.prose th{background:var(--accent-soft)}.prose ul,.prose ol{padding-left:1.4em}
+</style></head> <body> <header class="wrap" style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:14px;border-bottom:1px solid var(--line);"> <div style="display:flex;align-items:center;gap:10px;"> <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"> <path d="M9 18V5l12-2v13"></path> <circle cx="6" cy="18" r="3"></circle> <circle cx="18" cy="16" r="3"></circle> </svg> <span style="font-weight:600;letter-spacing:-0.02em;">Music Theory Reference</span> </div> <nav style="display:flex;gap:14px;font-size:13px;color:var(--muted);"> <a href="/" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Docs</a> <a href="/data" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Data</a> </nav> </header> <main class="wrap" style="padding-top:40px;padding-bottom:60px;"> <nav style="font-size:13px;color:var(--muted);margin-bottom:24px;border-left:3px solid var(--accent);padding-left:12px;"> <span>foundations</span> </nav> <h1 style="margin-top:0;">05 Rhythm and Meter</h1>   <div class="prose"><h1>05 Rhythm and Meter</h1>
+<p><strong>Rhythm</strong> is the organization of time in music — when events happen, how long they last, and how they are grouped. <strong>Meter</strong> is the recurring pattern of strong and weak beats that gives a piece its rhythmic framework.</p>
+<p>This module is instrument-agnostic and independent of pitch content.</p>
+<h2>1. Time, Duration, and Pulse</h2>
+<h3>Pulse</h3>
+<p>The <strong>pulse</strong> (or beat) is the underlying, recurring temporal unit — the "heartbeat" against which other durations are measured. A pulse may be explicit (as in a metronomic beat) or implied.</p>
+<h3>Tempo</h3>
+<p><strong>Tempo</strong> is the speed of the pulse, usually expressed in beats per minute (BPM). A tempo marking of 120 BPM means 120 pulses per minute, or 2 pulses per second.</p>
+<p>Tempo marks (e.g., <em>Adagio</em>, <em>Allegro</em>, <em>Presto</em>) provide expressive indications, often with approximate BPM ranges, but the actual pulse rate may vary within a piece.</p>
+<h3>Duration</h3>
+<p>A <strong>duration</strong> is the length of a musical event in time. Durations are related to the pulse through proportional division:</p>
+<ul>
+<li>A longer duration spans multiple pulses.</li>
+<li>A shorter duration is a subdivision of a pulse.</li>
+</ul>
+<h2>2. Note Values</h2>
+<p>In standard notation, relative durations are represented by note shapes. These shapes define durations relative to one another, not absolute time:</p>
+<table>
+<thead>
+<tr>
+<th>Symbol (concept)</th>
+<th>Name</th>
+<th>Relative duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>𝅝</td>
+<td>Whole note</td>
+<td>4 beats (in 4/4)</td>
+</tr>
+<tr>
+<td>𝅗𝅥</td>
+<td>Half note</td>
+<td>2 beats (in 4/4)</td>
+</tr>
+<tr>
+<td>𝅘𝅥</td>
+<td>Quarter note</td>
+<td>1 beat (in 4/4)</td>
+</tr>
+<tr>
+<td>𝅘𝅥𝅮</td>
+<td>Eighth note</td>
+<td>Half a quarter note</td>
+</tr>
+<tr>
+<td>𝅘𝅥𝅯</td>
+<td>Sixteenth note</td>
+<td>Quarter of a quarter note</td>
+</tr>
+</tbody>
+</table>
+<p>Dots and ties extend durations:</p>
+<ul>
+<li>A <strong>dotted</strong> note adds half of its base value (dotted quarter = quarter + eighth).</li>
+<li>A <strong>tie</strong> connects two notes of the same pitch into a single sustained duration.</li>
+</ul>
+<p>These relationships are purely proportional. The same shapes can be used at any tempo.</p>
+<h2>3. Rests</h2>
+<p><strong>Rests</strong> are the silent counterparts of note values. For every note value, there is a corresponding rest:</p>
+<table>
+<thead>
+<tr>
+<th>Note value</th>
+<th>Rest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Whole note</td>
+<td>Whole rest</td>
+</tr>
+<tr>
+<td>Half note</td>
+<td>Half rest</td>
+</tr>
+<tr>
+<td>Quarter note</td>
+<td>Quarter rest</td>
+</tr>
+<tr>
+<td>Eighth note</td>
+<td>Eighth rest</td>
+</tr>
+<tr>
+<td>Sixteenth note</td>
+<td>Sixteenth rest</td>
+</tr>
+</tbody>
+</table>
+<p>Rests are as important rhythmically as sounds — they create space, phrasing, and syncopation.</p>
+<h2>4. Time Signatures</h2>
+<p>A <strong>time signature</strong> indicates how beats are organized in each measure:</p>
+<ul>
+<li><strong>Top number:</strong> how many beats per measure.</li>
+<li><strong>Bottom number:</strong> which note value represents one beat.</li>
+</ul>
+<p>For example:</p>
+<ul>
+<li><strong>4/4:</strong> four quarter-note beats per measure — the most common "common time."</li>
+<li><strong>3/4:</strong> three quarter-note beats per measure — waltz meter.</li>
+<li><strong>6/8:</strong> six eighth-note beats per measure — often felt in two groups of three.</li>
+</ul>
+<p>The bottom number uses a code:</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Note value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Whole note</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Half note</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Quarter note</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Eighth note</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Sixteenth note</td>
+</tr>
+</tbody>
+</table>
+<h2>5. Simple, Compound, and Complex Meters</h2>
+<h3>Simple Meter</h3>
+<p>In <strong>simple meter</strong>, each beat divides into two:</p>
+<ul>
+<li>2/4, 3/4, 4/4 are simple meters.</li>
+<li>A beat feels like a single pulse divisible into two equal parts.</li>
+</ul>
+<h3>Compound Meter</h3>
+<p>In <strong>compound meter</strong>, each beat divides into three:</p>
+<ul>
+<li>6/8, 9/8, 12/8 are common compound meters.</li>
+<li>The beat is typically a dotted note value (e.g., dotted quarter in 6/8).</li>
+</ul>
+<p>6/8, for example, is often felt in <strong>two</strong> main beats, each split into three eighth notes.</p>
+<h3>Complex / Additive Meter</h3>
+<p><strong>Complex meters</strong> have irregular groupings that don't fit simple duple or triple patterns:</p>
+<ul>
+<li>Examples: 5/8, 7/8, 11/8.</li>
+<li>These may be felt as combinations such as 2+3 or 3+2+2.</li>
+</ul>
+<p>Complex meters are common in contemporary classical, folk, progressive, and world music traditions.</p>
+<h2>6. Strong and Weak Beats</h2>
+<p>Meter organizes beats into patterns of relative stress:</p>
+<ul>
+<li><strong>Strong beats</strong> feel accented, expected, and stable.</li>
+<li><strong>Weak beats</strong> feel lighter and tend to resolve toward strong beats.</li>
+</ul>
+<p>In 4/4, for example:</p>
+<ul>
+<li>Beat 1 is strongest.</li>
+<li>Beat 3 is secondary strong.</li>
+<li>Beats 2 and 4 are weaker.</li>
+</ul>
+<p>In 3/4:</p>
+<ul>
+<li>Beat 1 is strong.</li>
+<li>Beats 2 and 3 are weaker.</li>
+</ul>
+<p>These stress patterns shape phrasing, groove, and harmonic rhythm.</p>
+<h2>7. Downbeats and Upbeats</h2>
+<ul>
+<li>The <strong>downbeat</strong> is the first beat of a measure — typically the strongest.</li>
+<li>An <strong>upbeat</strong> (or anacrusis) is a note or group before the first downbeat, leading into the measure.</li>
+</ul>
+<p>Upbeats create forward motion and are central to syncopation.</p>
+<h2>8. Syncopation</h2>
+<p><strong>Syncopation</strong> places emphasis on weak beats or off-beats — moments that would normally be unstressed. This creates rhythmic tension and groove.</p>
+<p>Common forms of syncopation:</p>
+<ul>
+<li>Accenting an off-beat (the "and" between main pulses).</li>
+<li>Lengthening a note across a strong beat so the accent falls on the weak side.</li>
+<li>Starting or ending phrases on off-beats.</li>
+</ul>
+<p>Syncopation is central to jazz, funk, Latin music, rock, and many other styles.</p>
+<h2>9. Subdivisions</h2>
+<p><strong>Subdivision</strong> breaks the beat into smaller units, defining rhythmic precision and feel:</p>
+<ul>
+<li>Duple subdivision: beat splits into 2, 4, 8, 16, etc.</li>
+<li>Triple subdivision: beat splits into 3 (common in swing, compound meter, and certain groove styles).</li>
+<li>Polyrhythms and cross-rhythms occur when different parts subdivide or group beats differently at the same time.</li>
+</ul>
+<p>Feeling and controlling subdivisions is fundamental for both composition and performance.</p>
+<h2>10. Tuplets</h2>
+<p>A <strong>tuplet</strong> fits a number of notes into the space normally occupied by a different number:</p>
+<ul>
+<li><strong>Triplet:</strong> 3 notes in the time of 2.</li>
+<li><strong>Quintuplet:</strong> 5 notes in the time of 4 (or another indicated ratio).</li>
+</ul>
+<p>Tuplets create temporary subdivision shifts and are written with a bracketed number.</p>
+<h2>11. Polyrhythm</h2>
+<p>A <strong>polyrhythm</strong> is the simultaneous use of two or more conflicting rhythmic groupings. Classic examples:</p>
+<ul>
+<li>3 against 2 (a triplet feel over duple pulse)</li>
+<li>4 against 3</li>
+</ul>
+<p>Polyrhythms are written and felt as an alignment of different subdivisions over the same underlying pulse or measure.</p>
+<h2>12. Phrasing and Rhythmic Motifs</h2>
+<p>Rhythm is not just note lengths; it's also <strong>phrasing</strong> — how durations and accents group into larger units.</p>
+<p>A <strong>rhythmic motif</strong> is a short, recognizable pattern of durations and accents. Motifs can be:</p>
+<ul>
+<li>Repeated, sequenced, inverted, or augmented/diminished in time.</li>
+<li>Developed much like a melodic motif, even without pitch change.</li>
+</ul>
+<p>Phrasing is shaped by:</p>
+<ul>
+<li>Where accents fall within the meter.</li>
+<li>Where breaths, pauses, and phrase endings occur.</li>
+<li>How rhythmic patterns contrast and return.</li>
+</ul>
+<h2>13. Swing and Feel</h2>
+<p><strong>Swing</strong> is a rhythmic convention in which equal written subdivisions (often eighth notes) are performed unevenly — typically with the first of each pair lengthened and the second shortened.</p>
+<p>Swing is a <strong>feel</strong> rather than a strict notation, and its degree can vary from subtle to extreme. It is related to, but not identical to, triplet-based subdivisions.</p>
+<h2>14. Meter and Metric Modulation</h2>
+<ul>
+<li><strong>Metric modulation</strong> changes the pulse by reinterpreting a subdivision or note value as the new beat. For example, a dotted quarter might become the new quarter pulse.</li>
+<li>This allows smooth tempo changes and cross-references between metric feels.</li>
+</ul>
+<p>Metric concepts are widely used in contemporary composition and ensemble coordination.</p>
+<h2>15. Rhythm Without Pitch</h2>
+<p>Rhythm stands on its own. Percussion, spoken word, and purely temporal structures all rely on the same principles:</p>
+<ul>
+<li>Pulse, tempo, and duration.</li>
+<li>Meter and stress patterns.</li>
+<li>Subdivisions, tuplets, syncopation, and polyrhythm.</li>
+</ul>
+<p>A complete rhythmic understanding supports composition, analysis, and performance independently of pitch material.</p>
+<h2>16. Summary</h2>
+<ul>
+<li>Rhythm organizes time; meter organizes beats into recurring strong/weak patterns.</li>
+<li>Tempo sets pulse speed; note values and rests define proportional durations.</li>
+<li>Time signatures show beats per measure and the beat unit.</li>
+<li>Simple meters divide beats in two; compound meters divide beats in three; complex meters use irregular groupings.</li>
+<li>Syncopation, subdivisions, tuplets, and polyrhythms add richness beyond the basic grid.</li>
+<li>Phrasing, motifs, and feel connect rhythmic details into expressive musical time.</li>
+</ul></div>  </main> <footer class="footer wrap"> <div>Music Theory Reference — open source documentation library.</div> <div style="margin-top:6px;"> <a href="/" style="color:var(--muted);">Home</a> ·
+<a href="/data" style="color:var(--muted);">Data</a> </div> </footer> </body></html>

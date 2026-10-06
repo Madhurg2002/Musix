@@ -1,0 +1,56 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  section?: string;
+}
+
+const { title, description, section } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} — Music Theory Reference</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="wrap" style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:14px;border-bottom:1px solid var(--line);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);">
+          <path d="M9 18V5l12-2v13" />
+          <circle cx="6" cy="18" r="3" />
+          <circle cx="18" cy="16" r="3" />
+        </svg>
+        <span style="font-weight:600;letter-spacing:-0.02em;">Music Theory Reference</span>
+      </div>
+      <nav style="display:flex;gap:14px;font-size:13px;color:var(--muted);">
+        <a href="/" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Docs</a>
+        <a href="/data" style="text-decoration:none;color:inherit;border-bottom:2px solid transparent;">Data</a>
+      </nav>
+    </header>
+
+    <main class="wrap" style="padding-top:40px;padding-bottom:60px;">
+      <nav style="font-size:13px;color:var(--muted);margin-bottom:24px;border-left:3px solid var(--accent);padding-left:12px;">
+        {section && <span>{section}</span>}
+      </nav>
+
+      <h1 style="margin-top:0;">{title}</h1>
+      {description && <p class="muted">{description}</p>}
+
+      <slot />
+    </main>
+
+    <footer class="footer wrap">
+      <div>Music Theory Reference — open source documentation library.</div>
+      <div style="margin-top:6px;">
+        <a href="/" style="color:var(--muted);">Home</a> ·
+        <a href="/data" style="color:var(--muted);">Data</a>
+      </div>
+    </footer>
+  </body>
+</html>

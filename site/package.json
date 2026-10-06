@@ -1,0 +1,14 @@
+{
+  "name": "music-theory-reference-site",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "vite preview --host --strictPort"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.0.2",
+    "astro": "^4.0.0"
+  }
+}

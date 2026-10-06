@@ -1,0 +1,112 @@
+{
+  "scales": [
+    {
+      "id": "major",
+      "name": "Major / Ionian",
+      "formula": ["1", "2", "3", "4", "5", "6", "7"],
+      "semitones": [0, 2, 4, 5, 7, 9, 11],
+      "stepPattern": ["W", "W", "H", "W", "W", "W", "H"],
+      "parentScale": null,
+      "modeIndex": 0
+    },
+    {
+      "id": "dorian",
+      "name": "Dorian Mode",
+      "formula": ["1", "2", "b3", "4", "5", "6", "b7"],
+      "semitones": [0, 2, 3, 5, 7, 9, 10],
+      "stepPattern": ["W", "H", "W", "W", "W", "H", "W"],
+      "parentScale": "major",
+      "modeIndex": 1
+    },
+    {
+      "id": "phrygian",
+      "name": "Phrygian Mode",
+      "formula": ["1", "b2", "b3", "4", "5", "b6", "b7"],
+      "semitones": [0, 1, 3, 5, 7, 8, 10],
+      "stepPattern": ["H", "W", "W", "W", "H", "W", "W"],
+      "parentScale": "major",
+      "modeIndex": 2
+    },
+    {
+      "id": "lydian",
+      "name": "Lydian Mode",
+      "formula": ["1", "2", "3", "#4", "5", "6", "7"],
+      "semitones": [0, 2, 4, 6, 7, 9, 11],
+      "stepPattern": ["W", "W", "W", "H", "W", "W", "H"],
+      "parentScale": "major",
+      "modeIndex": 3
+    },
+    {
+      "id": "mixolydian",
+      "name": "Mixolydian Mode",
+      "formula": ["1", "2", "3", "4", "5", "6", "b7"],
+      "semitones": [0, 2, 4, 5, 7, 9, 10],
+      "stepPattern": ["W", "W", "H", "W", "W", "H", "W"],
+      "parentScale": "major",
+      "modeIndex": 4
+    },
+    {
+      "id": "aeolian",
+      "name": "Aeolian / Natural Minor",
+      "formula": ["1", "2", "b3", "4", "5", "b6", "b7"],
+      "semitones": [0, 2, 3, 5, 7, 8, 10],
+      "stepPattern": ["W", "H", "W", "W", "H", "W", "W"],
+      "parentScale": "major",
+      "modeIndex": 5
+    },
+    {
+      "id": "locrian",
+      "name": "Locrian Mode",
+      "formula": ["1", "b2", "b3", "4", "b5", "b6", "b7"],
+      "semitones": [0, 1, 3, 5, 6, 8, 10],
+      "stepPattern": ["H", "W", "W", "H", "W", "W", "W"],
+      "parentScale": "major",
+      "modeIndex": 6
+    },
+    {
+      "id": "harmonic-minor",
+      "name": "Harmonic Minor",
+      "formula": ["1", "2", "b3", "4", "5", "b6", "7"],
+      "semitones": [0, 2, 3, 5, 7, 8, 11],
+      "stepPattern": ["W", "H", "W", "W", "H", "W+H", "H"],
+      "parentScale": null,
+      "modeIndex": -1
+    },
+    {
+      "id": "melodic-minor-asc",
+      "name": "Melodic Minor (ascending)",
+      "formula": ["1", "2", "b3", "4", "5", "6", "7"],
+      "semitones": [0, 2, 3, 5, 7, 9, 11],
+      "stepPattern": ["W", "H", "W", "W", "W", "W", "H"],
+      "parentScale": null,
+      "modeIndex": -1
+    },
+    {
+      "id": "minor-pentatonic",
+      "name": "Minor Pentatonic",
+      "formula": ["1", "b3", "4", "5", "b7"],
+      "semitones": [0, 3, 5, 7, 10],
+      "stepPattern": ["H+W", "W", "W", "H+W", "W+H"],
+      "parentScale": "aeolian",
+      "modeIndex": -1
+    },
+    {
+      "id": "major-pentatonic",
+      "name": "Major Pentatonic",
+      "formula": ["1", "2", "3", "5", "6"],
+      "semitones": [0, 2, 4, 7, 9],
+      "stepPattern": ["W", "W", "H+W", "W", "W+H"],
+      "parentScale": "major",
+      "modeIndex": -1
+    },
+    {
+      "id": "blues",
+      "name": "Blues Scale",
+      "formula": ["1", "b3", "4", "b5", "5", "b7"],
+      "semitones": [0, 3, 5, 6, 7, 10],
+      "stepPattern": ["H+W", "W", "H", "H", "W+H", "W"],
+      "parentScale": "minor-pentatonic",
+      "modeIndex": -1
+    }
+  ]
+}

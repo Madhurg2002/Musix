@@ -1,0 +1,18 @@
+---
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeStringify from 'rehype-stringify';
+import remarkGfm from 'remark-gfm';
+
+export interface Props {
+  content: string;
+}
+
+const { content } = Astro.props;
+
+const processor = unified().use(remarkParse).use(remarkGfm).use(remarkRehype).use(rehypeStringify);
+const html = String(await processor.process(content));
+---
+
+<div class="prose" set:html={html} />
