@@ -1,0 +1,1319 @@
+/* Fonts are declared once, in index.html, so the browser can preconnect and so CSS
+   parsing is not blocked by a second network round-trip. */
+
+/* The whole sheet lives in the `components` layer. Tailwind declares
+   `@layer theme, base, components, utilities` from src/tailwind.css, so a utility class
+   always beats a component rule while the migration runs, and order *inside* this layer
+   is untouched — the rendering does not change by wrapping it. */
+@layer components {
+
+:root {
+  /* ── Analog Studio: warm, instrument-craft palette ── */
+  --bg-primary: #0f0c0a;        /* deep espresso canvas */
+  --bg-secondary: #171310;      /* raised surface */
+  --surface-2: #1f1813;         /* nested surface */
+  --card-bg: rgba(var(--card-rgb), 0.78);
+  --card-border: rgba(232, 200, 150, 0.14);
+  --card-border-strong: rgba(232, 200, 150, 0.28);
+  --glass-glow: rgba(var(--accent-rgb), 0.15);
+
+  /* Brass is the single accent; the rest support it. */
+  --accent-primary: #e0a458;    /* brass / amber */
+  --accent-secondary: #b8672f;  /* copper */
+  /* Terracotta lightened from #c9552f: with the page-background ink on the .btn-accent
+     ramp it sat at 4.48:1 — a hair under AA. The contrast audit fails on a regression. */
+  --accent-tertiary: #cf5e36;   /* terracotta */
+  --accent-highlight: #e8c07d;  /* pale brass */
+  --accent-success: #86b06b;    /* sage — "in tune" */
+  --accent-alert: #e06c5a;      /* warm red */
+
+  --text-primary: #f6efe4;      /* cream */
+  --text-secondary: #b8a894;
+  --text-muted: #8c7d6c;
+
+  /* Channel triplets: every translucent tint derives from these, so a theme only has to
+     restate the palette in one place and all overlays, insets and glows follow. */
+  --bg-primary-rgb: 15, 12, 10;
+  --bg-secondary-rgb: 23, 19, 16;
+  --card-rgb: 28, 22, 18;
+  --hero-rgb: 38, 26, 20;
+  --overlay-rgb: 255, 255, 255;
+  --inset-rgb: 0, 0, 0;
+  --accent-rgb: 224, 164, 88;
+  --accent-2-rgb: 184, 103, 47;
+  --tertiary-rgb: 207, 94, 54;
+  --highlight-rgb: 232, 192, 125;
+  --success-rgb: 134, 176, 107;
+  --alert-rgb: 224, 108, 90;
+
+  color-scheme: dark;
+
+  --font-main: 'Outfit', sans-serif;
+  --font-mono: 'Space Grotesk', monospace;
+
+  /* Shape, elevation, motion */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --elev-1: 0 1px 2px rgba(var(--inset-rgb), 0.45);
+  --elev-2: 0 10px 30px -14px rgba(var(--inset-rgb), 0.75);
+  --elev-warm: 0 16px 40px -20px rgba(var(--accent-rgb), 0.55);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--accent-rgb), 0.35) transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* The page never scrolls sideways: wide tools scroll inside their own containers, and
+     stray tooltip overhang cannot create a window-level horizontal scrollbar. `clip` (not
+     `hidden`) so position: sticky keeps working on the rail and top bar. */
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Remove the 300ms double-tap-zoom delay on touch devices. */
+button,
+select,
+input,
+[role='button'] {
+  touch-action: manipulation;
+}
+
+/* Warm, always-visible keyboard focus */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(var(--accent-rgb), 0.28);
+  color: var(--text-primary);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(var(--accent-rgb), 0.3);
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--accent-rgb), 0.45);
+  background-clip: content-box;
+}
+
+body {
+  background: var(--bg-primary);
+  background-image: 
+    radial-gradient(120% 90% at 10% 0%, rgba(var(--accent-rgb), 0.13) 0%, transparent 55%),
+    radial-gradient(90% 70% at 100% 100%, rgba(var(--accent-2-rgb), 0.16) 0%, transparent 60%);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism styling */
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--elev-2);
+  transition: transform 0.24s var(--ease), box-shadow 0.24s var(--ease),
+    border-color 0.24s var(--ease);
+}
+
+.glass-card:hover {
+  box-shadow: var(--elev-warm);
+  border-color: var(--card-border-strong);
+}
+
+/* Brand block — styled with Tailwind utilities in src/components/Header.tsx. */
+
+/* App Main Container */
+.main-content-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* The rail scrolls internally on short screens. Its thumb is noise next to the content
+   scroller, so it is hidden on desktop — wheel and touch still scroll the rail. Phones keep
+   the thumb: there the rail is a horizontal chip strip and the thumb shows it scrolls. */
+@media (min-width: 901px) {
+  .rail-scroll {
+    scrollbar-width: none;
+  }
+
+  .rail-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Header sound selector — styled with Tailwind utilities in src/components/TopBar.tsx. */
+
+/* Buttons System */
+.btn {
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-family: var(--font-main);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+/* Both stops ride the accent ramp so the gradient follows the palette (the hardcoded
+   tan ended up blue-to-tan on Nocturne), and the ink is the page background: dark on
+   the light accents of the dark themes, cream on Paper's dark brass. Black text on
+   Paper's #9a5b12 was 3.9:1 — below AA. */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  color: var(--bg-primary);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.4);
+}
+
+/* Same page-background ink as .btn-primary — white failed AA on three themes' ramps
+   (3.36:1 on Nocturne's violet). The audit in src/style.test.ts checks both stops. */
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent-tertiary) 0%, var(--accent-secondary) 100%);
+  color: var(--bg-primary);
+}
+
+.btn-accent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(var(--tertiary-rgb), 0.4);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+}
+
+.btn-outline:hover {
+  background: rgba(var(--overlay-rgb), 0.1);
+}
+
+/* Alert token, not a hardcoded red, and the ink follows the page background like the
+   other buttons: white on #e06c5a was 3.26:1 (below AA) and bypassed the theme. */
+.btn-danger {
+  background: var(--accent-alert);
+  color: var(--bg-primary);
+}
+
+/* Ink follows the text ramp: the field background is the page primary, so on Paper the
+   old white text sat on cream and vanished. */
+.select-input {
+  background: rgba(var(--bg-primary-rgb), 0.8);
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-family: var(--font-main);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover and focus echo the app's warm accent instead of the UA's blue ring. The closed
+   arrow already follows the theme through `color-scheme`; these rules give the closed
+   box its feedback states. */
+.select-input:hover {
+  border-color: rgba(var(--accent-rgb), 0.45);
+}
+
+.select-input:focus-visible {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.22);
+}
+
+/* The open popup is the part `color-scheme` does not reliably cover (Safari and some
+   Linux browsers keep UA colours there), so the list itself is themed directly. Browsers
+   that ignore `option` backgrounds fall back to the already-correct `color-scheme` popup. */
+.select-input option,
+select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.select-input optgroup,
+select optgroup {
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* Side-by-Side Chord Studio — the screen's markup moved to Tailwind utilities in
+   src/components/ChordWorkbench.tsx and src/components/ChordFretGrid.tsx. What stays
+   here is shared: section-badge sits on seven screen headers, btn-nano also drives the
+   song follower, and btn-sm sizes buttons across every screen. */
+.section-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent-primary);
+  margin-bottom: 6px;
+}
+
+/* The studio's compact fingering diagram (strings, frets, finger dots) and card layout
+   are utilities in src/components/ChordFretGrid.tsx now. */
+/* Same story as select-input: the tint is the overlay channel (a dark wash on Paper),
+   so white text disappeared there. Hover flips to accent + page-background ink. */
+.btn-nano {
+  background: rgba(var(--overlay-rgb), 0.1);
+  border: none;
+  color: var(--text-primary);
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn-nano:hover {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Guitar Fretboard Component — the header, string-status legend, and footer moved to
+   utilities in src/components/GuitarFretboard.tsx; the chord-chip picker moved with
+   routes.tsx. The neck grid below is the plan's explicit carve-out: it stays CSS. */
+.fretboard-wrapper {
+  background: #1a1512;
+  background-image: linear-gradient(90deg, #261f1a 0%, #15100e 100%);
+  border: 4px solid #3d3027;
+  border-radius: 12px;
+  padding: 16px 20px;
+  min-width: 900px;
+  box-shadow: inset 0 0 20px rgba(var(--inset-rgb),0.8);
+}
+
+.fret-numbers-row {
+  display: grid;
+  grid-template-columns: 60px repeat(12, 1fr);
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #8a7a6e;
+}
+
+.nut-spacer {
+  font-weight: 700;
+  color: var(--accent-highlight);
+}
+
+.fret-number-cell {
+  text-align: center;
+  position: relative;
+}
+
+.fret-dot-single {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: #8a7a6e;
+  border-radius: 50%;
+}
+
+.fret-dot-double {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 6px;
+  background: #8a7a6e;
+  border-radius: 3px;
+}
+
+.fretboard-neck {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fretboard-string-row {
+  display: grid;
+  grid-template-columns: 60px repeat(12, 1fr);
+  align-items: center;
+  position: relative;
+  height: 34px;
+}
+
+.string-head-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-highlight);
+}
+
+.string-head-label .string-num {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.string-head-label .string-note {
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.string-line {
+  position: absolute;
+  left: 60px;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, #d4af37 0%, #8c8c8c 100%);
+  box-shadow: 0 1px 3px rgba(var(--inset-rgb),0.8);
+  pointer-events: none;
+}
+
+.fret-cell {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.fret-wire {
+  position: absolute;
+  right: 0;
+  top: -6px;
+  bottom: -6px;
+  width: 3px;
+  background: linear-gradient(180deg, #8c8c8c 0%, #ffffff 50%, #4a4a4a 100%);
+}
+
+.note-press-badge {
+  position: relative;
+  z-index: 5;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #000;
+  box-shadow: 0 0 10px rgba(var(--inset-rgb),0.8);
+  transition: transform 0.15s ease;
+}
+
+.note-press-badge:hover {
+  transform: scale(1.2);
+}
+
+.chord-press-active {
+  box-shadow: 0 0 15px var(--accent-primary);
+  border: 2px solid #fff;
+  width: 32px;
+  height: 32px;
+}
+
+/* Root and scale tones on the neck: the root gets the brass ring, scale tones a
+   hairline. These were the two most-used classes with no rule at all (docs/BUGS.md A1). */
+.root-active {
+  border: 2px solid var(--accent-highlight);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.45);
+}
+
+.scale-active {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.badge-note-name {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.badge-finger {
+  font-size: 8px;
+  margin-top: -2px;
+}
+
+/* Live note finder: while the mic listens, every fret that sounds the detected note
+   pulses, and an open-string hit rings the string head at the nut. */
+.fret-cell--live::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--accent-highlight);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 6;
+  animation: live-hit-pulse 1.2s ease-in-out infinite;
+}
+
+.live-hit-badge {
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.7);
+}
+
+.string-head-label--live {
+  background: rgba(var(--accent-rgb), 0.16);
+  border-radius: 8px;
+  padding: 1px 6px;
+  animation: live-hit-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes live-hit-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.6);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0);
+    opacity: 0.7;
+  }
+}
+
+/* Piano Component */
+.piano-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.piano-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.piano-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.root-dot {
+  background: var(--accent-tertiary);
+}
+
+.active-dot {
+  background: var(--accent-primary);
+}
+
+.piano-keyboard {
+  display: flex;
+  position: relative;
+  height: 180px;
+  background: #111;
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(var(--inset-rgb),0.5);
+  user-select: none;
+  overflow-x: auto;
+}
+
+.piano-key {
+  position: relative;
+  cursor: pointer;
+  transition: background 0.1s ease, transform 0.1s ease;
+}
+
+.white-key {
+  flex: 1;
+  min-width: 40px;
+  height: 100%;
+  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #ced4da;
+  border-radius: 0 0 6px 6px;
+  z-index: 1;
+}
+
+.white-key:active {
+  background: #dee2e6;
+  transform: translateY(2px);
+}
+
+.black-key {
+  width: 28px;
+  height: 60%;
+  background: linear-gradient(180deg, #212529 0%, #000000 100%);
+  margin-left: -14px;
+  margin-right: -14px;
+  z-index: 2;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 8px rgba(var(--inset-rgb),0.5);
+}
+
+.black-key:active {
+  background: #343a40;
+}
+
+.piano-key.active-key {
+  background: var(--accent-primary) !important;
+  box-shadow: 0 0 15px var(--accent-primary);
+}
+
+.piano-key.root-key {
+  background: var(--accent-tertiary) !important;
+  box-shadow: 0 0 15px var(--accent-tertiary);
+}
+
+.key-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #333;
+}
+
+.black-key .key-badge {
+  color: #fff;
+  bottom: 6px;
+}
+
+.root-tag {
+  font-size: 8px;
+  background: #000;
+  color: #fff;
+  padding: 1px 4px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.dual-visualizers-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+/* Scales Navigator — markup is utilities in src/components/ScaleExplorer.tsx; the
+   twelve-note chips moved with NotePicker, shared with the interval explorer. */
+/* Interval Explorer — markup is utilities in src/components/IntervalExplorer.tsx; the
+   note grids ride on NotePicker, shared with the scale explorer. */
+/* Cheat Sheet Component — styled with Tailwind utilities in
+   src/components/TheoryCheatSheet.tsx. */
+
+/* Tuner Component Styling — the legacy linear meter, gauge, and preset bar were dead
+   code (nothing renders them); the live tuner is utilities in GuitarTuner.tsx. */
+
+/* GuitarTuna tuner — header controls, error banner, and stage layout are utilities in
+   src/components/GuitarTuner.tsx now. The arc gauge below stays CSS (SVG internals). */
+
+/* Curved Arc Gauge — the meter's stage panel as well as its layout box: the arc, the
+   note readout inside it, and the status badge below all live here. Box-sizing is
+   explicit because the sheet ships without preflight (the default is content-box, and
+   padding plus border on a width:100% box would otherwise overflow its card). */
+.tuna-arc-gauge {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 20px;
+  border: 1px solid rgba(var(--overlay-rgb), 0.14);
+  border-radius: 16px;
+  background: rgba(var(--inset-rgb), 0.22);
+}
+
+.arc-svg {
+  width: 100%;
+  height: 200px;
+  overflow: visible;
+}
+
+/* Marker rotation + stroke easing. The drop-shadow glow is per-state (inline, keyed
+   to the needle colour) so a silent meter does not glow and an in-tune one does. */
+.arc-needle-line {
+  transition: transform 0.1s ease-out, stroke 0.2s;
+}
+
+/* Headstock tuner — peg columns, cards, and the readout moved to utilities in
+   src/components/GuitarTuner.tsx; the wood graphic below stays CSS. */
+
+/* Headstock Wood Graphic */
+.headstock-graphic {
+  position: relative;
+  width: 160px;
+  height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.headstock-top-crown {
+  width: 120px;
+  height: 30px;
+  background: #2b221c;
+  border: 2px solid #5a4539;
+  border-radius: 20px 20px 0 0;
+}
+
+.headstock-wood-body {
+  position: relative;
+  width: 150px;
+  height: 250px;
+  background: linear-gradient(180deg, #3d2d24 0%, #1c130e 100%);
+  border: 3px solid #5a4539;
+  border-radius: 8px 8px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  box-shadow: inset 0 0 30px rgba(var(--inset-rgb),0.8), 0 10px 25px rgba(var(--inset-rgb),0.5);
+}
+
+.headstock-logo {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--accent-highlight);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.nut-bar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 12px;
+  background: #f4e8d1;
+  border-top: 1px solid #d4c4a8;
+}
+
+.headstock-strings-layer {
+  display: flex;
+  justify-content: space-around;
+  width: 80%;
+  height: 100%;
+  margin-top: 20px;
+}
+
+.headstock-string-wire {
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, #888 0%, #ddd 100%);
+  transition: background-color 0.2s, width 0.2s;
+}
+
+.headstock-string-wire.active-wire {
+  background: var(--accent-primary);
+  width: 3px;
+  box-shadow: 0 0 10px var(--accent-primary);
+}
+
+/* ============================
+   METRONOME PAGE
+   ============================ */
+.metronome-svg {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  filter: drop-shadow(0 8px 24px rgba(var(--inset-rgb),0.6));
+}
+
+/* Pendulum arm smooth swing */
+.pendulum-arm-group {
+  will-change: transform;
+}
+
+.metro-weight {
+  transition: fill 0.1s;
+}
+
+.metro-bpm-svg {
+  transition: fill 0.1s;
+}
+
+/* Pulse glow ring below metronome */
+.metro-pulse-ring {
+  width: 120px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(var(--accent-rgb), 0.05);
+  margin-top: -12px;
+  transition: background 0.1s, box-shadow 0.1s;
+}
+
+.metro-pulse-ring.ring-beat {
+  background: rgba(var(--accent-rgb), 0.3);
+  box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.5);
+}
+
+.metro-pulse-ring.ring-accent {
+  background: rgba(var(--highlight-rgb), 0.4);
+  box-shadow: 0 0 50px rgba(var(--highlight-rgb), 0.6);
+}
+
+/* Sliders — one themed base so every range input in the app (metronome tempo, song
+   follower tempo, chord fret position) reads as the same control. */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(var(--overlay-rgb), 0.1);
+  outline: none;
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
+  cursor: pointer;
+  border: 2px solid #fff;
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
+  cursor: pointer;
+  border: 2px solid #fff;
+}
+
+/* Filled-track enhancement: --v is the current BPM, set inline by RhythmMetronome, so the
+   filled part of the track follows the thumb across the full 40–220 range. Higher
+   specificity than the plain track above, and it deliberately keeps the name the metronome
+   markup already carries. */
+input[type='range'].bpm-slider {
+  background: linear-gradient(
+    to right,
+    var(--accent-primary) 0%,
+    var(--accent-primary) calc((var(--v, 100) - 40) / 180 * 100%),
+    rgba(var(--overlay-rgb), 0.1) calc((var(--v, 100) - 40) / 180 * 100%)
+  );
+}
+
+
+/* Visualizer switch — styled with Tailwind utilities in src/components/Header.tsx. */
+
+/* ============================================================
+   APP SHELL — navigation rail, main column, top bar, hero
+   ============================================================ */
+
+.musix-app-root {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+/* ── Navigation rail — styled with Tailwind utilities in src/components/Header.tsx ── */
+
+/* ── Main column ── */
+.musix-main-column {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Top bar ── styled with Tailwind utilities in src/components/TopBar.tsx ── */
+
+/* ── Screen hero — styled with Tailwind utilities in src/App.tsx ── */
+
+/* ── Section rhythm ── */
+.tab-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Responsive: rail becomes a scrollable top strip ── */
+@media (max-width: 900px) {
+  .musix-app-root {
+    flex-direction: column;
+  }
+
+  .btn {
+    min-height: 44px;
+  }
+
+  .main-content-container {
+    padding: 22px 16px;
+    gap: 22px;
+  }
+}
+
+/* ============================================================
+   THEMES — selectable at runtime via <html data-theme="…">.
+   Because every tint reads from the channel tokens, a theme is
+   just a palette restatement.
+   ============================================================ */
+
+html[data-theme="nocturne"] {
+  color-scheme: dark;
+  --bg-primary: #0b0f1a;
+  --bg-secondary: #121a2a;
+  --surface-2: #18213a;
+  --card-bg: rgba(18, 26, 42, 0.78);
+  --card-border: rgba(var(--overlay-rgb), 0.16);
+  --card-border-strong: rgba(var(--overlay-rgb), 0.32);
+  --accent-primary: #6ea8fe;
+  /* Copper-blue lightened from #4c6ef5: at 4.42:1 against the page-background ink it
+     missed AA as the .btn-primary ramp's end stop. The contrast audit fails on a regression. */
+  --accent-secondary: #5b77f7;
+  --accent-tertiary: #9775fa;
+  --accent-highlight: #a5d8ff;
+  --accent-success: #63e6be;
+  --accent-alert: #ff8787;
+  --text-primary: #eaf0fb;
+  --text-secondary: #a9b6cc;
+  --text-muted: #7c8aa3;
+  --bg-primary-rgb: 11, 15, 26;
+  --bg-secondary-rgb: 18, 26, 42;
+  --card-rgb: 18, 26, 42;
+  --hero-rgb: 26, 34, 58;
+  --overlay-rgb: 255, 255, 255;
+  --inset-rgb: 0, 0, 0;
+  --accent-rgb: 110, 168, 254;
+  --accent-2-rgb: 91, 119, 247;
+  --tertiary-rgb: 151, 117, 250;
+  --highlight-rgb: 165, 216, 255;
+  --success-rgb: 99, 230, 190;
+  --alert-rgb: 255, 135, 135;
+}
+
+html[data-theme="paper"] {
+  color-scheme: light;
+  --bg-primary: #f6f1e7;
+  --bg-secondary: #fffaf0;
+  --surface-2: #efe7d8;
+  --card-bg: rgba(255, 252, 246, 0.92);
+  --card-border: rgba(90, 66, 40, 0.18);
+  --card-border-strong: rgba(90, 66, 40, 0.34);
+  --accent-primary: #9a5b12;
+  --accent-secondary: #7a4410;
+  --accent-tertiary: #b3452a;
+  --accent-highlight: #b8862b;
+  --accent-success: #2f7d4f;
+  --accent-alert: #b23b2f;
+  --text-primary: #221a12;
+  --text-secondary: #5c4d3c;
+  /* Darkened from #8a7a66 so muted text clears WCAG AA (4.5:1) on the paper canvas —
+     the contrast audit in src/style.test.ts fails the suite if it regresses. */
+  --text-muted: #7a6b58;
+  --bg-primary-rgb: 246, 241, 231;
+  --bg-secondary-rgb: 255, 250, 240;
+  --card-rgb: 255, 252, 246;
+  --hero-rgb: 240, 231, 216;
+  /* On paper the overlays become a warm dark tint instead of a light one. */
+  --overlay-rgb: 60, 42, 24;
+  --inset-rgb: 74, 54, 32;
+  --accent-rgb: 154, 91, 18;
+  --accent-2-rgb: 122, 68, 16;
+  --tertiary-rgb: 179, 69, 42;
+  --highlight-rgb: 184, 134, 43;
+  --success-rgb: 47, 125, 79;
+  --alert-rgb: 178, 59, 47;
+}
+
+html[data-theme="arcade"] {
+  color-scheme: dark;
+  --bg-primary: #0a0d14;
+  --bg-secondary: #121824;
+  --surface-2: #1a2233;
+  --card-bg: rgba(20, 28, 44, 0.72);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --card-border-strong: rgba(255, 255, 255, 0.24);
+  --accent-primary: #00f0ff;
+  /* Purple lightened from #9d4edd: at 4.23:1 against the page-background ink it missed
+     AA as the .btn-primary ramp's end stop. The contrast audit fails on a regression. */
+  --accent-secondary: #a45ae6;
+  --accent-tertiary: #ff2a85;
+  --accent-highlight: #ffb703;
+  --accent-success: #00f5d4;
+  --accent-alert: #ff4d4d;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  /* Lightened from #64748b so muted text clears WCAG AA (4.5:1) on the arcade surfaces —
+     the contrast audit in src/style.test.ts fails the suite if it regresses. */
+  --text-muted: #7b8598;
+  --bg-primary-rgb: 10, 13, 20;
+  --bg-secondary-rgb: 18, 24, 36;
+  --card-rgb: 20, 28, 44;
+  --hero-rgb: 35, 20, 50;
+  --overlay-rgb: 255, 255, 255;
+  --inset-rgb: 0, 0, 0;
+  --accent-rgb: 0, 240, 255;
+  --accent-2-rgb: 164, 90, 230;
+  --tertiary-rgb: 255, 42, 133;
+  --highlight-rgb: 255, 183, 3;
+  --success-rgb: 0, 245, 212;
+  --alert-rgb: 255, 77, 77;
+}
+
+/* ---------------------------------------------------------------------------
+   Song Follower — markup is utilities in src/components/SongFollower.tsx.
+   The @media print rules that follow are the follower's take-away sheet.
+   --------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
+   Routing: chunk loader
+   --------------------------------------------------------------------------- */
+.screen-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 180px;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.screen-loading__pulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--accent-primary);
+  animation: screen-loading-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes screen-loading-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Footer — styled with Tailwind utilities in src/components/Footer.tsx.
+   --------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
+   Contact screen — styled with Tailwind utilities in src/components/Contact.tsx.
+   --------------------------------------------------------------------------- */
+
+@keyframes mic-banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Headstock visual cue: where the active string sits on the body. The old gradient
+   mixed a hex colour with an RGB triplet (`var(--accent-2-rgb)` = "184, 103, 47"),
+   which is invalid at computed-value time and wiped the wire's background entirely —
+   the active string disappeared instead of glowing. Both stops are real colours now.
+   The box-shadow below had the same disease (`rgba(var(--accent-primary), …)` wraps a
+   hex token, which rgba() cannot parse), so the glow silently rendered as none. */
+.active-wire {
+  background: linear-gradient(
+    to bottom,
+    var(--accent-primary),
+    var(--accent-secondary)
+  ) !important;
+  box-shadow: 0 0 10px var(--accent-primary);
+}
+
+/* The wire wiggles while a reference tone (or the “Hear tuning” tour) rings that
+   string — the smallest possible vibration cue. */
+.headstock-string-wire.vibrating {
+  animation: string-vibe 0.06s linear infinite alternate;
+}
+
+@keyframes string-vibe {
+  from {
+    transform: translateX(-1.5px);
+  }
+  to {
+    transform: translateX(1.5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headstock-string-wire.vibrating {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Tooltips — one shared hover bubble for controls whose label does not say
+   enough. `data-tip` carries the text; `data-tip-pos` flips the placement
+   (default above, `right` for the navigation rail, `bottom` for the top bar)
+   and `data-tip-align="end"` keeps a bubble inside the right edge. Keyboard
+   focus shows it as well as hover, and form fields fall back to `title`.
+   --------------------------------------------------------------------------- */
+[data-tip] {
+  position: relative;
+}
+
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 9px);
+  z-index: 90;
+  width: max-content;
+  max-width: 250px;
+  padding: 7px 10px;
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  border-radius: 9px;
+  background: var(--bg-secondary);
+  box-shadow: var(--elev-2);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  text-align: left;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  transition: opacity 0.15s var(--ease), transform 0.15s var(--ease);
+}
+
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Below the anchor: top bar and anything pinned under a header. */
+[data-tip-pos="bottom"]::after {
+  bottom: auto;
+  top: calc(100% + 9px);
+  transform: translate(-50%, -4px);
+}
+
+[data-tip-pos="bottom"]:hover::after,
+[data-tip-pos="bottom"]:focus-visible::after {
+  transform: translate(-50%, 0);
+}
+
+/* To the side: the navigation rail, where a bubble above would cover the group. */
+[data-tip-pos="right"]::after {
+  left: calc(100% + 10px);
+  bottom: auto;
+  top: 50%;
+  transform: translate(-4px, -50%);
+}
+
+[data-tip-pos="right"]:hover::after,
+[data-tip-pos="right"]:focus-visible::after {
+  transform: translate(0, -50%);
+}
+
+/* Right-aligned anchor, so the bubble grows leftwards and stays on screen. */
+[data-tip-align="end"]::after {
+  left: auto;
+  right: 0;
+  transform: translateY(4px);
+}
+
+[data-tip-align="end"]:hover::after,
+[data-tip-align="end"]:focus-visible::after {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tip]::after {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Preference-cookie permission bar
+   --------------------------------------------------------------------------- */
+.consent-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  z-index: 120;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 18px;
+  width: min(720px, calc(100vw - 32px));
+  padding: 16px 18px;
+  border: 1px solid var(--card-border-strong);
+  border-radius: var(--radius-lg);
+  background: rgba(var(--bg-secondary-rgb), 0.96);
+  box-shadow: var(--elev-warm);
+  backdrop-filter: blur(8px);
+  transform: translateX(-50%);
+  animation: consent-in 0.28s var(--ease);
+}
+
+@keyframes consent-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.consent-bar__text {
+  flex: 1 1 320px;
+}
+
+.consent-bar__title {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+  color: var(--text-primary);
+}
+
+.consent-bar__copy {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.consent-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.consent-bar__note {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+@media (max-width: 720px) {
+  .consent-bar {
+    bottom: 12px;
+    gap: 12px;
+  }
+
+  .consent-bar__actions {
+    width: 100%;
+  }
+
+  .consent-bar__actions .btn {
+    flex: 1 1 auto;
+  }
+}
+/* Print: paper carries only the Song Follower's chart, so a learner can take the graded
+   chart away from the screen (docs/PLAN.md, "print stylesheet"). The shell chrome hides
+   with Tailwind's `print:hidden`; this block re-themes the sheet for paper and lets it run
+   past the viewport-height scroll box. */
+@media print {
+  .print-sheet {
+    --text-primary: #111;
+    --text-secondary: #333;
+    --text-muted: #555;
+    --bg-primary: #111;
+    --overlay-rgb: 0, 0, 0;
+    --card-border: #bbb;
+
+    max-height: none !important;
+    overflow: visible !important;
+    height: auto !important;
+    border-top: 1px solid #bbb;
+    color: #111;
+  }
+
+  /* Each line of the chart stays whole — no chord chip orphaned from its lyrics. */
+  .print-sheet > * {
+    break-inside: avoid;
+  }
+
+  /* The card and page behind the sheet drop their dark chrome; ink stays near-black. */
+  .glass-card {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+}
+/* end @layer components — the closing brace is the last character of the file */
+}
+
