@@ -1,0 +1,14 @@
+# Musix — https://github.com/Madhurg2002/Musix
+#
+# The site is a static, single-page reference app. Everything a learner needs is
+# reachable from the root document, so crawling is fully allowed.
+
+User-agent: *
+Allow: /
+
+# Build outputs and tooling are not part of the published site.
+Disallow: /src/
+Disallow: /node_modules/
+
+# No sitemap is published: the app routes with URL fragments (#tuner, #songs, …),
+# which crawlers do not treat as separate documents.
