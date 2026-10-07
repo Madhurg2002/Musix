@@ -7,6 +7,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
   const tabs = [
+    { id: 'tuner', label: '🎯 Instrument Tuner', icon: '🎯' },
     { id: 'fretboard', label: '🎸 Guitar Fretboard', icon: '🎸' },
     { id: 'workbench', label: '🎴 Side-by-Side Cards', icon: '🎴' },
     { id: 'piano', label: '🎹 Piano Visualizer', icon: '🎹' },

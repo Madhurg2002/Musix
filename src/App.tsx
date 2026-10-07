@@ -10,6 +10,7 @@ import { ScaleExplorer } from './components/ScaleExplorer';
 import { IntervalExplorer } from './components/IntervalExplorer';
 import { RhythmMetronome } from './components/RhythmMetronome';
 import { TheoryCheatSheet } from './components/TheoryCheatSheet';
+import { GuitarTuner } from './components/GuitarTuner';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('workbench');
@@ -50,6 +51,13 @@ export function App() {
             </div>
           </div>
         </section>
+
+        {/* Tab 0: Tuner */}
+        {activeTab === 'tuner' && (
+          <section className="tab-section">
+            <GuitarTuner />
+          </section>
+        )}
 
         {/* Tab 1: Side-by-Side Chord Studio */}
         {activeTab === 'workbench' && (
