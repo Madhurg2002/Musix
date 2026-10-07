@@ -1,45 +1,54 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NoteName } from '../types';
-import { ALL_NOTES, midiToFrequency } from '../utils/musicTheory';
+import { ALL_NOTES } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
+
+export interface StringInfo {
+  index: number;
+  note: NoteName;
+  octave: number;
+  frequency: number;
+  stringName: string;
+  side: 'left' | 'right';
+}
 
 export interface TuningPreset {
   name: string;
-  strings: { note: NoteName; octave: number; frequency: number; stringName: string }[];
+  strings: StringInfo[];
 }
 
 export const TUNING_PRESETS: TuningPreset[] = [
   {
-    name: 'Standard Tuning (E A D G B E)',
+    name: 'Standard Guitar (E A D G B E)',
     strings: [
-      { note: 'E', octave: 2, frequency: 82.41, stringName: '6 (Low E)' },
-      { note: 'A', octave: 2, frequency: 110.00, stringName: '5 (A)' },
-      { note: 'D', octave: 3, frequency: 146.83, stringName: '4 (D)' },
-      { note: 'G', octave: 3, frequency: 196.00, stringName: '3 (G)' },
-      { note: 'B', octave: 3, frequency: 246.94, stringName: '2 (B)' },
-      { note: 'E', octave: 4, frequency: 329.63, stringName: '1 (High E)' },
+      { index: 6, note: 'E', octave: 2, frequency: 82.41, stringName: '6 (Low E)', side: 'left' },
+      { index: 5, note: 'A', octave: 2, frequency: 110.0, stringName: '5 (A)', side: 'left' },
+      { index: 4, note: 'D', octave: 3, frequency: 146.83, stringName: '4 (D)', side: 'left' },
+      { index: 3, note: 'G', octave: 3, frequency: 196.0, stringName: '3 (G)', side: 'right' },
+      { index: 2, note: 'B', octave: 3, frequency: 246.94, stringName: '2 (B)', side: 'right' },
+      { index: 1, note: 'E', octave: 4, frequency: 329.63, stringName: '1 (High E)', side: 'right' },
     ],
   },
   {
     name: 'Drop D (D A D G B E)',
     strings: [
-      { note: 'D', octave: 2, frequency: 73.42, stringName: '6 (Low D)' },
-      { note: 'A', octave: 2, frequency: 110.00, stringName: '5 (A)' },
-      { note: 'D', octave: 3, frequency: 146.83, stringName: '4 (D)' },
-      { note: 'G', octave: 3, frequency: 196.00, stringName: '3 (G)' },
-      { note: 'B', octave: 3, frequency: 246.94, stringName: '2 (B)' },
-      { note: 'E', octave: 4, frequency: 329.63, stringName: '1 (High E)' },
+      { index: 6, note: 'D', octave: 2, frequency: 73.42, stringName: '6 (Low D)', side: 'left' },
+      { index: 5, note: 'A', octave: 2, frequency: 110.0, stringName: '5 (A)', side: 'left' },
+      { index: 4, note: 'D', octave: 3, frequency: 146.83, stringName: '4 (D)', side: 'left' },
+      { index: 3, note: 'G', octave: 3, frequency: 196.0, stringName: '3 (G)', side: 'right' },
+      { index: 2, note: 'B', octave: 3, frequency: 246.94, stringName: '2 (B)', side: 'right' },
+      { index: 1, note: 'E', octave: 4, frequency: 329.63, stringName: '1 (High E)', side: 'right' },
     ],
   },
   {
     name: 'Half Step Down (E♭ A♭ D♭ G♭ B♭ E♭)',
     strings: [
-      { note: 'D♯', octave: 2, frequency: 77.78, stringName: '6 (E♭)' },
-      { note: 'G♯', octave: 2, frequency: 103.83, stringName: '5 (A♭)' },
-      { note: 'C♯', octave: 3, frequency: 138.59, stringName: '4 (D♭)' },
-      { note: 'F♯', octave: 3, frequency: 185.00, stringName: '3 (G♭)' },
-      { note: 'A♯', octave: 3, frequency: 233.08, stringName: '2 (B♭)' },
-      { note: 'D♯', octave: 4, frequency: 311.13, stringName: '1 (E♭)' },
+      { index: 6, note: 'D♯', octave: 2, frequency: 77.78, stringName: '6 (E♭)', side: 'left' },
+      { index: 5, note: 'G♯', octave: 2, frequency: 103.83, stringName: '5 (A♭)', side: 'left' },
+      { index: 4, note: 'C♯', octave: 3, frequency: 138.59, stringName: '4 (D♭)', side: 'left' },
+      { index: 3, note: 'F♯', octave: 3, frequency: 185.0, stringName: '3 (G♭)', side: 'right' },
+      { index: 2, note: 'A♯', octave: 3, frequency: 233.08, stringName: '2 (B♭)', side: 'right' },
+      { index: 1, note: 'D♯', octave: 4, frequency: 311.13, stringName: '1 (E♭)', side: 'right' },
     ],
   },
 ];
@@ -54,7 +63,7 @@ function autoCorrelate(buf: Float32Array, sampleRate: number): number {
     rms += val * val;
   }
   rms = Math.sqrt(rms / SIZE);
-  if (rms < 0.01) return -1; // signal too quiet
+  if (rms < 0.012) return -1; // signal too quiet
 
   let r1 = 0,
     r2 = SIZE - 1,
@@ -106,31 +115,32 @@ function autoCorrelate(buf: Float32Array, sampleRate: number): number {
 
 export const GuitarTuner: React.FC = () => {
   const [selectedPresetIndex, setSelectedPresetIndex] = useState<number>(0);
-  const [mode, setMode] = useState<'reference' | 'mic'>('mic');
-  const [activeRefNote, setActiveRefNote] = useState<string | null>(null);
+  const [autoDetectMode, setAutoDetectMode] = useState<boolean>(true);
+  const [selectedStringIndex, setSelectedStringIndex] = useState<number | null>(null);
 
-  // Live Mic Tuner States
+  // Live Mic States
   const [isMicListening, setIsMicListening] = useState<boolean>(false);
   const [detectedPitch, setDetectedPitch] = useState<number | null>(null);
-  const [detectedNote, setDetectedNote] = useState<string>('--');
+  const [detectedNoteName, setDetectedNoteName] = useState<string>('--');
   const [centsOff, setCentsOff] = useState<number>(0);
+  const [activePegIndex, setActivePegIndex] = useState<number | null>(null);
   const [micError, setMicError] = useState<string | null>(null);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
   const animFrameRef = useRef<number | null>(null);
+  const lastChimeTimeRef = useRef<number>(0);
 
   const preset = TUNING_PRESETS[selectedPresetIndex];
 
-  // Play Reference Tone for a string
-  const handlePlayRefTone = (freq: number, strName: string) => {
-    setActiveRefNote(strName);
-    soundEngine.playNote(freq, 2.5, 'acoustic-guitar');
-    setTimeout(() => setActiveRefNote(null), 2500);
+  // Play reference tone for peg
+  const handlePegClick = (str: StringInfo) => {
+    setSelectedStringIndex(str.index);
+    setActivePegIndex(str.index);
+    soundEngine.playNote(str.frequency, 2.5, 'acoustic-guitar');
   };
 
-  // Start Mic Pitch Detection
   const startMic = async () => {
     try {
       setMicError(null);
@@ -149,8 +159,8 @@ export const GuitarTuner: React.FC = () => {
 
       setIsMicListening(true);
       updatePitch();
-    } catch (err) {
-      setMicError('Microphone access denied or unavailable. Please enable mic access or use Reference Tones.');
+    } catch {
+      setMicError('Microphone access denied or unavailable. Please enable microphone permissions or click pegs to hear reference tones.');
     }
   };
 
@@ -164,8 +174,9 @@ export const GuitarTuner: React.FC = () => {
     }
     setIsMicListening(false);
     setDetectedPitch(null);
-    setDetectedNote('--');
+    setDetectedNoteName('--');
     setCentsOff(0);
+    setActivePegIndex(null);
   };
 
   const updatePitch = () => {
@@ -174,19 +185,37 @@ export const GuitarTuner: React.FC = () => {
     analyserRef.current.getFloatTimeDomainData(buf);
     const pitch = autoCorrelate(buf, audioCtxRef.current.sampleRate);
 
-    if (pitch !== -1 && pitch > 50 && pitch < 1000) {
+    if (pitch !== -1 && pitch > 60 && pitch < 1000) {
       setDetectedPitch(pitch);
-      // Calculate closest MIDI note: 12 * log2(pitch / 440) + 69
+
+      // Find closest MIDI note
       const noteNum = 12 * (Math.log(pitch / 440) / Math.log(2)) + 69;
       const roundedMidi = Math.round(noteNum);
       const noteName = ALL_NOTES[((roundedMidi % 12) + 12) % 12];
       const octave = Math.floor(roundedMidi / 12) - 1;
-
-      // Calculate cents deviation: 100 * (noteNum - roundedMidi)
       const cents = Math.round(100 * (noteNum - roundedMidi));
 
-      setDetectedNote(`${noteName}${octave}`);
+      setDetectedNoteName(`${noteName}${octave}`);
       setCentsOff(cents);
+
+      // Find matching string peg from active tuning preset
+      let matchedPeg: StringInfo | undefined;
+      if (autoDetectMode) {
+        matchedPeg = preset.strings.find(
+          (s) => Math.abs(12 * Math.log2(pitch / s.frequency)) < 1.8
+        );
+      } else if (selectedStringIndex !== null) {
+        matchedPeg = preset.strings.find((s) => s.index === selectedStringIndex);
+      }
+
+      if (matchedPeg) {
+        setActivePegIndex(matchedPeg.index);
+        // Play success chirp if perfectly in tune (once per 2 seconds)
+        if (Math.abs(cents) <= 4 && Date.now() - lastChimeTimeRef.current > 2000) {
+          soundEngine.playClick(true);
+          lastChimeTimeRef.current = Date.now();
+        }
+      }
     }
 
     animFrameRef.current = requestAnimationFrame(updatePitch);
@@ -198,139 +227,206 @@ export const GuitarTuner: React.FC = () => {
     };
   }, []);
 
+  // Needle angle for curved arc gauge (-45 deg to +45 deg)
+  const needleAngle = Math.min(Math.max((centsOff / 50) * 45, -45), 45);
+
+  const leftPegs = preset.strings.filter((s) => s.side === 'left');
+  const rightPegs = preset.strings.filter((s) => s.side === 'right');
+
   return (
-    <div className="tuner-container glass-card">
+    <div className="guitartuna-tuner-container glass-card">
+      {/* Top Header Controls */}
       <div className="tuner-header">
         <div>
-          <span className="section-badge">🎯 Precision Instrument Tuner</span>
-          <h2>Guitar & Pitch Tuner</h2>
-          <p>Tune your instrument using live microphone pitch detection or reference audio tones.</p>
+          <span className="section-badge">🎯 GuitarTuna Style Visual Pitch Engine</span>
+          <h2>Interactive Guitar Headstock Tuner</h2>
+          <p>Automatic pitch detection with visual tuning pegs and curved arc meter.</p>
         </div>
 
-        <div className="tuner-mode-switcher">
-          <button
-            className={`btn ${mode === 'mic' ? 'btn-primary' : 'btn-outline'}`}
-            onClick={() => {
-              setMode('mic');
-              if (!isMicListening) startMic();
-            }}
+        <div className="tuner-top-actions">
+          <select
+            className="select-input preset-select"
+            value={selectedPresetIndex}
+            onChange={(e) => setSelectedPresetIndex(Number(e.target.value))}
           >
-            🎙️ Live Mic Tuner
-          </button>
+            {TUNING_PRESETS.map((p, idx) => (
+              <option key={idx} value={idx}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+
           <button
-            className={`btn ${mode === 'reference' ? 'btn-primary' : 'btn-outline'}`}
-            onClick={() => {
-              setMode('reference');
-              stopMic();
-            }}
+            className={`btn ${autoDetectMode ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => setAutoDetectMode(!autoDetectMode)}
           >
-            🔊 Reference Tones
+            {autoDetectMode ? '⚡ Auto String Detection' : '🔒 Manual Lock String'}
           </button>
-        </div>
-      </div>
 
-      {/* Preset Selector */}
-      <div className="tuner-preset-bar">
-        <label>Tuning Preset:</label>
-        <select
-          className="select-input"
-          value={selectedPresetIndex}
-          onChange={(e) => setSelectedPresetIndex(Number(e.target.value))}
-        >
-          {TUNING_PRESETS.map((p, idx) => (
-            <option key={idx} value={idx}>
-              {p.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Mode 1: Live Mic Pitch Tuner */}
-      {mode === 'mic' && (
-        <div className="mic-tuner-body">
-          {micError ? (
-            <div className="mic-error-box">
-              <p>⚠️ {micError}</p>
-              <button className="btn btn-primary" onClick={startMic}>
-                Retry Mic Access
-              </button>
-            </div>
+          {!isMicListening ? (
+            <button className="btn btn-accent" onClick={startMic}>
+              🎙️ Enable Microphone
+            </button>
           ) : (
-            <div className="tuner-gauge-wrapper">
-              <div className="tuner-status-bar">
-                {!isMicListening ? (
-                  <button className="btn btn-primary btn-lg" onClick={startMic}>
-                    🎙️ Enable Microphone to Start Tuning
-                  </button>
-                ) : (
-                  <button className="btn btn-outline" onClick={stopMic}>
-                    Stop Mic
-                  </button>
-                )}
-              </div>
-
-              {/* Pitch Visual Gauge */}
-              <div className="tuner-gauge-display">
-                <div className="gauge-note-title">{detectedNote}</div>
-
-                {detectedPitch && (
-                  <div className="gauge-freq-text">{detectedPitch.toFixed(1)} Hz</div>
-                )}
-
-                {/* Meter Needle Bar */}
-                <div className="gauge-meter">
-                  <div className="meter-flat-zone">FLAT ♭</div>
-                  <div className="meter-center-mark">
-                    <span className={`center-light ${Math.abs(centsOff) <= 5 ? 'in-tune' : ''}`} />
-                  </div>
-                  <div className="meter-sharp-zone">SHARP ♯</div>
-
-                  {/* Dynamic Needle */}
-                  <div
-                    className="meter-needle"
-                    style={{
-                      left: `${Math.min(Math.max(50 + (centsOff / 50) * 45, 5), 95)}%`,
-                      backgroundColor:
-                        Math.abs(centsOff) <= 5
-                          ? '#00f5d4'
-                          : Math.abs(centsOff) <= 15
-                          ? '#ffb703'
-                          : '#ff4d4d',
-                    }}
-                  />
-                </div>
-
-                <div className="cents-display">
-                  {Math.abs(centsOff) <= 5 ? (
-                    <span className="in-tune-text">PERFECT! IN TUNE ✅</span>
-                  ) : centsOff < 0 ? (
-                    <span className="flat-text">{centsOff} cents (Tune UP)</span>
-                  ) : (
-                    <span className="sharp-text">+{centsOff} cents (Tune DOWN)</span>
-                  )}
-                </div>
-              </div>
-            </div>
+            <button className="btn btn-danger" onClick={stopMic}>
+              Stop Mic
+            </button>
           )}
+        </div>
+      </div>
+
+      {micError && (
+        <div className="mic-error-banner">
+          <span>⚠️ {micError}</span>
         </div>
       )}
 
-      {/* Target Strings Quick Grid */}
-      <div className="target-strings-section">
-        <h3>Target Strings ({preset.name})</h3>
-        <div className="target-strings-grid">
-          {preset.strings.map((str, idx) => (
-            <div
-              key={idx}
-              className={`target-string-card ${activeRefNote === str.stringName ? 'active-ref' : ''}`}
-              onClick={() => handlePlayRefTone(str.frequency, str.stringName)}
-            >
-              <span className="target-str-num">String {str.stringName}</span>
-              <span className="target-str-note">{str.note}{str.octave}</span>
-              <span className="target-str-freq">{str.frequency} Hz</span>
-              <button className="btn-nano">🔊 Play Tone</button>
+      {/* Main GuitarTuna Layout: Arc Meter Top + Headstock Below */}
+      <div className="guitartuna-main-stage">
+        {/* 1. Curved Arc Meter Gauge */}
+        <div className="tuna-arc-gauge">
+          <svg viewBox="0 0 300 160" className="arc-svg">
+            {/* Arc Track */}
+            <path
+              d="M 30 140 A 120 120 0 0 1 270 140"
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.1)"
+              strokeWidth="12"
+              strokeLinecap="round"
+            />
+
+            {/* In-Tune Center Target Segment (Green) */}
+            <path
+              d="M 140 22 A 120 120 0 0 1 160 22"
+              fill="none"
+              stroke={Math.abs(centsOff) <= 4 ? '#00f5d4' : 'rgba(0, 245, 212, 0.4)'}
+              strokeWidth="16"
+              strokeLinecap="round"
+            />
+
+            {/* Ticks */}
+            {[-40, -25, -10, 0, 10, 25, 40].map((deg) => {
+              const rad = ((deg - 90) * Math.PI) / 180;
+              const x1 = 150 + 105 * Math.cos(rad);
+              const y1 = 140 + 105 * Math.sin(rad);
+              const x2 = 150 + 120 * Math.cos(rad);
+              const y2 = 140 + 120 * Math.sin(rad);
+              return (
+                <line
+                  key={deg}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke={deg === 0 ? '#00f5d4' : 'rgba(255,255,255,0.3)'}
+                  strokeWidth={deg === 0 ? '3' : '1.5'}
+                />
+              );
+            })}
+
+            {/* Animated Needle */}
+            <g transform={`rotate(${needleAngle}, 150, 140)`}>
+              <line
+                x1="150"
+                y1="140"
+                x2="150"
+                y2="30"
+                stroke={
+                  Math.abs(centsOff) <= 4
+                    ? '#00f5d4'
+                    : centsOff < 0
+                    ? '#ffb703'
+                    : '#ff4d4d'
+                }
+                strokeWidth="4"
+                strokeLinecap="round"
+                className="arc-needle-line"
+              />
+              <circle cx="150" cy="140" r="8" fill="#fff" />
+            </g>
+          </svg>
+
+          {/* Note & Pitch Center Readout */}
+          <div className="tuna-readout">
+            <div className="tuna-note-letter">{detectedNoteName}</div>
+            {detectedPitch && (
+              <div className="tuna-freq-sub">{detectedPitch.toFixed(1)} Hz</div>
+            )}
+            <div className="tuna-status-badge">
+              {Math.abs(centsOff) <= 4 ? (
+                <span className="in-tune-chip">IN TUNE ✅</span>
+              ) : centsOff < 0 ? (
+                <span className="flat-chip">TOO LOW 🔼 (Tune Up)</span>
+              ) : (
+                <span className="sharp-chip">TOO HIGH 🔽 (Tune Down)</span>
+              )}
             </div>
-          ))}
+          </div>
+        </div>
+
+        {/* 2. Visual Guitar Headstock with 6 Interactive Tuning Pegs */}
+        <div className="headstock-tuner-wrapper">
+          {/* Left String Pegs (Low E, A, D) */}
+          <div className="pegs-column left-pegs">
+            {leftPegs.map((str) => {
+              const isActive = activePegIndex === str.index;
+              return (
+                <div
+                  key={str.index}
+                  className={`tuning-peg-card ${isActive ? 'active-peg' : ''}`}
+                  onClick={() => handlePegClick(str)}
+                >
+                  <div className="peg-info">
+                    <span className="peg-name">String {str.index}</span>
+                    <span className="peg-freq">{str.frequency} Hz</span>
+                  </div>
+                  <div className="peg-circle-badge">
+                    <span className="peg-note">{str.note}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Headstock Graphic Body */}
+          <div className="headstock-graphic">
+            <div className="headstock-top-crown" />
+            <div className="headstock-wood-body">
+              <span className="headstock-logo">Musix</span>
+              <div className="nut-bar" />
+              {/* String Lines running down */}
+              <div className="headstock-strings-layer">
+                {preset.strings.map((str) => (
+                  <div
+                    key={str.index}
+                    className={`headstock-string-wire ${activePegIndex === str.index ? 'active-wire' : ''}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right String Pegs (G, B, High E) */}
+          <div className="pegs-column right-pegs">
+            {rightPegs.map((str) => {
+              const isActive = activePegIndex === str.index;
+              return (
+                <div
+                  key={str.index}
+                  className={`tuning-peg-card ${isActive ? 'active-peg' : ''}`}
+                  onClick={() => handlePegClick(str)}
+                >
+                  <div className="peg-circle-badge">
+                    <span className="peg-note">{str.note}</span>
+                  </div>
+                  <div className="peg-info">
+                    <span className="peg-name">String {str.index}</span>
+                    <span className="peg-freq">{str.frequency} Hz</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
