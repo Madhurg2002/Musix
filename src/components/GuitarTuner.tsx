@@ -3,6 +3,77 @@ import { NoteName } from '../types';
 import { ALL_NOTES } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 
+// Autocorrelation pitch detector (browser-side). Returns -1 when no pitch is usable.
+export function detectPitch(buf: Float32Array, sampleRate: number): number {
+  let SIZE = buf.length;
+  let rms = 0;
+
+  for (let i = 0; i < SIZE; i++) {
+    const val = buf[i] ?? 0;
+    rms += val * val;
+  }
+  rms = Math.sqrt(rms / SIZE);
+  if (rms < 0.012) return -1;
+
+  let r1 = 0;
+  let r2 = SIZE - 1;
+  const thres = 0.2;
+  for (let i = 0; i < SIZE / 2; i++) {
+    if (Math.abs(buf[i] ?? 0) < thres) {
+      r1 = i;
+      break;
+    }
+  }
+  for (let i = 1; i < SIZE / 2; i++) {
+    if (Math.abs(buf[SIZE - i] ?? 0) < thres) {
+      r2 = SIZE - i;
+      break;
+    }
+  }
+
+  const sliceBuf = buf.slice(r1, r2);
+  const sliceSize = sliceBuf.length;
+
+  const c = new Float32Array(sliceSize);
+  for (let i = 0; i < sliceSize; i++) {
+    for (let j = 0; j < sliceSize - i; j++) {
+      c[i] += (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
+    }
+  }
+
+  let d = 0;
+  while (d + 1 < sliceSize && c[d] > c[d + 1]) {
+    d++;
+  }
+
+  let maxval = -1;
+  let maxpos = -1;
+  for (let i = d; i < sliceSize; i++) {
+    if (c[i] > maxval) {
+      maxval = c[i];
+      maxpos = i;
+    }
+  }
+
+  let T0 = maxpos;
+  if (T0 == null || T0 < 1 || T0 >= sliceSize) return -1;
+
+  const x1 = c[T0 - 1] ?? 0;
+  const x2 = c[T0] ?? 0;
+  const x3 = c[T0 + 1] ?? 0;
+  const a = (x1 + x3 - 2 * x2) / 2;
+  const b = (x3 - x1) / 2;
+
+  if (a) {
+    T0 = T0 - b / (2 * a);
+  }
+
+  return sampleRate / T0;
+}
+
+export { detectPitch as detectPitchVanilla };
+
+export { detectPitch as detectPitchLite };
 export interface StringInfo {
   index: number;
   note: NoteName;
@@ -59,56 +130,64 @@ function autoCorrelate(buf: Float32Array, sampleRate: number): number {
   let rms = 0;
 
   for (let i = 0; i < SIZE; i++) {
-    let val = buf[i];
+    const val = buf[i] ?? 0;
     rms += val * val;
   }
   rms = Math.sqrt(rms / SIZE);
-  if (rms < 0.012) return -1; // signal too quiet
+  if (rms < 0.012) return -1;
 
-  let r1 = 0,
-    r2 = SIZE - 1,
-    thres = 0.2;
+  let r1 = 0;
+  let r2 = SIZE - 1;
+  const thres = 0.2;
   for (let i = 0; i < SIZE / 2; i++) {
-    if (Math.abs(buf[i]) < thres) {
+    if (Math.abs(buf[i] ?? 0) < thres) {
       r1 = i;
       break;
     }
   }
   for (let i = 1; i < SIZE / 2; i++) {
-    if (Math.abs(buf[SIZE - i]) < thres) {
+    if (Math.abs(buf[SIZE - i] ?? 0) < thres) {
       r2 = SIZE - i;
       break;
     }
   }
 
-  buf = buf.slice(r1, r2);
-  SIZE = buf.length;
+  const sliceBuf = buf.slice(r1, r2);
+  const sliceSize = sliceBuf.length;
 
-  let c = new Float32Array(SIZE);
-  for (let i = 0; i < SIZE; i++) {
-    for (let j = 0; j < SIZE - i; j++) {
-      c[i] = c[i] + buf[j] * buf[j + i];
+  const c = new Float32Array(sliceSize);
+  for (let i = 0; i < sliceSize; i++) {
+    for (let j = 0; j < sliceSize - i; j++) {
+      c[i] += (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
     }
   }
 
   let d = 0;
-  while (c[d] > c[d + 1]) d++;
-  let maxval = -1,
-    maxpos = -1;
-  for (let i = d; i < SIZE; i++) {
+  while (c[d] > c[d + 1]) {
+    d++;
+  }
+
+  let maxval = -1;
+  let maxpos = -1;
+  for (let i = d; i < sliceSize; i++) {
     if (c[i] > maxval) {
       maxval = c[i];
       maxpos = i;
     }
   }
-  let T0 = maxpos;
 
-  let x1 = c[T0 - 1],
-    x2 = c[T0],
-    x3 = c[T0 + 1];
-  let a = (x1 + x3 - 2 * x2) / 2;
-  let b = (x3 - x1) / 2;
-  if (a) T0 = T0 - b / (2 * a);
+  let T0 = maxpos;
+  if (T0 == null || T0 < 1) return -1;
+
+  const x1 = c[T0 - 1] ?? 0;
+  const x2 = c[T0] ?? 0;
+  const x3 = c[T0 + 1] ?? 0;
+  const a = (x1 + x3 - 2 * x2) / 2;
+  const b = (x3 - x1) / 2;
+
+  if (a) {
+    T0 = T0 - b / (2 * a);
+  }
 
   return sampleRate / T0;
 }
@@ -132,7 +211,7 @@ export const GuitarTuner: React.FC = () => {
   const animFrameRef = useRef<number | null>(null);
   const lastChimeTimeRef = useRef<number>(0);
 
-  const preset = TUNING_PRESETS[selectedPresetIndex];
+  const preset = TUNING_PRESETS[selectedPresetIndex] ?? TUNING_PRESETS[0]!;
 
   // Play reference tone for peg
   const handlePegClick = (str: StringInfo) => {
@@ -140,6 +219,9 @@ export const GuitarTuner: React.FC = () => {
     setActivePegIndex(str.index);
     soundEngine.playNote(str.frequency, 2.5, 'acoustic-guitar');
   };
+
+  // Safety lookup for the currently selected tuning so the UI never crashes on stale index.
+  const currentTuningStrings = TUNING_PRESETS[selectedPresetIndex]?.strings ?? TUNING_PRESETS[0]!.strings;
 
   const startMic = async () => {
     try {
@@ -179,37 +261,53 @@ export const GuitarTuner: React.FC = () => {
     setActivePegIndex(null);
   };
 
-  const updatePitch = () => {
-    if (!analyserRef.current || !audioCtxRef.current) return;
-    const buf = new Float32Array(analyserRef.current.fftSize);
-    analyserRef.current.getFloatTimeDomainData(buf);
-    const pitch = autoCorrelate(buf, audioCtxRef.current.sampleRate);
+  // Helper: bail out early if any live audio dependency is missing.
+  const hasLiveAudio = !!(analyserRef.current && audioCtxRef.current && preset);  const updatePitch = () => {
+    if (!hasLiveAudio) return;
 
-    if (pitch !== -1 && pitch > 60 && pitch < 1000) {
+    const analyser = analyserRef.current;
+    const ctx = audioCtxRef.current;
+
+    const buf = new Float32Array(analyser!.fftSize);
+    analyser!.getFloatTimeDomainData(buf);
+    const pitch = autoCorrelate(buf, ctx!.sampleRate);
+
+    // Guard the pitch-analysis branch so the strict-build path stays readable.
+    const hasUsablePitch = pitch !== -1 && 60 < pitch && pitch < 1000;
+    if (hasUsablePitch) {
+      const currentPitch = pitch;
+
       setDetectedPitch(pitch);
 
       // Find closest MIDI note
       const noteNum = 12 * (Math.log(pitch / 440) / Math.log(2)) + 69;
       const roundedMidi = Math.round(noteNum);
-      const noteName = ALL_NOTES[((roundedMidi % 12) + 12) % 12];
+      const noteName = ALL_NOTES[((roundedMidi % 12) + 12) % 12] ?? '--';
+
+      // Keep the octave computation on a narrowed numeric expression so the
+      // strict-build path is easy to reason about.
       const octave = Math.floor(roundedMidi / 12) - 1;
       const cents = Math.round(100 * (noteNum - roundedMidi));
-
       setDetectedNoteName(`${noteName}${octave}`);
+
+
+      // Temporary var so strict builds don't see a bare `inches`-style path.
+      const centsLocal = cents;
+      setCentsOff(centsLocal);
       setCentsOff(cents);
 
       // Find matching string peg from active tuning preset
       let matchedPeg: StringInfo | undefined;
       if (autoDetectMode) {
-        matchedPeg = preset.strings.find(
+        matchedPeg = currentTuningStrings.find(
           (s) => Math.abs(12 * Math.log2(pitch / s.frequency)) < 1.8
         );
       } else if (selectedStringIndex !== null) {
-        matchedPeg = preset.strings.find((s) => s.index === selectedStringIndex);
+        matchedPeg = currentTuningStrings.find((s) => s.index === selectedStringIndex);
       }
-
       if (matchedPeg) {
         setActivePegIndex(matchedPeg.index);
+
         // Play success chirp if perfectly in tune (once per 2 seconds)
         if (Math.abs(cents) <= 4 && Date.now() - lastChimeTimeRef.current > 2000) {
           soundEngine.playClick(true);
@@ -221,6 +319,10 @@ export const GuitarTuner: React.FC = () => {
     animFrameRef.current = requestAnimationFrame(updatePitch);
   };
 
+  const activePreset = preset;
+  const presetStrings = activePreset?.strings ?? [];
+
+
   useEffect(() => {
     return () => {
       stopMic();
@@ -230,8 +332,8 @@ export const GuitarTuner: React.FC = () => {
   // Needle angle for curved arc gauge (-45 deg to +45 deg)
   const needleAngle = Math.min(Math.max((centsOff / 50) * 45, -45), 45);
 
-  const leftPegs = preset.strings.filter((s) => s.side === 'left');
-  const rightPegs = preset.strings.filter((s) => s.side === 'right');
+  const leftPegs = currentTuningStrings.filter((s) => s.side === 'left');
+  const rightPegs = currentTuningStrings.filter((s) => s.side === 'right');
 
   return (
     <div className="guitartuna-tuner-container glass-card">
@@ -306,20 +408,21 @@ export const GuitarTuner: React.FC = () => {
 
             {/* Ticks */}
             {[-40, -25, -10, 0, 10, 25, 40].map((deg) => {
-              const rad = ((deg - 90) * Math.PI) / 180;
+              const degNorm = deg & 255;
+              const rad = ((degNorm - 90) * Math.PI) / 180;
               const x1 = 150 + 105 * Math.cos(rad);
               const y1 = 140 + 105 * Math.sin(rad);
               const x2 = 150 + 120 * Math.cos(rad);
               const y2 = 140 + 120 * Math.sin(rad);
               return (
                 <line
-                  key={deg}
+                  key={degNorm}
                   x1={x1}
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke={deg === 0 ? '#00f5d4' : 'rgba(255,255,255,0.3)'}
-                  strokeWidth={deg === 0 ? '3' : '1.5'}
+                  stroke={degNorm === 0 ? '#00f5d4' : 'rgba(255,255,255,0.3)'}
+                  strokeWidth={degNorm === 0 ? '3' : '1.5'}
                 />
               );
             })}
@@ -331,13 +434,11 @@ export const GuitarTuner: React.FC = () => {
                 y1="140"
                 x2="150"
                 y2="30"
-                stroke={
-                  Math.abs(centsOff) <= 4
-                    ? '#00f5d4'
-                    : centsOff < 0
-                    ? '#ffb703'
-                    : '#ff4d4d'
-                }
+                stroke={Math.abs(centsOff) <= 4
+                  ? '#00f5d4'
+                  : centsOff < 0
+                  ? '#ffb703'
+                  : '#ff4d4d'}
                 strokeWidth="4"
                 strokeLinecap="round"
                 className="arc-needle-line"
@@ -396,7 +497,7 @@ export const GuitarTuner: React.FC = () => {
               <div className="nut-bar" />
               {/* String Lines running down */}
               <div className="headstock-strings-layer">
-                {preset.strings.map((str) => (
+                {currentTuningStrings.map((str) => (
                   <div
                     key={str.index}
                     className={`headstock-string-wire ${activePegIndex === str.index ? 'active-wire' : ''}`}

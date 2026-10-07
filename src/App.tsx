@@ -35,7 +35,7 @@ function getTabFromHash(): string {
 export function App() {
   const [activeTab, setActiveTabState] = useState<string>(() => getTabFromHash());
   const [selectedRoot, setSelectedRoot] = useState<NoteName>('C');
-  const [activeChordForFretboard, setActiveChordForFretboard] = useState<ChordShape | null>(COMPREHENSIVE_CHORDS[0]);
+  const [activeChordForFretboard, setActiveChordForFretboard] = useState<ChordShape | null>(COMPREHENSIVE_CHORDS[0] ?? null);
   const [activeScaleNotes, setActiveScaleNotes] = useState<NoteName[]>(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
   // 'auto' = follow tab defaults; anything else = user explicitly chose an instrument
   const [userOverride, setUserOverride] = useState<InstrumentType | 'auto'>('auto');

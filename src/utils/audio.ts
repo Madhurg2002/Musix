@@ -123,7 +123,7 @@ class SoundEngine {
             osc.frequency.setValueAtTime(freq * harmonic * 1.008, now);
             osc.frequency.exponentialRampToValueAtTime(freq * harmonic, now + 0.015);
 
-            oscGain.gain.setValueAtTime(weights[idx], now);
+            oscGain.gain.setValueAtTime(weights[idx] ?? 0, now);
 
             osc.connect(oscGain);
             oscGain.connect(pluckFilter);
@@ -183,7 +183,7 @@ class SoundEngine {
             osc.frequency.setValueAtTime(freq * harmonic, now);
 
             gain.gain.setValueAtTime(0.001, now);
-            gain.gain.linearRampToValueAtTime(weights[idx], now + 0.008);
+            gain.gain.linearRampToValueAtTime(weights[idx] ?? 0, now + 0.008);
             gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * (1.5 - idx * 0.2));
 
             osc.connect(gain);

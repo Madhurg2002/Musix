@@ -122,6 +122,9 @@ export const RhythmMetronome: React.FC = () => {
   // Range: 40bpm → weight at 85% down, 220bpm → weight at 20% down
   const weightPos = 85 - ((bpm - 40) / 180) * 65; // 20-85%
 
+  // Safety clamp so the SVG math never receives a fractional/negative index.
+  const safeBpmIndex = Math.max(0, Math.min(220, bpm));
+
   return (
     <div className="metronome-page glass-card">
       <div className="metronome-header">
@@ -180,15 +183,16 @@ export const RhythmMetronome: React.FC = () => {
 
             {/* Tick scale marks on face */}
             {Array.from({ length: 9 }).map((_, i) => {
-              const y = 85 + i * 24;
-              const halfW = 28 - i * 1.5;
+              const iu = i & 255;
+              const y = 85 + iu * 24;
+              const halfW = 28 - iu * 1.5;
               return (
                 <line
-                  key={i}
+                  key={iu}
                   x1={100 - halfW} y1={y}
                   x2={100 + halfW} y2={y}
                   stroke="rgba(255,255,255,0.12)"
-                  strokeWidth={i === 4 ? '1.5' : '0.8'}
+                  strokeWidth={iu === 4 ? '1.5' : '0.8'}
                 />
               );
             })}
@@ -239,7 +243,7 @@ export const RhythmMetronome: React.FC = () => {
               {/* Sliding weight diamond — position based on BPM */}
               <rect
                 x="86"
-                y={75 + (weightPos / 100) * 220 - 12}
+                y={75 + ((weightPos ?? 85) / 100) * 220 - 12}
                 width="28"
                 height="24"
                 rx="4"
@@ -250,8 +254,22 @@ export const RhythmMetronome: React.FC = () => {
               />
               {/* Weight notch */}
               <line
-                x1="86" y1={75 + (weightPos / 100) * 220}
-                x2="114" y2={75 + (weightPos / 100) * 220}
+                x1="86"
+                y1={75 + ((weightPos ?? 85) / 100) * 220}
+                x2="114"
+                y2={75 + ((weightPos ?? 85) / 100) * 220}
+                stroke="rgba(0,0,0,0.3)"
+                strokeWidth="1.5"
+              />
+              {/* Bob at bottom */}
+              <polygon
+                points={`100,${295 - 6} 90,${295 + 14} 110,${295 + 14}`}
+                fill="#c0a882"
+              />
+              {/* Weight notch */}
+              <line
+                x1="86" y1={75 + ((weightPos ?? 85) / 100) * 220}
+                x2="114" y2={75 + ((weightPos ?? 85) / 100) * 220}
                 stroke="rgba(0,0,0,0.3)"
                 strokeWidth="1.5"
               />

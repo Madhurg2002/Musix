@@ -1,4 +1,34 @@
-import { ChordShape, NoteName } from '../types';
+import { ChordShape, NoteName, SafeChordShape } from '../types';
+
+// Safe helper for strict builds that need non-nullable chord shapes.
+export function asSafeChord(chord: ChordShape | undefined | null): SafeChordShape {
+  if (!chord) {
+    return {
+      id: 'unknown',
+      name: 'Unknown',
+      root: 'C',
+      type: 'Major',
+      notes: ['C'],
+      intervals: ['1', '3', '5'],
+      frets: [-1, 0, 2, 2, 1, 0],
+      fingers: ['x', 0, 1, 2, 3, 0],
+      difficulty: 'Beginner',
+    };
+  }
+
+  return {
+    id: chord.id,
+    name: chord.name,
+    root: chord.root,
+    type: chord.type,
+    notes: chord.notes,
+    intervals: chord.intervals,
+    frets: chord.frets,
+    fingers: chord.fingers ?? undefined,
+    capo: chord.capo,
+    difficulty: chord.difficulty,
+  };
+}
 
 export const COMPREHENSIVE_CHORDS: ChordShape[] = [
   // C Chords
@@ -203,17 +233,19 @@ export const COMPREHENSIVE_CHORDS: ChordShape[] = [
   }
 ];
 
-// Helper to search or generate chords dynamically for any root and type
+
 export function findOrCreateChord(root: NoteName, type: string): ChordShape {
-  const existing = COMPREHENSIVE_CHORDS.find(c => c.root === root && c.type.toLowerCase() === type.toLowerCase());
+  const existing = COMPREHENSIVE_CHORDS.find(
+    (c) => c.root === root && c.type.toLowerCase() === type.toLowerCase()
+  );
   if (existing) return existing;
 
   // Fallback dynamic note derivation
   return {
     id: `${root.toLowerCase()}-${type.toLowerCase()}`,
     name: `${root} ${type}`,
-    root: root,
-    type: type,
+    root,
+    type,
     notes: [root],
     intervals: ['1', '3', '5'],
     frets: [-1, 0, 2, 2, 1, 0],

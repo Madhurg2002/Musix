@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { NoteName, ChordShape } from '../types';
-import { GUITAR_STRINGS, getFretNote, getFretMidi, midiToFrequency, NOTE_COLORS } from '../utils/musicTheory';
+import {
+  GUITAR_STRINGS,
+  noteNameAt,
+  getFretNote,
+  getFretMidi,
+  midiToFrequency,
+  noteColorFor,
+  getGuitarStringInfo,
+} from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
+import { asSafeChord } from '../data/chordsData';
 
 interface GuitarFretboardProps {
   activeChord?: ChordShape | null;
@@ -71,8 +80,9 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
           <span className="nut-label">String Press:</span>
           <div className="nut-badges">
             {GUITAR_STRINGS.map((str, idx) => {
-              const fret = activeChord.frets[idx];
-              const finger = activeChord.fingers ? activeChord.fingers[idx] : undefined;
+              const chordFret = activeChord ? asSafeChord(activeChord).frets[idx] : -1;
+              const finger = activeChord ? asSafeChord(activeChord).fingers?.[idx] ?? '?' : '?';
+              const fret = chordFret ?? -1;
               let statusText = 'O';
               let statusClass = 'open';
               if (fret === -1) {
@@ -82,7 +92,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
                 statusText = '○ Open';
                 statusClass = 'open';
               } else {
-                statusText = `Fret ${fret} (Finger ${finger ?? '?'})`;
+                statusText = `Fret ${fret} (Finger ${finger})`;
                 statusClass = 'pressed';
               }
               return (
@@ -100,22 +110,23 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
       <div className="fretboard-wrapper">
         {/* Fret Markers Row */}
         <div className="fret-numbers-row">
-          <div className="nut-spacer">Nut</div>
-          {fretsList.slice(1).map((f) => (
-            <div key={f} className="fret-number-cell">
-              {f}
-              {singleMarkers.includes(f) && <span className="fret-dot-single" />}
-              {doubleMarkers.includes(f) && <span className="fret-dot-double" />}
-            </div>
-          ))}
+          <div className="nut-spacer">Nut</div>                {fretsList.slice(1).map((f) => (
+                    <div key={f} className="fret-number-cell">
+                      <span>{f}</span>
+                      {singleMarkers.includes(f) && <span className="fret-dot-single" />}
+                      {doubleMarkers.includes(f) && <span className="fret-dot-double" />}
+                    </div>
+                  ))}
         </div>
 
         {/* 6 Guitar Strings (from High E (String 1) to Low E (String 6)) */}
         <div className="fretboard-neck">
           {[...GUITAR_STRINGS].reverse().map((stringInfo, revIdx) => {
             const actualStringIdx = GUITAR_STRINGS.length - 1 - revIdx;
-            const chordFret = activeChord ? activeChord.frets[actualStringIdx] : -2;
-            const finger = activeChord && activeChord.fingers ? activeChord.fingers[actualStringIdx] : undefined;
+            const chordFret = activeChord ? asSafeChord(activeChord).frets[actualStringIdx] : -2;
+            const finger = activeChord ? asSafeChord(activeChord).fingers?.[actualStringIdx] : undefined;
+
+            if (actualStringIdx === undefined) return null;
 
             return (
               <div key={actualStringIdx} className="fretboard-string-row">
@@ -159,7 +170,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
                           style={{
                             backgroundColor: isChordPress
                               ? '#00F0FF'
-                              : NOTE_COLORS[note] || '#999',
+                              : noteColorFor(note),
                           }}
                         >
                           <span className="badge-note-name">{note}</span>
@@ -181,7 +192,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
         {hoveredNote ? (
           <>
             <span>Note: <strong>{hoveredNote.note}</strong></span>
-            <span>String: <strong>{6 - hoveredNote.stringIdx} ({GUITAR_STRINGS[hoveredNote.stringIdx].name})</strong></span>
+            <span>String: <strong>{6 - hoveredNote.stringIdx} ({getGuitarStringInfo(hoveredNote.stringIdx).name})</strong></span>
             <span>Fret: <strong>{hoveredNote.fret}</strong></span>
             <span>Frequency: <strong>{midiToFrequency(getFretMidi(hoveredNote.stringIdx, hoveredNote.fret)).toFixed(1)} Hz</strong></span>
           </>

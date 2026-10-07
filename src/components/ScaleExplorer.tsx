@@ -17,7 +17,7 @@ export const ScaleExplorer: React.FC<ScaleExplorerProps> = ({
 }) => {
   const [selectedScaleId, setSelectedScaleId] = useState<string>('major');
 
-  const currentScaleDef = COMPREHENSIVE_SCALES.find((s) => s.id === selectedScaleId) || COMPREHENSIVE_SCALES[0];
+  const currentScaleDef = COMPREHENSIVE_SCALES.find((s) => s.id === selectedScaleId) ?? COMPREHENSIVE_SCALES[0]!;
 
   // Compute exact notes of scale based on root and intervals
   const scaleNotes: NoteName[] = currentScaleDef.intervals.map((semitone) =>
@@ -115,7 +115,7 @@ export const ScaleExplorer: React.FC<ScaleExplorerProps> = ({
               >
                 {note}
               </div>
-              <span className="interval-subtext">{currentScaleDef.intervals[idx]} semitones</span>
+              <span className="interval-subtext">{currentScaleDef.intervals[idx] ?? 0} semitones</span>
             </div>
           ))}
         </div>

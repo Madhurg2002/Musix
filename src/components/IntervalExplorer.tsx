@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NoteName } from '../types';
 import { COMPREHENSIVE_INTERVALS } from '../data/scalesData';
-import { ALL_NOTES, NOTE_COLORS, midiToFrequency } from '../utils/musicTheory';
+import { ALL_NOTES, NOTE_COLORS, midiToFrequency, noteColorFor } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 
 export const IntervalExplorer: React.FC = () => {
@@ -12,7 +12,8 @@ export const IntervalExplorer: React.FC = () => {
   const idx2 = ALL_NOTES.indexOf(note2);
 
   const semitones = (idx2 - idx1 + 12) % 12;
-  const intervalInfo = COMPREHENSIVE_INTERVALS.find((i) => i.semitones === semitones) || COMPREHENSIVE_INTERVALS[0];
+  const intervalInfo = COMPREHENSIVE_INTERVALS.find((i) => i.semitones === semitones);
+  const safeIntervalInfo = intervalInfo ?? COMPREHENSIVE_INTERVALS[0]!;
 
   const playInterval = (mode: 'melodic' | 'harmonic') => {
     const f1 = midiToFrequency(60 + idx1);
@@ -65,9 +66,9 @@ export const IntervalExplorer: React.FC = () => {
 
         <div className="interval-result-card">
           <div className="distance-badge">{semitones} Semitones</div>
-          <h3 className="interval-title">{intervalInfo.name} ({intervalInfo.short})</h3>
-          <span className={`quality-tag ${intervalInfo.quality}`}>{intervalInfo.quality}</span>
-          <p className="interval-desc">{intervalInfo.description}</p>
+          <h3 className="interval-title">{safeIntervalInfo.name} ({safeIntervalInfo.short})</h3>
+          <span className={`quality-tag ${safeIntervalInfo.quality}`}>{safeIntervalInfo.quality}</span>
+          <p className="interval-desc">{safeIntervalInfo.description}</p>
         </div>
 
         <div className="note-picker-card">
