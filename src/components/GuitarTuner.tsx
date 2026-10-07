@@ -126,7 +126,7 @@ export const GuitarTuner: React.FC = () => {
   // Play Reference Tone for a string
   const handlePlayRefTone = (freq: number, strName: string) => {
     setActiveRefNote(strName);
-    soundEngine.playNote(freq, 2.5, 'guitar');
+    soundEngine.playNote(freq, 2.5, 'acoustic-guitar');
     setTimeout(() => setActiveRefNote(null), 2500);
   };
 

@@ -72,7 +72,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
         freqs.push(midiToFrequency(60 + idx + i * 3));
       });
     }
-    soundEngine.strumChord(freqs, 0.07, 'guitar');
+    soundEngine.strumChord(freqs, 0.07, 'acoustic-guitar');
   };
 
   // Play all active cards in sequence (Progression playback!)

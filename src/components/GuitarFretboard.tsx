@@ -28,12 +28,12 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
         freqs.push(midiToFrequency(midi));
       }
     });
-    soundEngine.strumChord(freqs, 0.06, 'guitar');
+    soundEngine.strumChord(freqs, 0.06, 'acoustic-guitar');
   };
 
   const handleNoteClick = (stringIdx: number, fret: number) => {
     const midi = getFretMidi(stringIdx, fret);
-    soundEngine.playNote(midiToFrequency(midi), 1.2, 'guitar');
+    soundEngine.playNote(midiToFrequency(midi), 1.2, 'acoustic-guitar');
   };
 
   const fretsList = Array.from({ length: fretsCount + 1 }, (_, i) => i);

@@ -1,7 +1,18 @@
-// Web Audio API Synthesizer for realistic Piano & Guitar sounds
+// Web Audio API Synthesizer for realistic Instrument Sounds
+
+export type InstrumentType = 'acoustic-guitar' | 'electric-guitar' | 'piano' | 'bass' | 'ukulele' | 'synth';
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
+  private activeInstrument: InstrumentType | 'auto' = 'auto';
+
+  public setInstrument(inst: InstrumentType | 'auto') {
+    this.activeInstrument = inst;
+  }
+
+  public getInstrument(): InstrumentType | 'auto' {
+    return this.activeInstrument;
+  }
 
   private init() {
     if (!this.ctx) {
@@ -13,91 +24,223 @@ class SoundEngine {
     }
   }
 
-  // Play a single note by frequency or MIDI
-  playNote(freq: number, duration: number = 1.2, type: 'piano' | 'guitar' = 'guitar') {
+  // Distortion curve generator for Electric Guitar
+  private makeDistortionCurve(amount: number = 20) {
+    const k = typeof amount === 'number' ? amount : 20;
+    const n_samples = 44100;
+    const curve = new Float32Array(n_samples);
+    const deg = Math.PI / 180;
+    for (let i = 0; i < n_samples; ++i) {
+      const x = (i * 2) / n_samples - 1;
+      curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+    }
+    return curve;
+  }
+
+  // Play a note with explicit or selected instrument type
+  playNote(freq: number, duration: number = 1.4, overrideInstrument?: InstrumentType) {
     try {
       this.init();
       if (!this.ctx) return;
 
       const now = this.ctx.currentTime;
+      let targetInstrument: InstrumentType = 'acoustic-guitar';
 
-      if (type === 'guitar') {
-        // Acoustic Guitar Synthesis using Karplus-Strong / Plucked String Harmonics
-        const osc = this.ctx.createOscillator();
-        const osc2 = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
+      if (overrideInstrument) {
+        targetInstrument = overrideInstrument;
+      } else if (this.activeInstrument !== 'auto') {
+        targetInstrument = this.activeInstrument;
+      }
 
-        // Fundamental + Sub/Overtones
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now);
+      switch (targetInstrument) {
+        case 'acoustic-guitar': {
+          // Acoustic Plucked Guitar (Karplus-Strong approximation + wood body filter)
+          const osc1 = this.ctx.createOscillator();
+          const osc2 = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
 
-        osc2.type = 'sawtooth';
-        osc2.frequency.setValueAtTime(freq * 2, now);
+          osc1.type = 'triangle';
+          osc1.frequency.setValueAtTime(freq, now);
 
-        // Filter for acoustic warm pluck body
-        const filter = this.ctx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(freq * 4, now);
-        filter.frequency.exponentialRampToValueAtTime(150, now + duration);
+          osc2.type = 'sawtooth';
+          osc2.frequency.setValueAtTime(freq * 2.01, now);
 
-        const gain2 = this.ctx.createGain();
-        gain2.gain.setValueAtTime(0.3, now);
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(freq * 5, now);
+          filter.frequency.exponentialRampToValueAtTime(180, now + duration);
 
-        osc2.connect(gain2);
-        gain2.connect(filter);
+          const subGain = this.ctx.createGain();
+          subGain.gain.setValueAtTime(0.2, now);
+          osc2.connect(subGain);
+          subGain.connect(filter);
 
-        // Envelope: Instant attack, logarithmic decay
-        gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(0.7, now + 0.015);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.65, now + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.ctx.destination);
+          osc1.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.ctx.destination);
 
-        osc.start(now);
-        osc2.start(now);
-        osc.stop(now + duration);
-        osc2.stop(now + duration);
-      } else {
-        // Piano Synthesis (Harmonic Overtones + Warm Decay)
-        const harmonics = [1, 2, 3, 4];
-        const weights = [0.6, 0.3, 0.15, 0.05];
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + duration);
+          osc2.stop(now + duration);
+          break;
+        }
 
-        harmonics.forEach((harmonic, idx) => {
-          if (!this.ctx) return;
+        case 'electric-guitar': {
+          // Electric Guitar (Warm tube overdrive + cabinet filter)
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const distortion = this.ctx.createWaveShaper();
+          const cabFilter = this.ctx.createBiquadFilter();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, now);
+
+          distortion.curve = this.makeDistortionCurve(15);
+          distortion.oversample = '4x';
+
+          cabFilter.type = 'bandpass';
+          cabFilter.frequency.setValueAtTime(1200, now);
+          cabFilter.Q.setValueAtTime(1.2, now);
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.4, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.2);
+
+          osc.connect(distortion);
+          distortion.connect(cabFilter);
+          cabFilter.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + duration * 1.2);
+          break;
+        }
+
+        case 'piano': {
+          // Acoustic Grand Piano (Harmonic overtones + weighted decay)
+          const harmonics = [1, 2, 3, 4, 5];
+          const weights = [0.7, 0.35, 0.18, 0.08, 0.03];
+
+          harmonics.forEach((harmonic, idx) => {
+            if (!this.ctx) return;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = idx === 0 ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(freq * harmonic, now);
+
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(weights[idx], now + 0.008);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * (1.5 - idx * 0.2));
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + duration * 1.5);
+          });
+          break;
+        }
+
+        case 'bass': {
+          // Punchy Bass Guitar (Deep sub fundamental + punchy transient)
+          const osc1 = this.ctx.createOscillator();
+          const osc2 = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const filter = this.ctx.createBiquadFilter();
+
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(freq, now);
+
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(freq, now);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(400, now);
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.85, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.4);
+
+          osc1.connect(filter);
+          osc2.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + duration * 1.4);
+          osc2.stop(now + duration * 1.4);
+          break;
+        }
+
+        case 'ukulele': {
+          // Bright Ukulele (Light nylon string in higher register)
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
 
-          osc.type = idx === 0 ? 'sine' : 'triangle';
-          osc.frequency.setValueAtTime(freq * harmonic, now);
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
 
           gain.gain.setValueAtTime(0.001, now);
-          gain.gain.linearRampToValueAtTime(weights[idx], now + 0.01);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+          gain.gain.linearRampToValueAtTime(0.5, now + 0.008);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.8);
 
           osc.connect(gain);
           gain.connect(this.ctx.destination);
 
           osc.start(now);
-          osc.stop(now + duration);
-        });
+          osc.stop(now + duration * 0.8);
+          break;
+        }
+
+        case 'synth': {
+          // Warm Polyphonic Synth Pad
+          const osc1 = this.ctx.createOscillator();
+          const osc2 = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc1.type = 'sawtooth';
+          osc1.frequency.setValueAtTime(freq, now);
+
+          osc2.type = 'square';
+          osc2.frequency.setValueAtTime(freq * 1.005, now); // subtle detune chorus
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.4, now + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.6);
+
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + duration * 1.6);
+          osc2.stop(now + duration * 1.6);
+          break;
+        }
       }
     } catch {
-      // Audio fallback silent fail if browser blocks autoplay
+      // Audio fallback silent fail if audio context blocked
     }
   }
 
-  // Strum a chord (delay between string hits)
-  strumChord(frequencies: number[], arpeggioDelay: number = 0.05, type: 'piano' | 'guitar' = 'guitar') {
+  // Strum a chord with arpeggio delay
+  strumChord(frequencies: number[], arpeggioDelay: number = 0.05, overrideInstrument?: InstrumentType) {
     frequencies.forEach((freq, idx) => {
       setTimeout(() => {
-        this.playNote(freq, 1.5, type);
+        this.playNote(freq, 1.5, overrideInstrument);
       }, idx * arpeggioDelay * 1000);
     });
   }
 
-  // Beep for metronome
+  // Metronome click track sound
   playClick(isHighBeat: boolean = false) {
     try {
       this.init();
@@ -108,16 +251,16 @@ class SoundEngine {
       const gain = this.ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(isHighBeat ? 1000 : 700, now);
+      osc.frequency.setValueAtTime(isHighBeat ? 1200 : 800, now);
 
       gain.gain.setValueAtTime(0.8, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
 
       osc.start(now);
-      osc.stop(now + 0.08);
+      osc.stop(now + 0.07);
     } catch {
       // ignore
     }

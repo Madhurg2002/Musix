@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { soundEngine, InstrumentType } from '../utils/audio';
 
 interface HeaderProps {
   activeTab: string;
@@ -6,6 +7,8 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
+  const [selectedInst, setSelectedInst] = useState<InstrumentType | 'auto'>('auto');
+
   const tabs = [
     { id: 'tuner', label: '🎯 Instrument Tuner', icon: '🎯' },
     { id: 'fretboard', label: '🎸 Guitar Fretboard', icon: '🎸' },
@@ -16,6 +19,15 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
     { id: 'rhythm', label: '⏱️ Rhythm & Metronome', icon: '⏱️' },
     { id: 'guide', label: '📚 Beginner Guide', icon: '📚' },
   ];
+
+  const handleInstrumentChange = (inst: InstrumentType | 'auto') => {
+    setSelectedInst(inst);
+    soundEngine.setInstrument(inst);
+    // Play test note to demonstrate sound
+    if (inst !== 'auto') {
+      soundEngine.playNote(261.63, 1.2, inst);
+    }
+  };
 
   return (
     <header className="main-header glass-header">
@@ -38,6 +50,23 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
           </button>
         ))}
       </nav>
+
+      <div className="header-sound-selector">
+        <span className="sound-label">🔊 Sound Engine:</span>
+        <select
+          className="select-input sound-select"
+          value={selectedInst}
+          onChange={(e) => handleInstrumentChange(e.target.value as InstrumentType | 'auto')}
+        >
+          <option value="auto">🪄 Auto (Match Active View)</option>
+          <option value="acoustic-guitar">🎸 Acoustic Guitar</option>
+          <option value="electric-guitar">⚡ Electric Guitar</option>
+          <option value="piano">🎹 Grand Piano</option>
+          <option value="bass">🎸 Bass Guitar</option>
+          <option value="ukulele">🪕 Ukulele</option>
+          <option value="synth">🎛️ Synth Pad</option>
+        </select>
+      </div>
     </header>
   );
 };
