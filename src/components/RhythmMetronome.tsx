@@ -59,10 +59,12 @@ export const RhythmMetronome: React.FC = () => {
     setTimeout(() => setFlashBeat(false), 120);
 
     // Swap pendulum direction & animate
-    const from = pendulumFromRef.current;
-    const to = pendulumToRef.current;
-    pendulumFromRef.current = to;
-    pendulumToRef.current = from;
+    const fromVal = pendulumFromRef.current;
+    const toVal = pendulumToRef.current;
+    if (fromVal != null && toVal != null) {
+      pendulumFromRef.current = toVal;
+      pendulumToRef.current = fromVal;
+    }
     pendulumStartRef.current = null;
     if (pendulumAnimRef.current) cancelAnimationFrame(pendulumAnimRef.current);
     pendulumAnimRef.current = requestAnimationFrame(animatePendulum);

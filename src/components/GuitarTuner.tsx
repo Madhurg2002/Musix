@@ -196,15 +196,12 @@ export const GuitarTuner: React.FC = () => {
   const [selectedPresetIndex, setSelectedPresetIndex] = useState<number>(0);
   const [autoDetectMode, setAutoDetectMode] = useState<boolean>(true);
   const [selectedStringIndex, setSelectedStringIndex] = useState<number | null>(null);
-
-  // Live Mic States
   const [isMicListening, setIsMicListening] = useState<boolean>(false);
   const [detectedPitch, setDetectedPitch] = useState<number | null>(null);
   const [detectedNoteName, setDetectedNoteName] = useState<string>('--');
   const [centsOff, setCentsOff] = useState<number>(0);
   const [activePegIndex, setActivePegIndex] = useState<number | null>(null);
   const [micError, setMicError] = useState<string | null>(null);
-
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
@@ -212,16 +209,32 @@ export const GuitarTuner: React.FC = () => {
   const lastChimeTimeRef = useRef<number>(0);
 
   const preset = TUNING_PRESETS[selectedPresetIndex] ?? TUNING_PRESETS[0]!;
-
-  // Play reference tone for peg
+  const currentTuningStrings = preset.strings;
+  const selectedStringInfo:
+    | StringInfo
+    | undefined =
+    selectedStringIndex != null
+      ? currentTuningStrings[selectedStringIndex] ?? currentTuningStrings.find((s) => s.index === selectedStringIndex)
+      : undefined;
+  const selectedGuitarStringInfo:
+    | StringInfo
+    | undefined =
+    selectedStringInfo ??
+    currentTuningStrings.find((s) => s.index === selectedStringIndex) ??
+    currentTuningStrings[0]!
+  
   const handlePegClick = (str: StringInfo) => {
     setSelectedStringIndex(str.index);
     setActivePegIndex(str.index);
-    soundEngine.playNote(str.frequency, 2.5, 'acoustic-guitar');
+    soundEngine.playNote(str.frequency ?? 440, 2.5, 'acoustic-guitar');
   };
-
-  // Safety lookup for the currently selected tuning so the UI never crashes on stale index.
-  const currentTuningStrings = TUNING_PRESETS[selectedPresetIndex]?.strings ?? TUNING_PRESETS[0]!.strings;
+  
+  const handlePegClickExt = (str: StringInfo | null | undefined) => {
+    if (!str) return;
+    setSelectedStringIndex(str.index);
+    setActivePegIndex(str.index);
+    soundEngine.playNote(str.frequency ?? 440, 2.5, 'acoustic-guitar');
+  };
 
   const startMic = async () => {
     try {
@@ -475,7 +488,7 @@ export const GuitarTuner: React.FC = () => {
                 <div
                   key={str.index}
                   className={`tuning-peg-card ${isActive ? 'active-peg' : ''}`}
-                  onClick={() => handlePegClick(str)}
+                  onClick={() => str && handlePegClickExt(str)}
                 >
                   <div className="peg-info">
                     <span className="peg-name">String {str.index}</span>
@@ -515,7 +528,7 @@ export const GuitarTuner: React.FC = () => {
                 <div
                   key={str.index}
                   className={`tuning-peg-card ${isActive ? 'active-peg' : ''}`}
-                  onClick={() => handlePegClick(str)}
+                  onClick={() => str && handlePegClickExt(str)}
                 >
                   <div className="peg-circle-badge">
                     <span className="peg-note">{str.note}</span>
