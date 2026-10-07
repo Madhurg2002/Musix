@@ -9,6 +9,10 @@
     "build": "vite build",
     "preview": "vite preview --host"
   },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
   "devDependencies": {
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
