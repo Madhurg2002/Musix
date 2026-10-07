@@ -2,16 +2,18 @@
   "name": "music-theory-reference-site",
   "type": "module",
   "version": "1.0.0",
+  "description": "Musix — an interactive music theory reference for new learners. Pitch, intervals, scales, chords, guitar fretboard press visuals, and rhythm practice, all in the browser.",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --host"
   },
   "devDependencies": {
-    "@rollup/rollup-win32-x64-msvc": "^4.64.0",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
     "vite": "^8.3.3"
-  },
-  "dependencies": {
-    "marked": "^18.1.0"
   }
 }

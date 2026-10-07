@@ -1,143 +1,76 @@
-# Instrument Mapping Template
+---
+title: "<Instrument Name>"
+description: "Short one-line description shown in cards and index pages."
+section: "guitar"
+order: 0
+---
 
-This template is for adding a new instrument mapping to this repository while preserving the strict separation between instrument-agnostic theory and instrument-specific mechanics.
+# <Instrument Name>
 
-## 1. Where to Place a New Instrument
+<Short orientation paragraph: how this instrument maps to pitch, then the most important
+visual to memorize in this mapping. Name the fretboard zone first (e.g., "standard
+tuning puts a repeating 5-fret pattern on every string"), then name the card you are
+building in the app (e.g., "C major shape" as a chord card).>
 
-New instruments live under:
+<Why it matters for a beginner: one or two plain-language sentences that connect the
+visual to a goal (recognizing a chord while playing, moving a shape up the neck,
+reading a bass line).>
 
-```
-03-instrument-mappings/<instrument>/
-```
+## Key mappings
 
-For example:
+<Name the note for each open string or key on the instrument. Example:
+"E, A, D, G, B, E" for standard tuning.>
 
-```
-03-instrument-mappings/piano/
-03-instrument-mappings/bass/
-03-instrument-mappings/violin/
-```
+| String | Tuning note | Fret index | Actual pitch |
+| --- | --- | --- | --- |
+| 1 | E4 | 0 | E4 |
+| 2 | B3 | 0 | B3 |
+| 3 | G3 | 0 | G3 |
+| 4 | D3 | 0 | D3 |
+| 5 | A2 | 0 | A2 |
+| 6 | E2 | 0 | E2 |
 
-Each instrument should have its own folder with an index file and modules describing its physical system.
+Table usage: use a `Note` heading row where possible. The app renders this as a card
+with the string numbers and the open-tuning note.
 
-## 2. Repository Rule
+## Pitch positions
 
-Do not introduce guitar-, piano-, valve-, fret-, bow-, or other instrument-specific assumptions into the core theory modules:
+<Explain how to find each pitch on the instrument and in the app. Include charted
+positions (letter shape) when useful.
 
-- `01-foundations/`
-- `02-harmony-and-analysis/`
-- `04-data/` (except instrument-specific data, if any)
+## Common shapes
 
-Theory data may remain fully general. Instrument data and instrument documentation live only in `03-instrument-mappings/`.
+<List shapes that correspond to app cards. For each shape, give the name, the chord
+name or function, why beginners should recognize it, the string-and-fret presses
+(short phrase), and one beginner tip.
 
-## 3. Required Starting Files
+| Shape name | Chord / function | Why beginners should recognize it | Presses (strings) | Tip |
+| --- | --- | --- | --- | --- |
+| Open C | C major | First major chord most people learn; it is the reference for moving shapes. | 6: —, 5: —, 4: 3, 3: 2, 2: 3, 1: 3 | Keep the E-string open if the song only uses C. |
+| Barre E | E major | The "barre" teaches you to press the index across multiple strings instead of one fret. | 6: 2, 5: 2, 4: 2, 3: 2, 2: 2, 1: 2 | Use your thumb lightly on the back of the neck and keep the barre near the fret wire. |
 
-Each new instrument should include at minimum:
+Presses format: use a numbered string list (e.g., "1 – E, 2 – B, 3 – G, 4 – D, 5 – A,
+6 – E") and keep entries as short phrases, not long paragraphs. If a string is open or
+muted, say so explicitly ("—" or "X").
 
-- `01-<instrument>-system-and-pitch-realization.md` — how pitches are produced and organized on the instrument.
-- `README.md` (optional per instrument) — map of that instrument's modules.
+## Fingerings
 
-If the instrument has coordinate geometry, include a small coordinate system explanation early, so the rest of the instrument's docs can reference it.
+<Concise note: position in the app is shown as the smallest number of fingers and the
+exact fret, not as a full diagram. Optional note.
 
-## 4. Template Module Outline
+## Note spelling
 
-You may use the following outline as a starting point:
+<Names for each string/fret, linking it to the chord construction or rhythm examples
+used in the reference.
 
-```
-<instrument>/
-├── 01-<instrument>-system-and-pitch-realization.md
-├── 02-<instrument>-coordinate-system.md
-├── 03-<instrument>-chord-vocabulary.md
-├── 04-<instrument>-scale-and-patter-naming.md
-└── README.md
-```
+## Beginner tip
 
-Adjust the module list to the instrument's actual mechanics.
+<One sentence that tells the beginner exactly what to notice: "find where the left hand
+hits the most pressure" or "place the shape exactly behind the metal strip you are
+muting." The app shows sounds and visual proximity, so match the app description when
+referencing sound.
 
-## 5. Coordinate System Section
+## Reference
 
-If the instrument has a spatial/positional layout, define:
-
-- What the coordinates are (axes, numbering, orientation)
-- What zero means
-- How one step in each axis changes pitch or function
-- What the mapping is from coordinates to pitch classes or note names
-- Any important asymmetries in the layout
-
-Make the coordinate explanation concrete. Future readers should be able to translate a coordinate into a pitch without guessing.
-
-## 6. Chord and Scale Sections
-
-When documenting chord or scale material:
-
-- Be explicit about what changes versus standard theory and what is identical
-- Show how the abstract interval/chord/scale maps onto the instrument
-- Use diagrams, tables, or coordinate examples as appropriate
-- If a concept exists in the abstract theory but is impractical or impossible on the instrument, say so
-
-Do not duplicate the abstract formulas from `01-foundations/` unless restating them adds instrument-specific clarity.
-
-## 7. Data Files (If Applicable)
-
-If the instrument benefits from machine-readable data:
-
-- Place it under `04-data/` with a clear naming scheme, e.g. `piano-key-map.json`
-- Document the schema inside the README or a `schemas/` note
-- Keep data disciplined: consistent keys, consistent naming, and a documented coordinate/pitch convention
-
-If there is a generator script, place it under `scripts/` and document its usage.
-
-## 8. Naming and Style
-
-- Use the instrument name in lowercase folder names, e.g. `piano`, not `Piano`.
-- Prefer stable, descriptive filenames with numeric prefixes if ordering matters.
-- Use the same Markdown conventions and LaTeX usage already present in the repository.
-- Keep ASCII diagrams clean and scannable.
-- If adding a new data format, mirror the conventions already used in `04-data/` where possible.
-
-## 9. Cross-References
-
-In the instrument docs, cross-reference the relevant theory modules instead of re-explaining them:
-
-- intervals → `01-foundations/02-intervals.md`
-- scale formulas → `01-foundations/03-scale-formulas.md`
-- chord construction → `01-foundations/04-chord-construction.md`
-- diatonic harmony / Roman numeral analysis → `02-harmony-and-analysis/`
-
-This keeps instrument mappings focused on the instrument and surfaces the link to the general theory.
-
-## 10. Checklist Before Submitting
-
-- [ ] New instrument folder created under `03-instrument-mappings/`
-- [ ] No instrument-specific assumptions leaked into `01-foundations/` or `02-harmony-and-analysis/`
-- [ ] Coordinate system defined before pattern/chord/scale sections
-- [ ] Diagrams are clear and labeled
-- [ ] Any data files are valid JSON (or other documented format) and match the documented schema
-- [ ] Generator scripts, if any, run and produce the documented output
-- [ ] Cross-references point to the existing theory modules
-
-## 11. Example Stub
-
-A minimal piano mapping stub might start as:
-
-```markdown
-# Piano
-
-This module describes the piano as an instrument mapping for music theory.
-
-## 1. The Piano as a Pitch System
-
-The piano realizes the chromatic scale as a repeating set of keys arranged in
-a linear layout of black and white keys. Each octave contains 12 chromatic
-steps, and the keyboard repeats that pattern across the instrument's range.
-
-## 2. Coordinate System
-
-- Axis: keys left to right, lowest pitch to highest pitch
-- One step = one semitone
-- Octaves are labeled using scientific pitch notation
-
-...
-```
-
-Adapt the stub to the instrument you are documenting.
+<Link to the technique pages the app references: `05-triads-and-drop-chords.md` and
+`02-caged-system-and-movable-shapes.md` for guitar.
