@@ -700,12 +700,20 @@ body {
 
 .fretboard-footer-info {
   display: flex;
+  align-items: center;
   gap: 24px;
   background: rgba(0,0,0,0.4);
   padding: 10px 16px;
   border-radius: 8px;
   font-size: 13px;
   color: var(--text-secondary);
+  min-height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.placeholder-info {
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 /* Piano Component */

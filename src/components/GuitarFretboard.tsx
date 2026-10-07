@@ -177,14 +177,18 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
         </div>
       </div>
 
-      {hoveredNote && (
-        <div className="fretboard-footer-info">
-          <span>Note: <strong>{hoveredNote.note}</strong></span>
-          <span>String: <strong>{6 - hoveredNote.stringIdx} ({GUITAR_STRINGS[hoveredNote.stringIdx].name})</strong></span>
-          <span>Fret: <strong>{hoveredNote.fret}</strong></span>
-          <span>Frequency: <strong>{midiToFrequency(getFretMidi(hoveredNote.stringIdx, hoveredNote.fret)).toFixed(1)} Hz</strong></span>
-        </div>
-      )}
+      <div className="fretboard-footer-info">
+        {hoveredNote ? (
+          <>
+            <span>Note: <strong>{hoveredNote.note}</strong></span>
+            <span>String: <strong>{6 - hoveredNote.stringIdx} ({GUITAR_STRINGS[hoveredNote.stringIdx].name})</strong></span>
+            <span>Fret: <strong>{hoveredNote.fret}</strong></span>
+            <span>Frequency: <strong>{midiToFrequency(getFretMidi(hoveredNote.stringIdx, hoveredNote.fret)).toFixed(1)} Hz</strong></span>
+          </>
+        ) : (
+          <span className="placeholder-info">💡 Hover over any string & fret to inspect note pitch, string number, and exact Hz frequency.</span>
+        )}
+      </div>
     </div>
   );
 };
