@@ -62,7 +62,10 @@ export function App() {
         {/* Tab 1: Side-by-Side Chord Studio */}
         {activeTab === 'workbench' && (
           <section className="tab-section">
-            <ChordWorkbench onSelectChordForFretboard={handleSelectChordForFretboard} />
+            <ChordWorkbench
+              onSelectChordForFretboard={handleSelectChordForFretboard}
+              onOpenTuner={() => setActiveTab('tuner')}
+            />
           </section>
         )}
 

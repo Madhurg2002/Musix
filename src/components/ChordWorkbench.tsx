@@ -6,9 +6,10 @@ import { soundEngine } from '../utils/audio';
 
 interface ChordWorkbenchProps {
   onSelectChordForFretboard?: (chord: ChordShape) => void;
+  onOpenTuner?: () => void;
 }
 
-export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordForFretboard }) => {
+export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordForFretboard, onOpenTuner }) => {
   const [cards, setCards] = useState<ChordCardItem[]>([
     { id: 'card-1', chord: COMPREHENSIVE_CHORDS[0], transposeOffset: 0 }, // C Major
     { id: 'card-2', chord: COMPREHENSIVE_CHORDS[4], transposeOffset: 0 }, // A Major
@@ -126,6 +127,12 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
             </button>
           </div>
 
+          {onOpenTuner && (
+            <button className="btn btn-outline" onClick={onOpenTuner}>
+              🎯 Open Tuner
+            </button>
+          )}
+
           <button className="btn btn-primary" onClick={handlePlayProgression}>
             ▶ Play Progression
           </button>
@@ -227,12 +234,17 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                   </div>
 
                   <div className="card-play-btns">
+                    {onOpenTuner && (
+                      <button className="btn btn-outline btn-sm" onClick={onOpenTuner} title="Open Instrument Tuner">
+                        🎯 Tuner
+                      </button>
+                    )}
                     {onSelectChordForFretboard && (
                       <button
                         className="btn btn-outline btn-sm"
                         onClick={() => onSelectChordForFretboard(chord)}
                       >
-                        🎸 View Fretboard
+                        🎸 Fretboard
                       </button>
                     )}
                     <button className="btn btn-primary btn-sm" onClick={() => handlePlayChord(item)}>
