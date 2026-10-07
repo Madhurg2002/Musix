@@ -1626,3 +1626,335 @@ body {
   width: 3px;
   box-shadow: 0 0 10px var(--accent-cyan);
 }
+
+/* ============================
+   METRONOME PAGE
+   ============================ */
+.metronome-page {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.metronome-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* Two-column stage: figure left, controls right */
+.metronome-stage {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .metronome-stage { grid-template-columns: 1fr; }
+}
+
+/* ── Pendulum Figure ── */
+.metronome-figure-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  transition: filter 0.1s;
+}
+
+.metronome-figure-wrap.flash-beat {
+  filter: drop-shadow(0 0 20px var(--accent-cyan));
+}
+
+.metronome-figure-wrap.flash-accent {
+  filter: drop-shadow(0 0 28px var(--accent-gold));
+}
+
+.metronome-svg {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.6));
+}
+
+/* Pendulum arm smooth swing */
+.pendulum-arm-group {
+  will-change: transform;
+}
+
+.arc-needle-line {
+  transition: stroke 0.05s;
+}
+
+.metro-weight {
+  transition: fill 0.1s;
+}
+
+.metro-bpm-svg {
+  transition: fill 0.1s;
+}
+
+/* Pulse glow ring below metronome */
+.metro-pulse-ring {
+  width: 120px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(0, 240, 255, 0.05);
+  margin-top: -12px;
+  transition: background 0.1s, box-shadow 0.1s;
+}
+
+.metro-pulse-ring.ring-beat {
+  background: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.5);
+}
+
+.metro-pulse-ring.ring-accent {
+  background: rgba(255, 183, 3, 0.4);
+  box-shadow: 0 0 50px rgba(255, 183, 3, 0.6);
+}
+
+/* ── Controls Panel ── */
+.metronome-controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Beat dots */
+.beat-dots-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.beat-dot {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  transition: all 0.08s ease;
+  position: relative;
+}
+
+.beat-dot.dot-downbeat {
+  border-color: rgba(255, 183, 3, 0.5);
+}
+
+.beat-dot.dot-active {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+  transform: scale(1.15);
+}
+
+.beat-dot.dot-downbeat.dot-active {
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 24px rgba(255, 183, 3, 0.7);
+}
+
+.dot-num {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+/* BPM block */
+.bpm-control-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bpm-readout {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.bpm-big {
+  font-size: 72px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+  line-height: 1;
+  letter-spacing: -2px;
+  text-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+}
+
+.bpm-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 8px;
+}
+
+.bpm-unit-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.tempo-name-tag {
+  font-size: 15px;
+  color: var(--accent-gold);
+  font-weight: 700;
+  font-style: italic;
+}
+
+/* BPM Slider */
+.bpm-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    var(--accent-cyan) 0%,
+    var(--accent-cyan) calc((var(--v, 50) / 180) * 100%),
+    rgba(255,255,255,0.1) calc((var(--v, 50) / 180) * 100%)
+  );
+  outline: none;
+  cursor: pointer;
+}
+
+.bpm-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  cursor: pointer;
+  border: 2px solid #fff;
+}
+
+.bpm-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  cursor: pointer;
+  border: 2px solid #fff;
+}
+
+.bpm-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* BPM preset buttons */
+.tempo-preset-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tempo-preset-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tempo-preset-btn:hover {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.tempo-preset-btn.preset-active {
+  background: rgba(0, 240, 255, 0.18);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+}
+
+/* Bottom row: time sig + tap */
+.metronome-bottom-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.time-sig-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ctrl-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Tap Tempo */
+.tap-btn {
+  padding: 14px 28px;
+  border-radius: 16px;
+  border: 2px solid var(--accent-purple);
+  background: rgba(157, 78, 221, 0.12);
+  color: var(--accent-purple);
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+  letter-spacing: 0.5px;
+}
+
+.tap-btn:hover {
+  background: rgba(157, 78, 221, 0.25);
+  transform: scale(1.02);
+}
+
+.tap-btn:active {
+  background: rgba(157, 78, 221, 0.4);
+  transform: scale(0.97);
+  box-shadow: 0 0 20px rgba(157, 78, 221, 0.5);
+}
+
+/* Info chips row */
+.metronome-info-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.info-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
