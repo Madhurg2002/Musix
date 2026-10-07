@@ -31,13 +31,13 @@ export const ScaleExplorer: React.FC<ScaleExplorerProps> = ({
 
     currentScaleDef.intervals.forEach((semitone, i) => {
       setTimeout(() => {
-        soundEngine.playNote(midiToFrequency(baseMidi + semitone), 0.8, 'piano');
+        soundEngine.playNote(midiToFrequency(baseMidi + semitone), 0.8, 'acoustic-guitar');
       }, i * 350);
     });
 
     // Play top octave
     setTimeout(() => {
-      soundEngine.playNote(midiToFrequency(baseMidi + 12), 1.2, 'piano');
+      soundEngine.playNote(midiToFrequency(baseMidi + 12), 1.2, 'acoustic-guitar');
     }, currentScaleDef.intervals.length * 350);
   };
 

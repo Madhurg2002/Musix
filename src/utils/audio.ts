@@ -24,6 +24,18 @@ class SoundEngine {
     }
   }
 
+  // Generate white noise buffer for pick/pluck attack transients
+  private createNoiseBuffer(): AudioBuffer | null {
+    if (!this.ctx) return null;
+    const bufferSize = this.ctx.sampleRate * 0.03; // 30ms burst
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    return buffer;
+  }
+
   // Distortion curve generator for Electric Guitar
   private makeDistortionCurve(amount: number = 20) {
     const k = typeof amount === 'number' ? amount : 20;
@@ -38,7 +50,7 @@ class SoundEngine {
   }
 
   // Play a note with explicit or selected instrument type
-  playNote(freq: number, duration: number = 1.4, overrideInstrument?: InstrumentType) {
+  playNote(freq: number, duration: number = 1.6, overrideInstrument?: InstrumentType) {
     try {
       this.init();
       if (!this.ctx) return;
@@ -46,47 +58,83 @@ class SoundEngine {
       const now = this.ctx.currentTime;
       let targetInstrument: InstrumentType = 'acoustic-guitar';
 
-      if (overrideInstrument) {
-        targetInstrument = overrideInstrument;
-      } else if (this.activeInstrument !== 'auto') {
+      // If user manually selected a specific global instrument (not 'auto'), respect user's global choice!
+      if (this.activeInstrument !== 'auto') {
         targetInstrument = this.activeInstrument;
+      } else if (overrideInstrument) {
+        targetInstrument = overrideInstrument;
       }
 
       switch (targetInstrument) {
         case 'acoustic-guitar': {
-          // Acoustic Plucked Guitar (Karplus-Strong approximation + wood body filter)
-          const osc1 = this.ctx.createOscillator();
-          const osc2 = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
+          // Acoustic Plucked Steel/Nylon Guitar Synthesis
+          // 1. Pick Attack Transient Noise Burst
+          const noiseBuffer = this.createNoiseBuffer();
+          if (noiseBuffer) {
+            const noiseSource = this.ctx.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
 
-          osc1.type = 'triangle';
-          osc1.frequency.setValueAtTime(freq, now);
+            const noiseFilter = this.ctx.createBiquadFilter();
+            noiseFilter.type = 'bandpass';
+            noiseFilter.frequency.setValueAtTime(Math.min(freq * 3, 3500), now);
+            noiseFilter.Q.setValueAtTime(3.0, now);
 
-          osc2.type = 'sawtooth';
-          osc2.frequency.setValueAtTime(freq * 2.01, now);
+            const noiseGain = this.ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.25, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
 
-          const filter = this.ctx.createBiquadFilter();
-          filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(freq * 5, now);
-          filter.frequency.exponentialRampToValueAtTime(180, now + duration);
+            noiseSource.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(this.ctx.destination);
 
-          const subGain = this.ctx.createGain();
-          subGain.gain.setValueAtTime(0.2, now);
-          osc2.connect(subGain);
-          subGain.connect(filter);
+            noiseSource.start(now);
+            noiseSource.stop(now + 0.03);
+          }
 
-          gain.gain.setValueAtTime(0.001, now);
-          gain.gain.linearRampToValueAtTime(0.65, now + 0.012);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+          // 2. Harmonic Oscillators (Plucked String Tension Release + Decay)
+          const harmonics = [1, 2, 3, 4, 6];
+          const weights = [0.65, 0.35, 0.18, 0.08, 0.03];
 
-          osc1.connect(filter);
-          filter.connect(gain);
-          gain.connect(this.ctx.destination);
+          const pluckFilter = this.ctx.createBiquadFilter();
+          pluckFilter.type = 'lowpass';
+          pluckFilter.frequency.setValueAtTime(Math.min(freq * 6, 8000), now);
+          pluckFilter.frequency.exponentialRampToValueAtTime(Math.min(freq * 1.8, 1200), now + 0.15);
+          pluckFilter.frequency.exponentialRampToValueAtTime(Math.min(freq * 1.2, 400), now + duration);
 
-          osc1.start(now);
-          osc2.start(now);
-          osc1.stop(now + duration);
-          osc2.stop(now + duration);
+          // Wood Body Acoustic Resonance Box (hollow body peak ~220Hz)
+          const bodyFilter = this.ctx.createBiquadFilter();
+          bodyFilter.type = 'peaking';
+          bodyFilter.frequency.setValueAtTime(220, now);
+          bodyFilter.Q.setValueAtTime(2.0, now);
+          bodyFilter.gain.setValueAtTime(6.0, now);
+
+          const mainGain = this.ctx.createGain();
+          mainGain.gain.setValueAtTime(0.001, now);
+          mainGain.gain.linearRampToValueAtTime(0.7, now + 0.008); // Sharp pluck attack
+          mainGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+          harmonics.forEach((harmonic, idx) => {
+            if (!this.ctx) return;
+            const osc = this.ctx.createOscillator();
+            const oscGain = this.ctx.createGain();
+
+            // Plucked string initial tension pitch-drop (+12 cents down to nominal pitch in 15ms)
+            osc.type = idx === 0 ? 'triangle' : 'sawtooth';
+            osc.frequency.setValueAtTime(freq * harmonic * 1.008, now);
+            osc.frequency.exponentialRampToValueAtTime(freq * harmonic, now + 0.015);
+
+            oscGain.gain.setValueAtTime(weights[idx], now);
+
+            osc.connect(oscGain);
+            oscGain.connect(pluckFilter);
+
+            osc.start(now);
+            osc.stop(now + duration);
+          });
+
+          pluckFilter.connect(bodyFilter);
+          bodyFilter.connect(mainGain);
+          mainGain.connect(this.ctx.destination);
           break;
         }
 
@@ -100,15 +148,15 @@ class SoundEngine {
           osc.type = 'sawtooth';
           osc.frequency.setValueAtTime(freq, now);
 
-          distortion.curve = this.makeDistortionCurve(15);
+          distortion.curve = this.makeDistortionCurve(18);
           distortion.oversample = '4x';
 
           cabFilter.type = 'bandpass';
-          cabFilter.frequency.setValueAtTime(1200, now);
-          cabFilter.Q.setValueAtTime(1.2, now);
+          cabFilter.frequency.setValueAtTime(1400, now);
+          cabFilter.Q.setValueAtTime(1.4, now);
 
           gain.gain.setValueAtTime(0.001, now);
-          gain.gain.linearRampToValueAtTime(0.4, now + 0.02);
+          gain.gain.linearRampToValueAtTime(0.45, now + 0.015);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.2);
 
           osc.connect(distortion);
@@ -161,7 +209,7 @@ class SoundEngine {
           osc2.frequency.setValueAtTime(freq, now);
 
           filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(400, now);
+          filter.frequency.setValueAtTime(450, now);
 
           gain.gain.setValueAtTime(0.001, now);
           gain.gain.linearRampToValueAtTime(0.85, now + 0.015);
@@ -209,7 +257,7 @@ class SoundEngine {
           osc1.frequency.setValueAtTime(freq, now);
 
           osc2.type = 'square';
-          osc2.frequency.setValueAtTime(freq * 1.005, now); // subtle detune chorus
+          osc2.frequency.setValueAtTime(freq * 1.005, now);
 
           gain.gain.setValueAtTime(0.001, now);
           gain.gain.linearRampToValueAtTime(0.4, now + 0.08);
@@ -227,7 +275,7 @@ class SoundEngine {
         }
       }
     } catch {
-      // Audio fallback silent fail if audio context blocked
+      // Audio fallback silent fail
     }
   }
 
@@ -235,7 +283,7 @@ class SoundEngine {
   strumChord(frequencies: number[], arpeggioDelay: number = 0.05, overrideInstrument?: InstrumentType) {
     frequencies.forEach((freq, idx) => {
       setTimeout(() => {
-        this.playNote(freq, 1.5, overrideInstrument);
+        this.playNote(freq, 1.6, overrideInstrument);
       }, idx * arpeggioDelay * 1000);
     });
   }
