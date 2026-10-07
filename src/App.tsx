@@ -11,6 +11,19 @@ import { IntervalExplorer } from './components/IntervalExplorer';
 import { RhythmMetronome } from './components/RhythmMetronome';
 import { TheoryCheatSheet } from './components/TheoryCheatSheet';
 import { GuitarTuner } from './components/GuitarTuner';
+import { soundEngine, InstrumentType } from './utils/audio';
+
+// Default instrument for each tab — what sounds most natural on that page
+const TAB_DEFAULT_INSTRUMENT: Record<string, InstrumentType> = {
+  workbench: 'acoustic-guitar',
+  tuner: 'acoustic-guitar',
+  fretboard: 'acoustic-guitar',
+  piano: 'piano',
+  scales: 'acoustic-guitar',
+  intervals: 'piano',
+  rhythm: 'acoustic-guitar',
+  guide: 'acoustic-guitar',
+};
 
 const VALID_TABS = ['workbench', 'tuner', 'fretboard', 'piano', 'scales', 'intervals', 'rhythm', 'guide'];
 
@@ -24,6 +37,16 @@ export function App() {
   const [selectedRoot, setSelectedRoot] = useState<NoteName>('C');
   const [activeChordForFretboard, setActiveChordForFretboard] = useState<ChordShape | null>(COMPREHENSIVE_CHORDS[0]);
   const [activeScaleNotes, setActiveScaleNotes] = useState<NoteName[]>(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
+  // 'auto' = follow tab defaults; anything else = user explicitly chose an instrument
+  const [userOverride, setUserOverride] = useState<InstrumentType | 'auto'>('auto');
+
+  // When tab changes AND user has not locked an instrument manually → auto-select
+  useEffect(() => {
+    if (userOverride === 'auto') {
+      const defaultInst = TAB_DEFAULT_INSTRUMENT[activeTab] || 'acoustic-guitar';
+      soundEngine.setInstrument(defaultInst);
+    }
+  }, [activeTab, userOverride]);
 
   // Sync state with URL hash and listen for browser back/forward navigation
   const setActiveTab = (tab: string) => {
@@ -53,7 +76,12 @@ export function App() {
 
   return (
     <div className="musix-app-root">
-      <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Header
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        userOverride={userOverride}
+        setUserOverride={setUserOverride}
+      />
 
       <main className="main-content-container">
         {/* Quick Hero Banner */}

@@ -262,11 +262,29 @@ body {
   background: rgba(10, 13, 20, 0.9);
   border: 1px solid var(--card-border);
   color: var(--accent-cyan);
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  outline: none;
+}
+
+.sound-selector-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sound-active-chip {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding-left: 2px;
+}
+
+.sound-active-chip strong {
+  color: var(--accent-green);
+  font-weight: 700;
 }
 
 /* Buttons System */

@@ -1,31 +1,64 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { soundEngine, InstrumentType } from '../utils/audio';
 
 interface HeaderProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  userOverride: InstrumentType | 'auto';
+  setUserOverride: (val: InstrumentType | 'auto') => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
-  const [selectedInst, setSelectedInst] = useState<InstrumentType | 'auto'>('auto');
+const TAB_DEFAULT_INSTRUMENT: Record<string, InstrumentType> = {
+  workbench: 'acoustic-guitar',
+  tuner: 'acoustic-guitar',
+  fretboard: 'acoustic-guitar',
+  piano: 'piano',
+  scales: 'acoustic-guitar',
+  intervals: 'piano',
+  rhythm: 'acoustic-guitar',
+  guide: 'acoustic-guitar',
+};
 
+const INSTRUMENT_LABELS: Record<InstrumentType | 'auto', string> = {
+  'auto': '🪄 Auto',
+  'acoustic-guitar': '🎸 Acoustic Guitar',
+  'electric-guitar': '⚡ Electric Guitar',
+  'piano': '🎹 Grand Piano',
+  'bass': '🎸 Bass Guitar',
+  'ukulele': '🪕 Ukulele',
+  'synth': '🎛️ Synth Pad',
+};
+
+export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, userOverride, setUserOverride }) => {
   const tabs = [
-    { id: 'tuner', label: '🎯 Instrument Tuner', icon: '🎯' },
-    { id: 'fretboard', label: '🎸 Guitar Fretboard', icon: '🎸' },
-    { id: 'workbench', label: '🎴 Side-by-Side Cards', icon: '🎴' },
-    { id: 'piano', label: '🎹 Piano Visualizer', icon: '🎹' },
-    { id: 'scales', label: '🎼 Scales & Modes', icon: '🎼' },
-    { id: 'intervals', label: '📏 Intervals', icon: '📏' },
-    { id: 'rhythm', label: '⏱️ Rhythm & Metronome', icon: '⏱️' },
-    { id: 'guide', label: '📚 Beginner Guide', icon: '📚' },
+    { id: 'tuner', label: '🎯 Instrument Tuner' },
+    { id: 'fretboard', label: '🎸 Guitar Fretboard' },
+    { id: 'workbench', label: '🎴 Side-by-Side Cards' },
+    { id: 'piano', label: '🎹 Piano Visualizer' },
+    { id: 'scales', label: '🎼 Scales & Modes' },
+    { id: 'intervals', label: '📏 Intervals' },
+    { id: 'rhythm', label: '⏱️ Rhythm & Metronome' },
+    { id: 'guide', label: '📚 Beginner Guide' },
   ];
 
-  const handleInstrumentChange = (inst: InstrumentType | 'auto') => {
-    setSelectedInst(inst);
-    soundEngine.setInstrument(inst);
-    // Play test note to demonstrate sound
-    if (inst !== 'auto') {
-      soundEngine.playNote(261.63, 1.2, inst);
+  // The currently active instrument (auto resolved or user-picked)
+  const effectiveInstrument: InstrumentType =
+    userOverride === 'auto'
+      ? (TAB_DEFAULT_INSTRUMENT[activeTab] || 'acoustic-guitar')
+      : userOverride;
+
+  const handleInstrumentChange = (val: string) => {
+    const inst = val as InstrumentType | 'auto';
+    setUserOverride(inst);
+
+    if (inst === 'auto') {
+      // Revert to tab default immediately
+      const defaultInst = TAB_DEFAULT_INSTRUMENT[activeTab] || 'acoustic-guitar';
+      soundEngine.setInstrument(defaultInst);
+    } else {
+      soundEngine.setInstrument(inst);
+      // Play a quick preview note to confirm sound
+      soundEngine.playNote(261.63, 1.0, inst);
     }
   };
 
@@ -51,21 +84,29 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
         ))}
       </nav>
 
+      {/* Sound Engine Selector */}
       <div className="header-sound-selector">
-        <span className="sound-label">🔊 Sound Engine:</span>
-        <select
-          className="select-input sound-select"
-          value={selectedInst}
-          onChange={(e) => handleInstrumentChange(e.target.value as InstrumentType | 'auto')}
-        >
-          <option value="auto">🪄 Auto (Match Active View)</option>
-          <option value="acoustic-guitar">🎸 Acoustic Guitar</option>
-          <option value="electric-guitar">⚡ Electric Guitar</option>
-          <option value="piano">🎹 Grand Piano</option>
-          <option value="bass">🎸 Bass Guitar</option>
-          <option value="ukulele">🪕 Ukulele</option>
-          <option value="synth">🎛️ Synth Pad</option>
-        </select>
+        <span className="sound-label">🔊</span>
+        <div className="sound-selector-inner">
+          <select
+            className="select-input sound-select"
+            value={userOverride}
+            onChange={(e) => handleInstrumentChange(e.target.value)}
+          >
+            <option value="auto">🪄 Auto (Follow Page)</option>
+            <option value="acoustic-guitar">🎸 Acoustic Guitar</option>
+            <option value="electric-guitar">⚡ Electric Guitar</option>
+            <option value="piano">🎹 Grand Piano</option>
+            <option value="bass">🎸 Bass Guitar</option>
+            <option value="ukulele">🪕 Ukulele</option>
+            <option value="synth">🎛️ Synth Pad</option>
+          </select>
+          {/* Live indicator showing what is actually playing right now */}
+          <span className="sound-active-chip">
+            {userOverride === 'auto' ? '⚡ Auto: ' : '🔒 Locked: '}
+            <strong>{INSTRUMENT_LABELS[effectiveInstrument]?.replace(/^.{2}\s/, '')}</strong>
+          </span>
+        </div>
       </div>
     </header>
   );
