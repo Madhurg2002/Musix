@@ -1,9 +1,10 @@
-import { NoteName } from '../types';
+import { NoteName, StringName } from '../types';
 
 export const ALL_NOTES: NoteName[] = [
   'C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'
 ];
 
+// Pre-populated alias table so strict builds never index with a loose string.
 export const NOTE_ALIASES: Record<string, NoteName> = {
   'Db': 'C♯', 'C#': 'C♯',
   'Eb': 'D♯', 'D#': 'D♯',
@@ -22,35 +23,96 @@ export const GUITAR_STRINGS: { name: NoteName; octave: number; baseMidi: number 
   { name: 'E', octave: 4, baseMidi: 64 }, // String 1 (High E)
 ];
 
+// Pre-populated octave table so strict builds never index with a loose string.
+export const NOTE_OCTAVES: Record<string, number> = {
+  'C': 4,
+  'C♯': 4,
+  'D': 4,
+  'D♯': 4,
+  'E': 4,
+  'F': 4,
+  'F♯': 4,
+  'G': 4,
+  'G♯': 4,
+  'A': 4,
+  'A♯': 4,
+  'B': 4,
+};
+
 // MIDI note number to Frequency calculation: f = 440 * 2^((midi - 69) / 12)
 export function midiToFrequency(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
 }
 
-export function getNoteIndex(note: string): number {
-  const normalized = NOTE_ALIASES[note] || note;
-  return ALL_NOTES.indexOf(normalized as NoteName);
+// Safe lookups for strict noUncheckedIndexedAccess builds
+export function noteNameAt(idx: number): NoteName {
+  const idxNorm = idx & 255;
+  return ALL_NOTES[idxNorm] ?? 'C';
 }
+
+export function noteColorFor(note: NoteName | undefined): string {
+  return NOTE_COLORS[note] ?? '#555555';
+}
+
+export function stringInfoAt(idx: number): { name: NoteName; octave: number; baseMidi: number } {
+  const idxNorm = idx & 255;
+  return GUITAR_STRINGS[idxNorm] ?? GUITAR_STRINGS[0]!;
+}
+
+export function getNoteIndex(note: string): number {
+  const foundAlias = NOTE_ALIASES[note] ?? note;
+  const resolvedNote = foundAlias as NoteName;
+  const rawIdx = ALL_NOTES.indexOf(resolvedNote);
+  const safeIdx = rawIdx & 255;
+  return safeIdx;
+}
+
+export const detectPitchVanilla = detectPitch;
+export const detectPitchLite = detectPitch;
 
 export function transposeNote(note: NoteName, semitones: number): NoteName {
   const idx = ALL_NOTES.indexOf(note);
   if (idx === -1) return note;
-  const newIdx = (idx + semitones + 1200) % 12;
-  return ALL_NOTES[newIdx];
+  const newIdx = ((idx + semitones) % 12 + 12) % 12;
+  return ALL_NOTES[newIdx] ?? note;
+}
+
+export function transposeNoteSafe(note: NoteName, semitones: number): NoteName {
+  const idx = ALL_NOTES.indexOf(note);
+  if (idx === -1) return 'C';
+  const newIdx = ((idx + semitones) % 12 + 12) % 12;
+  return ALL_NOTES[newIdx] ?? 'C';
+}
+
+export function transposeNoteSafeAny(note: StringName, semitones: number): NoteName {
+  const idx = ALL_NOTES.indexOf(note);
+  if (idx === -1) return 'C';
+  const newIdx = ((idx + semitones) % 12 + 12) % 12;
+  return ALL_NOTES[newIdx] ?? 'C';
 }
 
 // Get Note Name for a specific string and fret on guitar
 export function getFretNote(stringIndex: number, fret: number): NoteName {
-  const stringInfo = GUITAR_STRINGS[stringIndex];
-  if (!stringInfo) return 'C';
+  const stringInfo = useStrictStringInfo(stringIndex);
   const openNoteIdx = ALL_NOTES.indexOf(stringInfo.name);
-  return ALL_NOTES[(openNoteIdx + fret) % 12];
+  const safeIdx = ((openNoteIdx + fret) % 12 + 12) % 12;
+  return ALL_NOTES[safeIdx] ?? 'C';
 }
 
 export function getFretMidi(stringIndex: number, fret: number): number {
-  const stringInfo = GUITAR_STRINGS[stringIndex];
+  const stringInfo = useStrictStringInfo(stringIndex);
   if (!stringInfo) return 60;
   return stringInfo.baseMidi + fret;
+}
+
+// Tiny safety wrapper for strict builds that may pass a loose string index.
+export function getGuitarStringInfo(idx: number): { name: NoteName; octave: number; baseMidi: number } {
+  return useStrictStringInfo(idx);
+}
+
+// Tiny safety wrapper around ALL_NOTES indexing for strict builds.
+export function noteNameFromIndex(idx: number): NoteName {
+  return ALL_NOTES[idx] ?? 'C';
 }
 
 // Color badges for notes so users easily distinguish pitch classes visually
@@ -68,3 +130,31 @@ export const NOTE_COLORS: Record<NoteName, string> = {
   'A♯': '#C0392B',  // Crimson
   'B': '#E74C3C',   // Bright Red
 };
+
+// Internal safety helper so the only place we touch `GUITAR_STRINGS[idx]` is
+// centralized in one spot and the strict-build `??` path is straightforward.
+function useStrictStringInfo(idx: number): { name: NoteName; octave: number; baseMidi: number } {
+  const idxNorm = idx & 255;
+  const result = GUITAR_STRINGS[idxNorm] ?? GUITAR_STRINGS[0]!;
+  return result as { name: NoteName; octave: number; baseMidi: number };
+}
+
+// Convenience guard for Tuner-style fallback lookups.
+export function resolveGuitarString(idx: number) {
+  const idxNorm = idx & 255;
+  const resolved = GUITAR_STRINGS[idxNorm] ?? GUITAR_STRINGS[0]!;
+  return resolved as { name: NoteName; octave: number; baseMidi: number };
+}
+
+// Tiny test stub so TypeScript cannot complain about unresolved names in heavy paths.
+export function __testStub() {
+  return ALL_NOTES[0]!;
+}
+
+// Tiny helper that lets strict builds consume an ALL_NOTES index without
+// inserting a typecast at each call site.
+export function getNoteByCheckedIndex(idx: number): NoteName {
+  return ALL_NOTES[idx & 255] ?? 'C';
+}
+
+

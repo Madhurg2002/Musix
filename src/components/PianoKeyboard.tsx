@@ -1,6 +1,6 @@
 import React from 'react';
 import { NoteName } from '../types';
-import { ALL_NOTES, NOTE_COLORS, midiToFrequency } from '../utils/musicTheory';
+import { ALL_NOTES, NOTE_COLORS, midiToFrequency, noteColorFor } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 
 interface PianoKeyboardProps {
@@ -39,7 +39,7 @@ export const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
         {Array.from({ length: totalKeys }).map((_, i) => {
           const midi = baseMidi + i;
           const noteIndex = i % 12;
-          const noteName = ALL_NOTES[noteIndex];
+          const noteName = ALL_NOTES[noteIndex] ?? 'C';
           const isBlackKey = noteName.includes('♯');
           const isActive = activeNotes.includes(noteName);
           const isRoot = noteName === rootNote;
@@ -53,9 +53,7 @@ export const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
               key={i}
               className={keyClass}
               onClick={() => handleKeyClick(midi)}
-              style={{
-                borderColor: isActive ? NOTE_COLORS[noteName] : undefined,
-              }}
+              style={{ borderColor: isActive ? noteColorFor(noteName) : undefined }}
             >
               <div className="key-badge">
                 <span className="key-note-name">{noteName}</span>

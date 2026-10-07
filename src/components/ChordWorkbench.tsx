@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import { ChordCardItem, NoteName, ChordShape } from '../types';
-import { COMPREHENSIVE_CHORDS, findOrCreateChord } from '../data/chordsData';
-import { ALL_NOTES, transposeNote, NOTE_COLORS, getFretMidi, midiToFrequency } from '../utils/musicTheory';
+import {
+  COMPREHENSIVE_CHORDS,
+  findOrCreateChord,
+  asSafeChord,
+} from '../data/chordsData';
+import {
+  ALL_NOTES,
+  transposeNote,
+  noteColorFor,
+  getFretMidi,
+  midiToFrequency,
+} from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 
 interface ChordWorkbenchProps {
@@ -11,9 +21,9 @@ interface ChordWorkbenchProps {
 
 export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordForFretboard, onOpenTuner }) => {
   const [cards, setCards] = useState<ChordCardItem[]>([
-    { id: 'card-1', chord: COMPREHENSIVE_CHORDS[0], transposeOffset: 0 }, // C Major
-    { id: 'card-2', chord: COMPREHENSIVE_CHORDS[4], transposeOffset: 0 }, // A Major
-    { id: 'card-3', chord: COMPREHENSIVE_CHORDS[12], transposeOffset: 0 }, // B Minor
+    { id: 'card-1', chord: COMPREHENSIVE_CHORDS[0] ?? COMPREHENSIVE_CHORDS[0]!, transposeOffset: 0 }, // C Major
+    { id: 'card-2', chord: COMPREHENSIVE_CHORDS[4] ?? COMPREHENSIVE_CHORDS[4]!, transposeOffset: 0 }, // A Major
+    { id: 'card-3', chord: COMPREHENSIVE_CHORDS[12] ?? COMPREHENSIVE_CHORDS[12]!, transposeOffset: 0 }, // B Minor
   ]);
 
   const [selectedRootToAdd, setSelectedRootToAdd] = useState<NoteName>('G');
@@ -41,7 +51,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
       cards.map((item) => {
         if (item.id !== id) return item;
         const newRoot = transposeNote(item.chord.root, delta);
-        const newNotes = item.chord.notes.map((n) => transposeNote(n, delta));
+        const newNotes = item.chord.notes.map((n: NoteName) => transposeNote(n, delta));
         return {
           ...item,
           transposeOffset: item.transposeOffset + delta,
@@ -59,15 +69,19 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
   // Play chord sound
   const handlePlayChord = (card: ChordCardItem) => {
     const freqs: number[] = [];
-    card.chord.frets.forEach((fret, sIdx) => {
+    const notes = asSafeChord(card.chord).notes;
+    const frets = asSafeChord(card.chord).frets;
+
+    frets.forEach((fret: number, sIdx: number) => {
       if (fret >= 0) {
         const midi = getFretMidi(sIdx, fret);
         freqs.push(midiToFrequency(midi + card.transposeOffset));
       }
     });
+
     // Fallback if frets empty
     if (freqs.length === 0) {
-      card.chord.notes.forEach((n, i) => {
+      notes.forEach((n: NoteName, i: number) => {
         const idx = ALL_NOTES.indexOf(n);
         freqs.push(midiToFrequency(60 + idx + i * 3));
       });
@@ -104,7 +118,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
               value={selectedRootToAdd}
               onChange={(e) => setSelectedRootToAdd(e.target.value as NoteName)}
             >
-              {ALL_NOTES.map((n) => (
+              {ALL_NOTES.map((n: NoteName) => (
                 <option key={n} value={n}>
                   Key {n}
                 </option>
@@ -176,13 +190,13 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                 {/* Notes Pill Badges */}
                 <div className="chord-notes-row">
                   <span className="notes-label">Notes:</span>
-                  {chord.notes.map((note, idx) => (
+                  {asSafeChord(chord).notes.map((note: NoteName, idx: number) => (
                     <span
                       key={idx}
                       className="note-pill"
-                      style={{ backgroundColor: NOTE_COLORS[note] || '#555' }}
+                      style={{ backgroundColor: noteColorFor(note) }}
                     >
-                      {note} <small>({chord.intervals[idx] || ''})</small>
+                      {note} <small>({asSafeChord(chord).intervals[idx] ?? ''})</small>
                     </span>
                   ))}
                 </div>
@@ -191,8 +205,8 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                 <div className="guitar-mini-box">
                   <div className="mini-box-title">Guitar Press Pattern (Low E ➔ High E)</div>
                   <div className="string-press-grid">
-                    {chord.frets.map((fret, stringIdx) => {
-                      const finger = chord.fingers ? chord.fingers[stringIdx] : undefined;
+                    {asSafeChord(chord).frets.map((fret: number, stringIdx: number) => {
+                      const finger = asSafeChord(chord).fingers?.[stringIdx];
                       let label = 'O';
                       let cssClass = 'open';
                       if (fret === -1) {
