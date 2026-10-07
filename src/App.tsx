@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './style.css';
 import { NoteName, ChordShape } from './types';
 import { COMPREHENSIVE_CHORDS } from './data/chordsData';
@@ -12,11 +12,39 @@ import { RhythmMetronome } from './components/RhythmMetronome';
 import { TheoryCheatSheet } from './components/TheoryCheatSheet';
 import { GuitarTuner } from './components/GuitarTuner';
 
+const VALID_TABS = ['workbench', 'tuner', 'fretboard', 'piano', 'scales', 'intervals', 'rhythm', 'guide'];
+
+function getTabFromHash(): string {
+  const hash = window.location.hash.replace('#', '').trim().toLowerCase();
+  return VALID_TABS.includes(hash) ? hash : 'workbench';
+}
+
 export function App() {
-  const [activeTab, setActiveTab] = useState<string>('workbench');
+  const [activeTab, setActiveTabState] = useState<string>(() => getTabFromHash());
   const [selectedRoot, setSelectedRoot] = useState<NoteName>('C');
   const [activeChordForFretboard, setActiveChordForFretboard] = useState<ChordShape | null>(COMPREHENSIVE_CHORDS[0]);
   const [activeScaleNotes, setActiveScaleNotes] = useState<NoteName[]>(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
+
+  // Sync state with URL hash and listen for browser back/forward navigation
+  const setActiveTab = (tab: string) => {
+    setActiveTabState(tab);
+    window.location.hash = tab;
+  };
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const currentTab = getTabFromHash();
+      setActiveTabState(currentTab);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleHashChange);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handleHashChange);
+    };
+  }, []);
 
   const handleSelectChordForFretboard = (chord: ChordShape) => {
     setActiveChordForFretboard(chord);
@@ -33,7 +61,7 @@ export function App() {
           <div className="hero-text">
             <h2>Learn Music Theory Visually & Interactively</h2>
             <p>
-              Compare chords side by side, inspect exact guitar finger press positions, explore piano keys, and listen to real synthesized audio in real time.
+              Compare chords side by side, inspect exact guitar finger press positions, tune your instrument with mic pitch detection, explore piano keys, and listen to real synthesized audio in real time.
             </p>
           </div>
           <div className="hero-quick-keys">
@@ -149,7 +177,7 @@ export function App() {
       </main>
 
       <footer className="musix-footer">
-        <p>Musix — Built for music learners. Interactive Guitar & Piano Visualizers.</p>
+        <p>Musix — Built for music learners. Interactive Guitar, Tuner & Piano Visualizers.</p>
       </footer>
     </div>
   );
