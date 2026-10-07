@@ -1,0 +1,70 @@
+import React from 'react';
+import { NoteName } from '../types';
+import { ALL_NOTES, NOTE_COLORS, midiToFrequency } from '../utils/musicTheory';
+import { soundEngine } from '../utils/audio';
+
+interface PianoKeyboardProps {
+  activeNotes?: NoteName[];
+  rootNote?: NoteName;
+  octaves?: number;
+}
+
+export const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
+  activeNotes = [],
+  rootNote = 'C',
+  octaves = 2,
+}) => {
+  // Generate keys array across octaves (starting at C3 / MIDI 48)
+  const baseMidi = 48;
+  const totalKeys = octaves * 12;
+
+  const handleKeyClick = (midi: number) => {
+    soundEngine.playNote(midiToFrequency(midi), 1.2, 'piano');
+  };
+
+  return (
+    <div className="piano-container glass-card">
+      <div className="piano-header">
+        <div>
+          <h3>🎹 Interactive Piano Visualizer</h3>
+          <p>Click keys to play. Active notes in current chord/scale light up dynamically.</p>
+        </div>
+        <div className="piano-legend">
+          <span className="legend-item"><span className="dot root-dot" /> Root ({rootNote})</span>
+          <span className="legend-item"><span className="dot active-dot" /> Scale / Chord Note</span>
+        </div>
+      </div>
+
+      <div className="piano-keyboard">
+        {Array.from({ length: totalKeys }).map((_, i) => {
+          const midi = baseMidi + i;
+          const noteIndex = i % 12;
+          const noteName = ALL_NOTES[noteIndex];
+          const isBlackKey = noteName.includes('♯');
+          const isActive = activeNotes.includes(noteName);
+          const isRoot = noteName === rootNote;
+
+          let keyClass = isBlackKey ? 'piano-key black-key' : 'piano-key white-key';
+          if (isActive) keyClass += ' active-key';
+          if (isRoot) keyClass += ' root-key';
+
+          return (
+            <div
+              key={i}
+              className={keyClass}
+              onClick={() => handleKeyClick(midi)}
+              style={{
+                borderColor: isActive ? NOTE_COLORS[noteName] : undefined,
+              }}
+            >
+              <div className="key-badge">
+                <span className="key-note-name">{noteName}</span>
+                {isRoot && <span className="root-tag">ROOT</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
