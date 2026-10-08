@@ -158,11 +158,10 @@ function autoCorrelate(buf: Float32Array, sampleRate: number): number {
   const c: Float32Array = new Float32Array(sliceSize);
   for (let i = 0; i < sliceSize; i++) {
     let sum = 0;
-    const limit = sliceSize - i;
     let j = 0;
-    while (j < limit) {
+    const limit = sliceSize - i;
+    for (j = 0; j < limit; j++) {
       sum += (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
-      j++;
     }
     c[i] = sum;
   }
@@ -289,7 +288,7 @@ export const GuitarTuner: React.FC = () => {
 
     const buf = new Float32Array(analyser!.fftSize);
     analyser!.getFloatTimeDomainData(buf);
-    const pitch = autoCorrelate(buf, ctx!.sampleRate);
+    const pitch = autoCorrelate(buf, ctx!.sampleRate ?? 44100);
 
     // Guard the pitch-analysis branch so the strict-build path stays readable.
     const hasUsablePitch = pitch !== -1 && 60 < pitch && pitch < 1000;

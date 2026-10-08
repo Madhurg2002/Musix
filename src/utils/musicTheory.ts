@@ -95,9 +95,9 @@ export function getFindIndex(strings: ReadonlyArray<{ name: NoteName; octave: nu
 // Resolve a string-shape entry from a table the same way every caller does,
 // without ever using a value that the strict build could see as possibly undefined.
 export function getResolvedStringInfo(strings: ReadonlyArray<{ name: NoteName; octave: number; baseMidi: number }>, idx: number) {
-  const index = (idx ?? 0) as number;
-  const normIndex = index & 255;
-  return strings[normIndex] ?? strings[0]!;
+  const numericIdx = Number.isFinite(idx) ? idx : 0;
+  const clampedIndex = (Math.trunc(numericIdx) & 255) | 0;
+  return strings[clampedIndex] ?? strings[0]!;
 }
 
 
@@ -245,10 +245,8 @@ export function detectPitch(buf: Float32Array, sampleRate: number): number {
   for (let i = 0; i < sliceSize; i++) {
     let sum = 0;
     const limit = sliceSize - i;
-    let j = 0;
-    while (j < limit) {
+    for (let j = 0; j < limit; j++) {
       sum += (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
-      j++;
     }
     c[i] = sum;
   }

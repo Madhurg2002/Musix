@@ -281,7 +281,7 @@ export const RhythmMetronome: React.FC = () => {
           {/* Beat dots */}
           <div className="beat-dots-row">
             {Array.from({ length: beatsPerMeasure }).map((_, i) => {
-              const beatNum = i + 1;
+              const beatNum = (i + 1) || 1;
               const isActive = isPlaying && currentBeat === beatNum;
               return (
                 <div
