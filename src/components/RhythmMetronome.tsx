@@ -209,7 +209,7 @@ export const RhythmMetronome: React.FC = () => {
               fill={accent && flashBeat ? '#00f5d4' : '#f8fafc'}
               className="metro-bpm-svg"
             >
-              {bpm}
+              {bpm ?? 0}
             </text>
             <text
               x="100" y="296"
@@ -257,9 +257,9 @@ export const RhythmMetronome: React.FC = () => {
               {/* Weight notch */}
               <line
                 x1="86"
-                y1={75 + ((weightPos / 100) * 220)}
+                y1={75 + (weightPos / 100) * 220}
                 x2="114"
-                y2={75 + ((weightPos / 100) * 220)}
+                y2={75 + (weightPos / 100) * 220}
                 stroke="rgba(0,0,0,0.3)"
                 strokeWidth="1.5"
               />

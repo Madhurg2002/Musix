@@ -74,6 +74,7 @@ export function detectPitch(buf: Float32Array, sampleRate: number): number {
 export { detectPitch as detectPitchVanilla };
 
 export { detectPitch as detectPitchLite };
+
 export interface StringInfo {
   index: number;
   note: NoteName;
@@ -299,7 +300,8 @@ export const GuitarTuner: React.FC = () => {
       // Find closest MIDI note
       const noteNum = 12 * (Math.log(pitch / 440) / Math.log(2)) + 69;
       const roundedMidi = Math.round(noteNum);
-      const noteName = ALL_NOTES[(((roundedMidi % 12) + 12) % 12) & 255] ?? '--';
+
+      const noteName = ALL_NOTES[(((roundedMidi % 12) + 12) % 12) & 255] ?? '--' as NoteName;
 
       // Keep the octave computation on a narrowed numeric expression so the
       // strict-build path is easy to reason about.
@@ -313,7 +315,7 @@ export const GuitarTuner: React.FC = () => {
       let matchedPeg: StringInfo | undefined;
       if (autoDetectMode) {
         matchedPeg = currentTuningStrings.find(
-          (s) => Math.abs(12 * Math.log2(pitch / s.frequency)) < 1.8
+          (s) => s.frequency != null && Math.abs(12 * Math.log2(pitch / s.frequency)) < 1.8
         );
       } else if (selectedStringIndex !== null) {
         matchedPeg = currentTuningStrings.find((s) => s.index === selectedStringIndex);
@@ -334,7 +336,6 @@ export const GuitarTuner: React.FC = () => {
 
   const activePreset = preset;
   const presetStrings = activePreset?.strings ?? [];
-
 
   useEffect(() => {
     return () => {

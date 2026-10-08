@@ -68,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, userOve
         <span className="brand-logo">♫</span>
         <div className="brand-titles">
           <h1>Musix</h1>
-          <p className="tagline">Interactive Visual Music Theory Studio</p>
+          <p className="tagline">Interactive Music Theory Studio</p>
         </div>
       </div>
 
@@ -102,9 +102,9 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, userOve
             <option value="synth">🎛️ Synth Pad</option>
           </select>
           {/* Live indicator showing what is actually playing right now */}
-          <span className="sound-active-chip">
+          <span className="sound-active-chip small">
             {userOverride === 'auto' ? '⚡ Auto: ' : '🔒 Locked: '}
-            <strong>{INSTRUMENT_LABELS[effectiveInstrument]?.replace(/^.{2}\s/, '')}</strong>
+            <strong>{INSTRUMENT_LABELS[effectiveInstrument]}</strong>
           </span>
         </div>
       </div>

@@ -67,8 +67,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 16px;
+  min-width: 0;
 }
 
 .header-brand {
@@ -280,6 +281,10 @@ body {
   font-size: 11px;
   color: var(--text-muted);
   padding-left: 2px;
+}
+
+.sound-active-chip.small {
+  font-size: 10px;
 }
 
 .sound-active-chip strong {
