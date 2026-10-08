@@ -241,6 +241,7 @@ export const GuitarTuner: React.FC = () => {
     soundEngine.playNote(str.frequency ?? 440, 2.5, 'acoustic-guitar');
   };
 
+  // Safety lookup for the currently selected tuning so the UI never crashes on stale index.
   const startMic = async () => {
     try {
       setMicError(null);
@@ -287,14 +288,9 @@ export const GuitarTuner: React.FC = () => {
     const analyser = analyserRef.current;
     const ctx = audioCtxRef.current;
 
-    if (!analyser || !ctx) return;
-
-    const buf = new Float32Array(analyser.fftSize);
-    analyser.getFloatTimeDomainData(buf);
-
-    const pitch = autoCorrelate(buf, ctx.sampleRate ?? 44100);
-
-    // Guard the pitch-analysis branch so the strict-build path stays readable.
+    const buf = new Float32Array(analyser!.fftSize);
+    analyser!.getFloatTimeDomainData(buf);
+    const pitch = autoCorrelate(buf, ctx!.sampleRate ?? 44100);      // Guard the pitch-analysis branch so the strict-build path stays readable.
     const hasUsablePitch = pitch !== -1 && 60 < pitch && pitch < 1000;
     if (hasUsablePitch) {
       const currentPitch = pitch;
