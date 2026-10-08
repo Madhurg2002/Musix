@@ -189,15 +189,74 @@ body {
   transition: all 0.2s;
 }
 
-.btn-key-chip.active {
-  background: var(--accent-cyan);
-  color: #000;
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 12px var(--accent-cyan);
+
+.chord-workbench-picker__toggle,
+.chord-workbench-picker__item,
+.chord-workbench-picker__label {
+  font-family: var(--font-main);
 }
 
-/* Fretboard Chord Picker Bar */
-.fretboard-chord-picker {
+.chord-workbench-picker__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.chord-workbench-picker__toggle {
+  margin-top: 10px;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.16) 0%, rgba(157, 78, 221, 0.16) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  color: var(--text-primary);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.chord-workbench-picker__toggle:hover {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.26) 0%, rgba(157, 78, 221, 0.26) 100%);
+  border-color: var(--accent-cyan);
+  color: #fff;
+}
+
+.chord-workbench-picker__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chord-workbench-picker__item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.chord-workbench-picker__item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.35);
+}
+
+.chord-workbench-picker__item.active {
+  background: linear-gradient(135deg, var(--accent-cyan) 0%, #00a8ff 100%);
+  color: #000;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 14px var(--accent-cyan);
+}
+
+.chord-workbench-picker.hidden .chord-workbench-picker__list {
+  display: none;
+}
+
+/* Info chips row */
+.metronome-info-chips {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1945,6 +2004,104 @@ body {
   background: rgba(157, 78, 221, 0.4);
   transform: scale(0.97);
   box-shadow: 0 0 20px rgba(157, 78, 221, 0.5);
+}
+
+/* Side-by-Side Chord Studio — open/close chord picker */
+.chord-workbench-picker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  background: rgba(10, 13, 20, 0.85);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+.chord-workbench-picker__toggle,
+.chord-workbench-picker__item,
+.chord-workbench-picker__label {
+  font-family: var(--font-main);
+}
+
+.chord-workbench-picker__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.chord-workbench-picker__toggle {
+  margin-top: 10px;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.16) 0%, rgba(157, 78, 221, 0.16) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  color: var(--text-primary);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.chord-workbench-picker__toggle:hover {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.26) 0%, rgba(157, 78, 221, 0.26) 100%);
+  border-color: var(--accent-cyan);
+  color: #fff;
+}
+
+/* Persistent piano toggle in the header */
+.header-piano-toggle {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.14) 0%, rgba(157, 78, 221, 0.14) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: var(--text-primary);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.header-piano-toggle:hover {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.24) 0%, rgba(157, 78, 221, 0.24) 100%);
+  border-color: var(--accent-cyan);
+  color: #fff;
+}
+
+.chord-workbench-picker__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chord-workbench-picker__item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.chord-workbench-picker__item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.35);
+}
+
+.chord-workbench-picker__item.active {
+  background: linear-gradient(135deg, var(--accent-cyan) 0%, #00a8ff 100%);
+  color: #000;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 14px var(--accent-cyan);
+}
+
+.chord-workbench-picker.hidden .chord-workbench-picker__list {
+  display: none;
 }
 
 /* Info chips row */

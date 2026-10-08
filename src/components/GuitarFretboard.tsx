@@ -17,6 +17,8 @@ interface GuitarFretboardProps {
   activeScaleNotes?: NoteName[];
   rootNote?: NoteName;
   fretsCount?: number;
+  /** Id of the chord currently shown in the side-by-side chord studio; unused when null. */
+  activeChordId?: string | null;
 }
 
 export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
@@ -27,11 +29,37 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
 }) => {
   const [hoveredNote, setHoveredNote] = useState<{ stringIdx: number; fret: number; note: NoteName } | null>(null);
 
+  // The chord the side-by-side ChordWorkbench selected (or the learner picked inside
+  // the card section). null = no side-by-side override; the fretboard keeps the chord
+  // it was already showing.
+  const [displayedChordId, setDisplayedChordId] = useState<string | null>(null);
+
+  // Promote the workbench's chosen chord the first time it arrives, then keep it for
+  // the rest of the tab so the workbench's open/close flow never resets the fretboard.
+  React.useEffect(() => {
+    if (activeChordId !== null) {
+      setDisplayedChordId(activeChordId);
+    }
+  }, [activeChordId]);
+
+  // Resolve what to draw: the side-by-side chord if set, otherwise the chord the
+  // learner already picked on the fretboard.
+  const displayedChord: ChordShape | null =
+    activeChordId !== null && activeChord
+      ? (activeChord.id === activeChordId ? activeChord : null)
+      : activeChord;
+
+  const selectedChord = displayedChord;
+
+  const passedChord = selectedChord ?? activeChord;
+
+  const fretsList = Array.from({ length: fretsCount + 1 }, (_, i) => i);
+
   // Strum the full chord audio
   const handleStrum = () => {
-    if (!activeChord) return;
+    if (!passedChord) return;
     const freqs: number[] = [];
-    activeChord.frets.forEach((fret, sIdx) => {
+    passedChord.frets.forEach((fret, sIdx) => {
       if (fret >= 0) {
         const midi = getFretMidi(sIdx, fret);
         freqs.push(midiToFrequency(midi));
@@ -45,8 +73,9 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
     soundEngine.playNote(midiToFrequency(midi), 1.2, 'acoustic-guitar');
   };
 
-  const fretsList = Array.from({ length: fretsCount + 1 }, (_, i) => i);
-  // Fret marker dots (single dot on 3, 5, 7, 9, 15; double dot on 12)
+  // The nut status and fretboard markers use the chord that is actually shown, so the
+  // fretboard never silently follows a workbench chord that the side-by-side cards are
+  // hiding.
   const singleMarkers = [3, 5, 7, 9, 15];
   const doubleMarkers = [12];
 
@@ -68,20 +97,20 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
         </div>
 
         {activeChord && (
-          <button className="btn btn-primary strum-btn" onClick={handleStrum}>
+          <button className="btn btn-primary strum-btn" onClick={() => handleStrum()}>
             <span>🔊</span> Strum Chord
           </button>
         )}
       </div>
 
       {/* String Head Stock / Nut Status (X / O indicators) */}
-      {activeChord && (
+      {passedChord && (
         <div className="nut-indicators">
           <span className="nut-label">String Press:</span>
           <div className="nut-badges">
             {GUITAR_STRINGS.map((str, idx) => {
-              const chordFret = activeChord ? asSafeChord(activeChord).frets[idx] : -1;
-              const finger = activeChord ? asSafeChord(activeChord).fingers?.[idx] ?? '?' : '?';
+              const chordFret = passedChord ? asSafeChord(passedChord).frets[idx] : -1;
+              const finger = displayedChord ? asSafeChord(displayedChord).fingers?.[idx] ?? '?' : '?';
               const fret = chordFret ?? -1;
               let statusText = 'O';
               let statusClass = 'open';
@@ -110,13 +139,14 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
       <div className="fretboard-wrapper">
         {/* Fret Markers Row */}
         <div className="fret-numbers-row">
-          <div className="nut-spacer">Nut</div>                {fretsList.slice(1).map((f) => (
-                    <div key={f} className="fret-number-cell">
-                      <span>{f}</span>
-                      {singleMarkers.includes(f) && <span className="fret-dot-single" />}
-                      {doubleMarkers.includes(f) && <span className="fret-dot-double" />}
-                    </div>
-                  ))}
+          <div className="nut-spacer">Nut</div>
+          {fretsList.slice(1).map((f) => (
+            <div key={f} className="fret-number-cell">
+              <span>{f}</span>
+              {singleMarkers.includes(f) && <span className="fret-dot-single" />}
+              {doubleMarkers.includes(f) && <span className="fret-dot-double" />}
+            </div>
+          ))}
         </div>
 
         {/* 6 Guitar Strings (from High E (String 1) to Low E (String 6)) */}
@@ -124,7 +154,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
           {[...GUITAR_STRINGS].reverse().map((stringInfo, revIdx) => {
             const actualStringIdx = GUITAR_STRINGS.length - 1 - revIdx;
             const chordFret = activeChord ? asSafeChord(activeChord).frets[actualStringIdx] : -2;
-            const finger = activeChord ? asSafeChord(activeChord).fingers?.[actualStringIdx] : undefined;
+            const finger = displayedChord ? asSafeChord(displayedChord).fingers?.[actualStringIdx] ?? undefined : undefined;
 
             if (actualStringIdx === undefined) return null;
 
@@ -203,3 +233,4 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
     </div>
   );
 };
+
