@@ -240,5 +240,5 @@ export function detectPitch(buf: Float32Array, sampleRate: number): number {
 
 // Re-export the pitch detector in stable alternate names so other modules can import
 // the same detector through different names if they prefer.
-export const detectPitchVanilla = detectPitch;
 export const detectPitchLite = detectPitch;
+export const detectPitchVanilla = detectPitch;

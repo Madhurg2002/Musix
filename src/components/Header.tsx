@@ -6,8 +6,6 @@ interface HeaderProps {
   setActiveTab: (tab: string) => void;
   userOverride: InstrumentType | 'auto';
   setUserOverride: (val: InstrumentType | 'auto') => void;
-  pianoOpen: boolean;
-  setPianoOpen: (open: boolean) => void;
 }
 
 const TAB_DEFAULT_INSTRUMENT: Record<string, InstrumentType> = {
@@ -110,15 +108,6 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, userOve
           </span>
         </div>
       </div>
-
-      {/* Persistent piano toggle — stays in the header on every tab */}
-      <button
-        className="btn btn-ghost header-piano-toggle"
-        aria-label={pianoOpen ? 'Hide piano' : 'Show piano'}
-        onClick={() => setPianoOpen((v) => !v)}
-      >
-        {pianoOpen ? '🎹 Hide Piano' : '🎹 Show Piano'}
-      </button>
     </header>
   );
 };
