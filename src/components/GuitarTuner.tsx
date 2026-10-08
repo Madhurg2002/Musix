@@ -232,7 +232,7 @@ export const GuitarTuner: React.FC = () => {
     setActivePegIndex(str.index);
     soundEngine.playNote(str.frequency ?? 440, 2.5, 'acoustic-guitar');
   };
-  
+
   const handlePegClickExt = (str: StringInfo | null | undefined) => {
     if (!str) return;
     setSelectedStringIndex(str.index);
@@ -241,8 +241,6 @@ export const GuitarTuner: React.FC = () => {
   };
 
   // Safety lookup for the currently selected tuning so the UI never crashes on stale index.
-  const currentTuningStrings = TUNING_PRESETS[selectedPresetIndex]?.strings ?? TUNING_PRESETS[0]!.strings;
-
   const startMic = async () => {
     try {
       setMicError(null);
@@ -291,9 +289,7 @@ export const GuitarTuner: React.FC = () => {
 
     const buf = new Float32Array(analyser!.fftSize);
     analyser!.getFloatTimeDomainData(buf);
-    const pitch = autoCorrelate(buf, ctx!.sampleRate ?? 44100);
-
-    // Guard the pitch-analysis branch so the strict-build path stays readable.
+    const pitch = autoCorrelate(buf, ctx!.sampleRate ?? 44100);      // Guard the pitch-analysis branch so the strict-build path stays readable.
     const hasUsablePitch = pitch !== -1 && 60 < pitch && pitch < 1000;
     if (hasUsablePitch) {
       const currentPitch = pitch;
@@ -311,10 +307,6 @@ export const GuitarTuner: React.FC = () => {
       const cents = Math.round(100 * (noteNum - roundedMidi));
       setDetectedNoteName(`${noteName}${octave}`);
 
-
-      // Temporary var so strict builds don't see a bare `inches`-style path.
-      const centsLocal = cents;
-      setCentsOff(centsLocal);
       setCentsOff(cents);
 
       // Find matching string peg from active tuning preset
