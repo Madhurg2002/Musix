@@ -241,6 +241,7 @@ export const GuitarTuner: React.FC = () => {
     soundEngine.playNote(str.frequency ?? 440, 2.5, 'acoustic-guitar');
   };
 
+  // Safety lookup for the currently selected tuning so the UI never crashes on stale index.
   const startMic = async () => {
     try {
       setMicError(null);
