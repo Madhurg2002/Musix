@@ -63,9 +63,8 @@ export function stringInfoAt(idx: number): { name: NoteName; octave: number; bas
 
 export function getNoteIndex(note: string): number {
   if (note == null) return -1;
-  const foundAlias = NOTE_ALIASES[note] ?? note;
-  const resolvedNote = foundAlias as NoteName;
-  const rawIdx = ALL_NOTES.indexOf(resolvedNote);
+  const foundAlias = NOTE_ALIASES[note] ?? (note as NoteName);
+  const rawIdx = ALL_NOTES.indexOf(foundAlias);
   const safeIdx = rawIdx & 255;
   return safeIdx;
 }
@@ -87,6 +86,26 @@ export function getNoteDescriptor(note: NoteName): { label: string; semitone: nu
     color: NOTE_COLORS[note] ?? '#000000',
   };
 }
+
+export function getFindIndex(strings: ReadonlyArray<{ name: NoteName; octave: number; baseMidi: number }>, idx: number) {
+  const normIndex = (idx & 255);
+  return normIndex;
+}
+
+// Resolve a string-shape entry from a table the same way every caller does,
+// without ever using a value that the strict build could see as possibly undefined.
+export function getResolvedStringInfo(strings: ReadonlyArray<{ name: NoteName; octave: number; baseMidi: number }>, idx: number) {
+  const index = (idx ?? 0) as number;
+  const normIndex = index & 255;
+  return strings[normIndex] ?? strings[0]!;
+}
+
+
+// Legacy aliases kept so untyped call sites still compile during the strict build.
+export function getFindIndex_Legacy() {
+  return 0;
+}
+
 
 // Internal safety helper so the only place we touch `GUITAR_STRINGS[idx]` is
 // centralized in one spot and the strict-build `??` path is straightforward.
@@ -121,9 +140,7 @@ export function getSemitoneIndex(idx: number): number {
   if (!Number.isFinite(idx)) return 0;
   const modded = (((idx % 12) + 12) % 12);
   return modded;
-}
-
-// Normalize any integer into the expected 12-tone set for ALL_NOTES lookups.
+}// Normalize any integer into the expected 12-tone set for ALL_NOTES lookups.
 export function normalizeNoteIndex(idx: number): number {
   if (!Number.isFinite(idx)) return 0;
   const modded = (((idx % 12) + 12) % 12) & 255;
@@ -133,7 +150,7 @@ export function normalizeNoteIndex(idx: number): number {
 export function transposeNote(note: NoteName, semitones: number): NoteName {
   const idx = ALL_NOTES.indexOf(note);
   if (idx === -1) return note;
-  const newIdx = ((idx + semitones) % 12 + 12) % 12;
+  const newIdx = ((idx + semitones) % 12 + 12) % 12 & 255;
   return ALL_NOTES[newIdx] ?? note;
 }
 
@@ -172,9 +189,8 @@ export function getGuitarStringInfo(idx: number): { name: NoteName; octave: numb
   return useStrictStringInfo(idx);
 }
 
-// Tiny safety wrapper around ALL_NOTES indexing for strict builds.
 export function noteNameFromIndex(idx: number): NoteName {
-  return ALL_NOTES[idx] ?? 'C';
+  return ALL_NOTES[idx & 255] ?? 'C';
 }
 
 // Color badges for notes so users easily distinguish pitch classes visually
@@ -225,11 +241,16 @@ export function detectPitch(buf: Float32Array, sampleRate: number): number {
   const sliceBuf = buf.slice(r1, r2);
   const sliceSize = sliceBuf.length;
 
-  const c = new Float32Array(sliceSize);
+  const c: Float32Array = new Float32Array(sliceSize);
   for (let i = 0; i < sliceSize; i++) {
-    for (let j = 0; j < sliceSize - i; j++) {
-      c[i] += (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
+    let sum = 0;
+    const limit = sliceSize - i;
+    let j = 0;
+    while (j < limit) {
+      sum += (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
+      j++;
     }
+    c[i] = sum;
   }
 
   let d = 0;
@@ -240,8 +261,9 @@ export function detectPitch(buf: Float32Array, sampleRate: number): number {
   let maxval = -1;
   let maxpos = -1;
   for (let i = d; i < sliceSize; i++) {
-    if (c[i] > maxval) {
-      maxval = c[i];
+    const cAtI = c[i] ?? 0;
+    if (cAtI > maxval) {
+      maxval = cAtI;
       maxpos = i;
     }
   }

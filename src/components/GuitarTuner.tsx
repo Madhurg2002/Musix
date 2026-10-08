@@ -155,23 +155,29 @@ function autoCorrelate(buf: Float32Array, sampleRate: number): number {
   const sliceBuf = buf.slice(r1, r2);
   const sliceSize = sliceBuf.length;
 
-  const c = new Float32Array(sliceSize);
+  const c: Float32Array = new Float32Array(sliceSize);
   for (let i = 0; i < sliceSize; i++) {
-    for (let j = 0; j < sliceSize - i; j++) {
-      c[i] += (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
+    let sum = 0;
+    const limit = sliceSize - i;
+    let j = 0;
+    while (j < limit) {
+      sum += (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
+      j++;
     }
+    c[i] = sum;
   }
 
   let d = 0;
-  while (c[d] > c[d + 1]) {
+  while (d + 1 < sliceSize && c[d] > c[d + 1]) {
     d++;
   }
 
   let maxval = -1;
   let maxpos = -1;
   for (let i = d; i < sliceSize; i++) {
-    if (c[i] > maxval) {
-      maxval = c[i];
+    const cAtI = c[i] ?? 0;
+    if (cAtI > maxval) {
+      maxval = cAtI;
       maxpos = i;
     }
   }
@@ -210,19 +216,18 @@ export const GuitarTuner: React.FC = () => {
 
   const preset = TUNING_PRESETS[selectedPresetIndex] ?? TUNING_PRESETS[0]!;
   const currentTuningStrings = preset.strings;
-  const selectedStringInfo:
-    | StringInfo
-    | undefined =
-    selectedStringIndex != null
-      ? currentTuningStrings[selectedStringIndex] ?? currentTuningStrings.find((s) => s.index === selectedStringIndex)
-      : undefined;
-  const selectedGuitarStringInfo:
-    | StringInfo
-    | undefined =
-    selectedStringInfo ??
-    currentTuningStrings.find((s) => s.index === selectedStringIndex) ??
-    currentTuningStrings[0]!
-  
+  const selectedStringInfo = (() => {
+    if (selectedStringIndex == null) return undefined;
+    return currentTuningStrings[selectedStringIndex] ?? undefined;
+  })();
+
+  const selectedGuitarStringInfo = (() => {
+    if (selectedStringInfo) return selectedStringInfo;
+    const found = currentTuningStrings.find((s) => s.index === selectedStringIndex);
+    if (found) return found;
+    return currentTuningStrings[0] ?? undefined;
+  })();
+
   const handlePegClick = (str: StringInfo) => {
     setSelectedStringIndex(str.index);
     setActivePegIndex(str.index);
@@ -275,7 +280,8 @@ export const GuitarTuner: React.FC = () => {
   };
 
   // Helper: bail out early if any live audio dependency is missing.
-  const hasLiveAudio = !!(analyserRef.current && audioCtxRef.current && preset);  const updatePitch = () => {
+  const hasLiveAudio = !!(analyserRef.current && audioCtxRef.current && preset);
+  const updatePitch = () => {
     if (!hasLiveAudio) return;
 
     const analyser = analyserRef.current;
@@ -295,7 +301,7 @@ export const GuitarTuner: React.FC = () => {
       // Find closest MIDI note
       const noteNum = 12 * (Math.log(pitch / 440) / Math.log(2)) + 69;
       const roundedMidi = Math.round(noteNum);
-      const noteName = ALL_NOTES[((roundedMidi % 12) + 12) % 12] ?? '--';
+      const noteName = ALL_NOTES[(((roundedMidi % 12) + 12) % 12) & 255] ?? '--';
 
       // Keep the octave computation on a narrowed numeric expression so the
       // strict-build path is easy to reason about.
