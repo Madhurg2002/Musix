@@ -71,21 +71,22 @@ class SoundEngine {
           // 1. Pick Attack Transient Noise Burst
           const noiseBuffer = this.createNoiseBuffer();
           if (noiseBuffer) {
-            const noiseSource = this.ctx.createBufferSource();
+            const noiseSource = this.ctx!.createBufferSource();
             noiseSource.buffer = noiseBuffer;
 
-            const noiseFilter = this.ctx.createBiquadFilter();
+            const noiseFilter = this.ctx!.createBiquadFilter();
             noiseFilter.type = 'bandpass';
             noiseFilter.frequency.setValueAtTime(Math.min(freq * 3, 3500), now);
             noiseFilter.Q.setValueAtTime(3.0, now);
 
-            const noiseGain = this.ctx.createGain();
+            const noiseGain = this.ctx!.createGain();
             noiseGain.gain.setValueAtTime(0.25, now);
             noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
 
-            noiseSource.connect(noiseFilter);
-            noiseFilter.connect(noiseGain);
-            noiseGain.connect(this.ctx.destination);
+            noiseSource.connect(noiseFilter!);
+            noiseFilter.connect(noiseGain!);
+            noiseGain.connect(this.ctx!.destination);
+            
 
             noiseSource.start(now);
             noiseSource.stop(now + 0.03);
@@ -115,8 +116,9 @@ class SoundEngine {
 
           harmonics.forEach((harmonic, idx) => {
             if (!this.ctx) return;
-            const osc = this.ctx.createOscillator();
-            const oscGain = this.ctx.createGain();
+            const osc = this.ctx!.createOscillator();
+            const oscGain = this.ctx!.createGain();
+            oscGain.gain.setValueAtTime(weights[idx] ?? 0, now);
 
             // Plucked string initial tension pitch-drop (+12 cents down to nominal pitch in 15ms)
             osc.type = idx === 0 ? 'triangle' : 'sawtooth';
@@ -125,25 +127,26 @@ class SoundEngine {
 
             oscGain.gain.setValueAtTime(weights[idx] ?? 0, now);
 
-            osc.connect(oscGain);
-            oscGain.connect(pluckFilter);
+            osc.connect(oscGain!);
+            oscGain.connect(pluckFilter!);
+            
 
             osc.start(now);
             osc.stop(now + duration);
           });
 
-          pluckFilter.connect(bodyFilter);
-          bodyFilter.connect(mainGain);
-          mainGain.connect(this.ctx.destination);
+          pluckFilter.connect(bodyFilter!);
+          bodyFilter.connect(mainGain!);
+          mainGain.connect(this.ctx!.destination);
           break;
         }
 
         case 'electric-guitar': {
           // Electric Guitar (Warm tube overdrive + cabinet filter)
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          const distortion = this.ctx.createWaveShaper();
-          const cabFilter = this.ctx.createBiquadFilter();
+          const osc = this.ctx!.createOscillator();
+          const gain = this.ctx!.createGain();
+          const distortion = this.ctx!.createWaveShaper();
+          const cabFilter = this.ctx!.createBiquadFilter();
 
           osc.type = 'sawtooth';
           osc.frequency.setValueAtTime(freq, now);
@@ -162,7 +165,7 @@ class SoundEngine {
           osc.connect(distortion);
           distortion.connect(cabFilter);
           cabFilter.connect(gain);
-          gain.connect(this.ctx.destination);
+          gain.connect(this.ctx!.destination);
 
           osc.start(now);
           osc.stop(now + duration * 1.2);
@@ -176,8 +179,8 @@ class SoundEngine {
 
           harmonics.forEach((harmonic, idx) => {
             if (!this.ctx) return;
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
+            const osc = this.ctx!.createOscillator();
+            const gain = this.ctx!.createGain();
 
             osc.type = idx === 0 ? 'sine' : 'triangle';
             osc.frequency.setValueAtTime(freq * harmonic, now);
@@ -186,8 +189,8 @@ class SoundEngine {
             gain.gain.linearRampToValueAtTime(weights[idx] ?? 0, now + 0.008);
             gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * (1.5 - idx * 0.2));
 
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
+            osc.connect(gain!);
+            gain.connect(this.ctx!.destination);
 
             osc.start(now);
             osc.stop(now + duration * 1.5);
@@ -197,10 +200,10 @@ class SoundEngine {
 
         case 'bass': {
           // Punchy Bass Guitar (Deep sub fundamental + punchy transient)
-          const osc1 = this.ctx.createOscillator();
-          const osc2 = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          const filter = this.ctx.createBiquadFilter();
+          const osc1 = this.ctx!.createOscillator();
+          const osc2 = this.ctx!.createOscillator();
+          const gain = this.ctx!.createGain();
+          const filter = this.ctx!.createBiquadFilter();
 
           osc1.type = 'sine';
           osc1.frequency.setValueAtTime(freq, now);
@@ -213,12 +216,10 @@ class SoundEngine {
 
           gain.gain.setValueAtTime(0.001, now);
           gain.gain.linearRampToValueAtTime(0.85, now + 0.015);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.4);
-
-          osc1.connect(filter);
-          osc2.connect(filter);
-          filter.connect(gain);
-          gain.connect(this.ctx.destination);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.4);            osc1.connect(filter!);
+          osc2.connect(filter!);
+          filter.connect(gain!);
+          gain.connect(this.ctx!.destination);
 
           osc1.start(now);
           osc2.start(now);
@@ -229,29 +230,27 @@ class SoundEngine {
 
         case 'ukulele': {
           // Bright Ukulele (Light nylon string in higher register)
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
+          const osc = this.ctx!.createOscillator();
+          const gain = this.ctx!.createGain();
 
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(freq, now);
 
           gain.gain.setValueAtTime(0.001, now);
           gain.gain.linearRampToValueAtTime(0.5, now + 0.008);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.8);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.8);            osc.connect(gain!);
+            gain.connect(this.ctx!.destination);
 
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-
-          osc.start(now);
-          osc.stop(now + duration * 0.8);
+            osc.start(now);
+            osc.stop(now + duration * 0.8);
           break;
         }
 
         case 'synth': {
           // Warm Polyphonic Synth Pad
-          const osc1 = this.ctx.createOscillator();
-          const osc2 = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
+          const osc1 = this.ctx!.createOscillator();
+          const osc2 = this.ctx!.createOscillator();
+          const gain = this.ctx!.createGain();
 
           osc1.type = 'sawtooth';
           osc1.frequency.setValueAtTime(freq, now);
@@ -261,11 +260,9 @@ class SoundEngine {
 
           gain.gain.setValueAtTime(0.001, now);
           gain.gain.linearRampToValueAtTime(0.4, now + 0.08);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.6);
-
-          osc1.connect(gain);
-          osc2.connect(gain);
-          gain.connect(this.ctx.destination);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.6);            osc1.connect(gain!);
+          osc2.connect(gain!);
+          gain.connect(this.ctx!.destination);
 
           osc1.start(now);
           osc2.start(now);
@@ -294,9 +291,9 @@ class SoundEngine {
       this.init();
       if (!this.ctx) return;
 
-      const now = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
+      const now = this.ctx!.currentTime;
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
 
       osc.type = 'sine';
       osc.frequency.setValueAtTime(isHighBeat ? 1200 : 800, now);
@@ -304,8 +301,8 @@ class SoundEngine {
       gain.gain.setValueAtTime(0.8, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
 
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      osc.connect(gain!);
+      gain.connect(this.ctx!.destination);
 
       osc.start(now);
       osc.stop(now + 0.07);

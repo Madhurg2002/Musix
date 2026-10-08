@@ -59,10 +59,12 @@ export const RhythmMetronome: React.FC = () => {
     setTimeout(() => setFlashBeat(false), 120);
 
     // Swap pendulum direction & animate
-    const from = pendulumFromRef.current;
-    const to = pendulumToRef.current;
-    pendulumFromRef.current = to;
-    pendulumToRef.current = from;
+    const fromVal = pendulumFromRef.current;
+    const toVal = pendulumToRef.current;
+    if (fromVal != null && toVal != null) {
+      pendulumFromRef.current = toVal;
+      pendulumToRef.current = fromVal;
+    }
     pendulumStartRef.current = null;
     if (pendulumAnimRef.current) cancelAnimationFrame(pendulumAnimRef.current);
     pendulumAnimRef.current = requestAnimationFrame(animatePendulum);
@@ -120,7 +122,10 @@ export const RhythmMetronome: React.FC = () => {
 
   // Weight position on pendulum rod: higher BPM = weight closer to pivot
   // Range: 40bpm → weight at 85% down, 220bpm → weight at 20% down
-  const weightPos = 85 - ((bpm - 40) / 180) * 65; // 20-85%
+  const weightPos: number = 85 - ((bpm - 40) / 180) * 65; // 20-85%
+
+  // Safety clamp so the SVG math never receives a fractional/negative index.
+  const safeBpmIndex = Math.max(0, Math.min(220, bpm));
 
   // Safety clamp so the SVG math never receives a fractional/negative index.
   const safeBpmIndex = Math.max(0, Math.min(220, bpm));
@@ -243,7 +248,7 @@ export const RhythmMetronome: React.FC = () => {
               {/* Sliding weight diamond — position based on BPM */}
               <rect
                 x="86"
-                y={75 + ((weightPos ?? 85) / 100) * 220 - 12}
+                y={75 + ((weightPos / 100) * 220 - 12)}
                 width="28"
                 height="24"
                 rx="4"
@@ -255,21 +260,9 @@ export const RhythmMetronome: React.FC = () => {
               {/* Weight notch */}
               <line
                 x1="86"
-                y1={75 + ((weightPos ?? 85) / 100) * 220}
+                y1={75 + ((weightPos / 100) * 220)}
                 x2="114"
-                y2={75 + ((weightPos ?? 85) / 100) * 220}
-                stroke="rgba(0,0,0,0.3)"
-                strokeWidth="1.5"
-              />
-              {/* Bob at bottom */}
-              <polygon
-                points={`100,${295 - 6} 90,${295 + 14} 110,${295 + 14}`}
-                fill="#c0a882"
-              />
-              {/* Weight notch */}
-              <line
-                x1="86" y1={75 + ((weightPos ?? 85) / 100) * 220}
-                x2="114" y2={75 + ((weightPos ?? 85) / 100) * 220}
+                y2={75 + ((weightPos / 100) * 220)}
                 stroke="rgba(0,0,0,0.3)"
                 strokeWidth="1.5"
               />
@@ -291,7 +284,7 @@ export const RhythmMetronome: React.FC = () => {
           {/* Beat dots */}
           <div className="beat-dots-row">
             {Array.from({ length: beatsPerMeasure }).map((_, i) => {
-              const beatNum = i + 1;
+              const beatNum = (i + 1) || 1;
               const isActive = isPlaying && currentBeat === beatNum;
               return (
                 <div
