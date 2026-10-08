@@ -350,6 +350,7 @@ export const RhythmMetronome: React.FC = () => {
                 <option value={6}>6 / 8</option>
                 <option value={5}>5 / 4</option>
                 <option value={7}>7 / 8</option>
+                <option value={1}>1 / 8</option>
               </select>
             </div>
 
@@ -366,7 +367,7 @@ export const RhythmMetronome: React.FC = () => {
           <div className="metronome-info-chips">
             <span className="info-chip">⚡ {swingDuration}ms / beat</span>
             <span className="info-chip">🎵 {tempoName}</span>
-            <span className="info-chip">🕒 {beatsPerMeasure}/4</span>
+            <span className="info-chip">🕒 {beatsPerMeasure}/4&#8201;&#8212;&#8201;{beatsPerMeasure === 1 ? '1' : beatsPerMeasure}/8</span>
           </div>
         </div>
       </div>

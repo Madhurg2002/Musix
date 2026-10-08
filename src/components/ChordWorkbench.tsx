@@ -28,6 +28,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
 
   const [selectedRootToAdd, setSelectedRootToAdd] = useState<NoteName>('G');
   const [selectedTypeToAdd, setSelectedTypeToAdd] = useState<string>('Major');
+  const [sheetSelectedChordId, setSheetSelectedChordId] = useState<string | null>(COMPREHENSIVE_CHORDS[0]?.id ?? null);
 
   // Add new card
   const handleAddCard = () => {
@@ -155,6 +156,22 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
 
       {/* Side by Side Grid */}
       <div className="cards-grid">
+        {onSelectChordForFretboard && (
+          <div className="pick-chord-bar glass-card">
+            <label>Pick chord for the fretboard</label>
+            <div className="chord-picker-buttons">
+              {COMPREHENSIVE_CHORDS.map((chord) => (
+                <button
+                  key={chord.id}
+                  className={`btn-chord-chip ${sheetSelectedChordId === chord.id ? 'active' : ''}`}
+                  onClick={() => setSheetSelectedChordId(chord.id)}
+                >
+                  {chord.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {cards.map((item, index) => {
           const { chord, isMuted } = item;
           return (
@@ -260,6 +277,9 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                       >
                         🎸 Fretboard
                       </button>
+                    )}
+                    {sheetSelectedChordId === chord.id && (
+                      <span className="sheet-note">picked for the fretboard</span>
                     )}
                     <button className="btn btn-primary btn-sm" onClick={() => handlePlayChord(item)}>
                       ▶ Play Audio
