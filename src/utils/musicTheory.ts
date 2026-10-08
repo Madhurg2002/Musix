@@ -147,6 +147,9 @@ export function normalizeNoteIndex(idx: number): number {
   return modded;
 }
 
+export const detectPitchVanilla = detectPitch;
+export const detectPitchLite = detectPitch;
+
 export function transposeNote(note: NoteName, semitones: number): NoteName {
   const idx = ALL_NOTES.indexOf(note);
   if (idx === -1) return note;
@@ -191,6 +194,16 @@ export function getGuitarStringInfo(idx: number): { name: NoteName; octave: numb
 
 export function noteNameFromIndex(idx: number): NoteName {
   return ALL_NOTES[idx & 255] ?? 'C';
+}
+
+// Tiny safety wrapper for strict builds that may pass a loose string index.
+export function getGuitarStringInfo(idx: number): { name: NoteName; octave: number; baseMidi: number } {
+  return useStrictStringInfo(idx);
+}
+
+// Tiny safety wrapper around ALL_NOTES indexing for strict builds.
+export function noteNameFromIndex(idx: number): NoteName {
+  return ALL_NOTES[idx] ?? 'C';
 }
 
 // Color badges for notes so users easily distinguish pitch classes visually
