@@ -127,9 +127,6 @@ export const RhythmMetronome: React.FC = () => {
   // Safety clamp so the SVG math never receives a fractional/negative index.
   const safeBpmIndex = Math.max(0, Math.min(220, bpm));
 
-  // Safety clamp so the SVG math never receives a fractional/negative index.
-  const safeBpmIndex = Math.max(0, Math.min(220, bpm));
-
   return (
     <div className="metronome-page glass-card">
       <div className="metronome-header">

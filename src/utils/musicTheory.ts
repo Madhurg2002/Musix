@@ -23,22 +23,6 @@ export const GUITAR_STRINGS: ReadonlyArray<{ name: NoteName; octave: number; bas
   { name: 'E', octave: 4, baseMidi: 64 }, // String 1 (High E)
 ];
 
-// Pre-populated octave table so strict builds never index with a loose string.
-export const NOTE_OCTAVES: Readonly<Record<string, number>> = {
-  'C': 4,
-  'C♯': 4,
-  'D': 4,
-  'D♯': 4,
-  'E': 4,
-  'F': 4,
-  'F♯': 4,
-  'G': 4,
-  'G♯': 4,
-  'A': 4,
-  'A♯': 4,
-  'B': 4,
-};
-
 // MIDI note number to Frequency calculation: f = 440 * 2^((midi - 69) / 12)
 export function midiToFrequency(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
@@ -92,21 +76,6 @@ export function getFindIndex(strings: ReadonlyArray<{ name: NoteName; octave: nu
   return normIndex;
 }
 
-// Resolve a string-shape entry from a table the same way every caller does,
-// without ever using a value that the strict build could see as possibly undefined.
-export function getResolvedStringInfo(strings: ReadonlyArray<{ name: NoteName; octave: number; baseMidi: number }>, idx: number) {
-  const numericIdx = Number.isFinite(idx) ? idx : 0;
-  const clampedIndex = (Math.trunc(numericIdx) & 255) | 0;
-  return strings[clampedIndex] ?? strings[0]!;
-}
-
-
-// Legacy aliases kept so untyped call sites still compile during the strict build.
-export function getFindIndex_Legacy() {
-  return 0;
-}
-
-
 // Internal safety helper so the only place we touch `GUITAR_STRINGS[idx]` is
 // centralized in one spot and the strict-build `??` path is straightforward.
 function useStrictStringInfo(idx: number): { name: NoteName; octave: number; baseMidi: number } {
@@ -128,28 +97,32 @@ export function getNoteByCheckedIndex(idx: number): NoteName {
   return ALL_NOTES[idx & 255] ?? 'C';
 }
 
-// Resolve any index-like value to a valid ALL_NOTES index (0..11).
-export function resolveNoteIndex(idx: number): number {
-  if (!Number.isFinite(idx)) return 0;
-  const modded = (((idx % 12) + 12) % 12);
-  return modded;
+// Tiny safety wrapper for strict builds that may pass a loose string index.
+export function getGuitarStringInfo(idx: number): { name: NoteName; octave: number; baseMidi: number } {
+  return useStrictStringInfo(idx);
 }
 
-// Return the nearest semitone offset for any index-like input, clamped to 0..11.
-export function getSemitoneIndex(idx: number): number {
-  if (!Number.isFinite(idx)) return 0;
-  const modded = (((idx % 12) + 12) % 12);
-  return modded;
-}// Normalize any integer into the expected 12-tone set for ALL_NOTES lookups.
-export function normalizeNoteIndex(idx: number): number {
-  if (!Number.isFinite(idx)) return 0;
-  const modded = (((idx % 12) + 12) % 12) & 255;
-  return modded;
+export function noteNameFromIndex(idx: number): NoteName {
+  return ALL_NOTES[idx & 255] ?? 'C';
 }
 
-export const detectPitchVanilla = detectPitch;
-export const detectPitchLite = detectPitch;
+// Color badges for notes so users easily distinguish pitch classes visually
+export const NOTE_COLORS: Readonly<Record<NoteName, string>> = {
+  'C': '#FF5733',   // Red-Orange
+  'C♯': '#FF8D33',  // Orange
+  'D': '#FFC300',   // Amber
+  'D♯': '#D4AC0D',  // Yellow-Gold
+  'E': '#28B463',   // Emerald Green
+  'F': '#17A589',   // Teal
+  'F♯': '#1ABC9C',  // Cyan-Turquoise
+  'G': '#2980B9',   // Ocean Blue
+  'G♯': '#5B2C6F',  // Indigo
+  'A': '#8E44AD',   // Purple
+  'A♯': '#C0392B',  // Crimson
+  'B': '#E74C3C',   // Bright Red
+};
 
+// Transpose a pitch class by a number of semitones.
 export function transposeNote(note: NoteName, semitones: number): NoteName {
   const idx = ALL_NOTES.indexOf(note);
   if (idx === -1) return note;
@@ -186,41 +159,6 @@ export function getFretMidi(stringIndex: number, fret: number): number {
   if (!Number.isFinite(baseMidi)) return 60 + fret;
   return baseMidi + fret;
 }
-
-// Tiny safety wrapper for strict builds that may pass a loose string index.
-export function getGuitarStringInfo(idx: number): { name: NoteName; octave: number; baseMidi: number } {
-  return useStrictStringInfo(idx);
-}
-
-export function noteNameFromIndex(idx: number): NoteName {
-  return ALL_NOTES[idx & 255] ?? 'C';
-}
-
-// Tiny safety wrapper for strict builds that may pass a loose string index.
-export function getGuitarStringInfo(idx: number): { name: NoteName; octave: number; baseMidi: number } {
-  return useStrictStringInfo(idx);
-}
-
-// Tiny safety wrapper around ALL_NOTES indexing for strict builds.
-export function noteNameFromIndex(idx: number): NoteName {
-  return ALL_NOTES[idx] ?? 'C';
-}
-
-// Color badges for notes so users easily distinguish pitch classes visually
-export const NOTE_COLORS: Readonly<Record<NoteName, string>> = {
-  'C': '#FF5733',   // Red-Orange
-  'C♯': '#FF8D33',  // Orange
-  'D': '#FFC300',   // Amber
-  'D♯': '#D4AC0D',  // Yellow-Gold
-  'E': '#28B463',   // Emerald Green
-  'F': '#17A589',   // Teal
-  'F♯': '#1ABC9C',  // Cyan-Turquoise
-  'G': '#2980B9',   // Ocean Blue
-  'G♯': '#5B2C6F',  // Indigo
-  'A': '#8E44AD',   // Purple
-  'A♯': '#C0392B',  // Crimson
-  'B': '#E74C3C',   // Bright Red
-};
 
 // Autocorrelation pitch detector (browser-side). Returns -1 when no pitch is usable.
 export function detectPitch(buf: Float32Array, sampleRate: number): number {
