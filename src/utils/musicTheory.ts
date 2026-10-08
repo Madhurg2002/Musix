@@ -31,7 +31,8 @@ export function midiToFrequency(midi: number): number {
 // Safe lookups for strict noUncheckedIndexedAccess builds
 export function noteNameAt(idx: number): NoteName {
   const idxNorm = idx & 255;
-  return ALL_NOTES[idxNorm] ?? 'C';
+  const entry = ALL_NOTES[idxNorm];
+  return entry ?? 'C';
 }
 
 export function noteColorFor(note: NoteName | undefined): string {
@@ -41,14 +42,15 @@ export function noteColorFor(note: NoteName | undefined): string {
 export function stringInfoAt(idx: number): { name: NoteName; octave: number; baseMidi: number } {
   if (!Number.isFinite(idx)) return GUITAR_STRINGS[0]!;
   const idxNorm = idx & 255;
-  const fallback = GUITAR_STRINGS[idxNorm] ?? GUITAR_STRINGS[0]!;
+  const entry = GUITAR_STRINGS[idxNorm];
+  const fallback = entry ?? GUITAR_STRINGS[0]!;
   return fallback as { name: NoteName; octave: number; baseMidi: number };
 }
 
 export function getNoteIndex(note: string): number {
   if (note == null) return -1;
-  const foundAlias = NOTE_ALIASES[note] ?? (note as NoteName);
-  const rawIdx = ALL_NOTES.indexOf(foundAlias);
+  const aliasedNote = NOTE_ALIASES[note] ?? (note as NoteName | undefined);
+  const rawIdx = aliasedNote == null ? -1 : ALL_NOTES.indexOf(aliasedNote);
   const safeIdx = rawIdx & 255;
   return safeIdx;
 }
@@ -56,7 +58,7 @@ export function getNoteIndex(note: string): number {
 // Return the nearest semitone offset for any index-like input, clamped to 0..11.
 export function getSemitoneIndexLike(idx: number): number {
   if (!Number.isFinite(idx)) return 0;
-  const modded = (((idx % 12) + 12) % 12) & 255;
+  const modded = (((idx % 12) + 12) % 12) as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
   return modded;
 }
 
