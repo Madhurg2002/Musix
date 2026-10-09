@@ -61,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
           <h1 className="text-[24px] font-extrabold tracking-[-0.5px] [background:linear-gradient(135deg,#fff_0%,var(--accent-primary)_100%)] [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">
             Musix
           </h1>
-          <p className="tagline text-[13px] text-ink-soft">Analog studio for theory</p>
+          <p className="text-[13px] text-ink-soft">Analog studio for theory</p>
         </div>
       </div>
 
