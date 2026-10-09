@@ -166,8 +166,8 @@ export const RhythmMetronome: React.FC = () => {
                 <stop offset="100%" stopColor="#2e1a0e" />
               </linearGradient>
               <linearGradient id="faceGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor="#1a2640" />
-                <stop offset="100%" stopColor="#0d1520" />
+                <stop offset="0%"   stopColor="#241a12" />
+                <stop offset="100%" stopColor="#14100c" />
               </linearGradient>
             </defs>
 
@@ -210,7 +210,7 @@ export const RhythmMetronome: React.FC = () => {
               fontSize="28"
               fontWeight="700"
               fontFamily="'Space Grotesk', monospace"
-              fill={accent && flashBeat ? '#00f5d4' : '#f8fafc'}
+              fill={accent && flashBeat ? '#86b06b' : '#f6efe4'}
               className="metro-bpm-svg"
             >
               {bpm ?? 0}
@@ -253,7 +253,7 @@ export const RhythmMetronome: React.FC = () => {
                 width="28"
                 height="24"
                 rx="4"
-                fill={accent && flashBeat ? '#00f5d4' : '#ffb703'}
+                fill={accent && flashBeat ? '#86b06b' : '#e8c07d'}
                 stroke="#fff"
                 strokeWidth="1"
                 className="metro-weight"

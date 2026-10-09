@@ -421,7 +421,7 @@ export const GuitarTuner: React.FC = () => {
             <path
               d="M 140 22 A 120 120 0 0 1 160 22"
               fill="none"
-              stroke={Math.abs(centsOff) <= 4 ? '#00f5d4' : 'rgba(0, 245, 212, 0.4)'}
+              stroke={Math.abs(centsOff) <= 4 ? '#86b06b' : 'rgba(134, 176, 107, 0.4)'}
               strokeWidth="16"
               strokeLinecap="round"
             />
@@ -441,7 +441,7 @@ export const GuitarTuner: React.FC = () => {
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke={degNorm === 0 ? '#00f5d4' : 'rgba(255,255,255,0.3)'}
+                  stroke={degNorm === 0 ? '#86b06b' : 'rgba(255,255,255,0.3)'}
                   strokeWidth={degNorm === 0 ? '3' : '1.5'}
                 />
               );
@@ -455,10 +455,10 @@ export const GuitarTuner: React.FC = () => {
                 x2="150"
                 y2="30"
                 stroke={Math.abs(centsOff) <= 4
-                  ? '#00f5d4'
+                  ? '#86b06b'
                   : centsOff < 0
-                  ? '#ffb703'
-                  : '#ff4d4d'}
+                  ? '#e8c07d'
+                  : '#e06c5a'}
                 strokeWidth="4"
                 strokeLinecap="round"
                 className="arc-needle-line"

@@ -200,7 +200,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
                           className={`note-press-badge ${markerClass}`}
                           style={{
                             backgroundColor: isChordPress
-                              ? '#00F0FF'
+                              ? '#e0a458'
                               : noteColorFor(note),
                           }}
                         >
