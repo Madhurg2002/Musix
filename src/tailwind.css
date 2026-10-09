@@ -1,0 +1,39 @@
+/* Tailwind v4 for Musix — utilities only, no reset.
+ *
+ * `@import "tailwindcss"` would also pull in preflight, which would wipe the base element
+ * styling the whole hand-tuned stylesheet relies on. Importing just the theme and the
+ * utilities keeps the current rendering byte-for-byte while markup moves over one screen at
+ * a time, and gives Tailwind its canonical layer order (`theme, base, components,
+ * utilities`) so a utility always wins over a component rule in `src/style.css`.
+ *
+ * The `inline` theme block maps the app's design tokens into Tailwind's vocabulary, so
+ * `text-ink`, `bg-canvas`, or `border-hairline` resolve to whatever the active theme set in
+ * `:root` — the four palettes keep working without a Tailwind config per theme.
+ */
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme inline {
+  --color-canvas: var(--bg-primary);
+  --color-surface: var(--bg-secondary);
+  --color-card: var(--card-bg);
+  --color-hairline: var(--card-border);
+  --color-hairline-strong: var(--card-border-strong);
+
+  --color-accent: var(--accent-primary);
+  --color-copper: var(--accent-secondary);
+  --color-terracotta: var(--accent-tertiary);
+  --color-highlight: var(--accent-highlight);
+  --color-success: var(--accent-success);
+  --color-alert: var(--accent-alert);
+
+  --color-ink: var(--text-primary);
+  --color-ink-soft: var(--text-secondary);
+  --color-ink-muted: var(--text-muted);
+
+  --font-sans: var(--font-main);
+  --font-display: var(--font-mono);
+}

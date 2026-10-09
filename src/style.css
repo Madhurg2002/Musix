@@ -1,6 +1,12 @@
 /* Fonts are declared once, in index.html, so the browser can preconnect and so CSS
    parsing is not blocked by a second network round-trip. */
 
+/* The whole sheet lives in the `components` layer. Tailwind declares
+   `@layer theme, base, components, utilities` from src/tailwind.css, so a utility class
+   always beats a component rule while the migration runs, and order *inside* this layer
+   is untouched — the rendering does not change by wrapping it. */
+@layer components {
+
 :root {
   /* ── Analog Studio: warm, instrument-craft palette ── */
   --bg-primary: #0f0c0a;        /* deep espresso canvas */
@@ -3900,3 +3906,6 @@ html[data-theme="arcade"] {
     flex: 1 1 auto;
   }
 }
+/* end @layer components — the closing brace is the last character of the file */
+}
+
