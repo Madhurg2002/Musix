@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# npm lockfile — this project installs with bun, so bun.lock is the lock of record
+package-lock.json
+
 # Build output
 dist/
 

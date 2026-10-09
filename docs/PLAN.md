@@ -16,6 +16,7 @@ Do **not** rewrite every doc on every change. The rule from here on:
 | 1 | `6073dfb` | `CAPABILITIES.md`, `COMPONENTS.md` (Song Follower) |
 | 2 | `f919b4f`, `84ca95f` | `ARCHITECTURE.md`, `COMPONENTS.md`, `DEVELOPMENT.md`, `BUGS.md`, `README.md`, `README-docs.md`, docs index |
 | 3 | `938fd47`, `c5ce232`, `07483ff`, `975ae19` | **this file only** |
+| 4 | `93d7acc`, `42398c9`, `de04710`, `22954b4`, `d6dcf4a` | `CAPABILITIES.md` (tooltips), `CONTRIBUTING.md` (new), this file |
 
 ### Deferred doc edits (sweep up in the next batch)
 
@@ -34,11 +35,26 @@ Do **not** rewrite every doc on every change. The rule from here on:
 
 `docs/BUGS.md` has the statuses updated in the same sweep.
 
+Batch 4 (this run) still owes the other docs:
+
+- The preference-cookie permission flow (`src/utils/consent.ts`, `src/utils/cookies.ts`,
+  `src/components/CookieConsent.tsx`, and the `title`/`data-tip` convention).
+- The stylesheet truncation regression, its guard (`src/style.test.ts`), and the test count
+  (114 across 8 files).
+- The issue forms, pull request template, and `CONTRIBUTING.md`.
+- The footer no longer links `robots.txt`, and `/LICENSE` is served from `public/LICENSE`.
+
 **Progress:** Phase 1 (design language), Phase 2 (shell), the user-selectable theme system,
 the repository bug audit (`docs/BUGS.md`), the mobile audio fixes, the Song Follower, the
 route table with lazy loading, the licence/contact work, the CI gate, the dead-code cleanup
-(Phase 4), and preference persistence are all implemented, verified, and pushed.
-Phase 3 (screen-level craft) and the remaining follow-ups are still open.
+(Phase 4), preference persistence, and Phase 3 (screen-level craft plus the tooltip layer)
+are implemented, verified, and committed.
+
+One incident and its fix belong in the record: commit `5846cf8` replaced `src/style.css`
+with the Phase 3 fragment instead of appending to it, silently dropping 2,750 lines (type
+check and tests stayed green because nothing read the stylesheet). `93d7acc` restored it,
+and `42398c9` added `src/style.test.ts`, which fails the build if the sheet is ever
+truncated again.
 
 ## The reimagining in one line
 
@@ -136,9 +152,12 @@ still follows tabs, responsive at ≤720px.
       and a footer that links to both.
 - [x] **`.gitignore` reconciled** — the tracked-but-ignored paths were untracked or
       un-ignored, and the stale build cache was purged.
-- **Not done: Tailwind.** The request allowed it "if not using already", and this project
-  explicitly does not use it. Adopting it would mean rewriting a 3,200-line hand-tuned
-  stylesheet and the token system the four themes depend on. The tokens do the same job.
+- [~] **Tailwind.** Previously declined ("if not using already"), then explicitly requested
+  as a complete migration, so it is now work in progress rather than a no. The approach:
+  Tailwind v4 through `@tailwindcss/vite` with **preflight off**, so the existing look does
+  not change while markup moves over; design tokens stay in `:root` and are exposed to
+  Tailwind as theme colours so the four themes keep working; screens migrate one commit at
+  a time, and `src/style.test.ts` guards the stylesheet until each layer has moved.
 
 ### Phase 3 — Screen-level craft
 
@@ -218,9 +237,19 @@ Ordered by value; none block the phases above.
 - [x] **Reconcile `.gitignore`** — the tracked-but-ignored paths were reconciled and the
       stale `tsconfig.tsbuildinfo` was purged.
 - [x] **Align `tsconfig.json` include** with the real config filename.
-- [ ] **Decide on `package-lock.json`.** It is a stale npm lockfile sitting next to
-      `bun.lock`; the project installs with bun, so the npm lock is likely drift. Not
-      deleted yet because a decision on it belongs in a commit of its own.
+- [~] **Migrate to Tailwind.** Set up Tailwind v4 (preflight off) and move the markup off
+  hand-written classes screen by screen, keeping `src/style.css` for tokens, keyframes,
+  and the pieces utilities do not reach (SVG, fretboard grid, print). Each screen is its own
+  commit; the guard test keeps the sheet honest until the last layer moves.
+- [x] **Preference-cookie permission.** First-visit bar, writes held until allowed, refusal
+  clears everything, and `Cookie settings` in the footer reopens the choice. Cookies are
+  first-party, one per preference, with local-storage overflow for pasted charts.
+- [x] **Issue forms, PR template, `CONTRIBUTING.md`** — `.github/ISSUE_TEMPLATE/` (bug and
+  feature forms, blank issues off) plus `.github/PULL_REQUEST_TEMPLATE.md`.
+- [x] **Guard the stylesheet.** `src/style.test.ts` fails if `src/style.css` is truncated,
+  loses a layer marker, or ends up with unbalanced braces.- [x] **Decide on `package-lock.json`.** Decided: the project installs with bun, so a
+  stale npm lock next to `bun.lock` is drift. Deleted in its own commit and gitignored so
+  an accidental `npm install` cannot bring it back.
 - [ ] **Accessibility audit.** Contrast check on the new palette, and keyboard flows for the
       chord card drag-and-drop (which currently has Alt+↑/↓ as the keyboard fallback).
 - [ ] **Progressions.** Turn the "Play Progression" feature into a real chord-progression
@@ -228,6 +257,6 @@ Ordered by value; none block the phases above.
 - [x] **Save a followed song.** The pasted chart and its practice settings persist; a
       shareable link (encoding the chart in the URL) is still open.
 - [ ] **Render a PDF/page export of the follower.** Print stylesheet so a learner can take the
-      graded chart away from the screen.
-- [ ] **Serve `LICENSE` from the built site.** The footer links to GitHub's copy; a `public/`
-      copy would also make `/LICENSE` reachable in production builds (dev already serves it).
+      graded chart away from the screen.- [x] **Serve `LICENSE` from the built site.** `public/LICENSE` ships with the build, the
+  footer links to `/LICENSE`, and `/robots.txt` stays published but is no longer linked from
+  the footer — a crawler policy is not a button a learner needs.
