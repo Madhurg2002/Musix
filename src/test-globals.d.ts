@@ -11,11 +11,16 @@ declare function test(name: string, fn: () => void): void;
 interface ExpectMatchers<T> {
   toBe(expected: T): void;
   toEqual(expected: T): void;
+  toBeNull(): void;
   toBeCloseTo(expected: number, precision?: number): void;
   toBeLessThan(expected: number): void;
   toBeGreaterThan(expected: number): void;
   toHaveProperty(property: string): void;
   toHaveLength(expected: number): void;
+  /** Array membership, or substring for strings. */
+  toContain(
+    expected: T extends readonly (infer Item)[] ? Item : T extends string ? string : never
+  ): void;
 }
 
 declare function expect<T>(actual: T): ExpectMatchers<T>;

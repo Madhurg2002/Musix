@@ -12,6 +12,7 @@ import { IntervalExplorer } from './components/IntervalExplorer';
 import { RhythmMetronome } from './components/RhythmMetronome';
 import { TheoryCheatSheet } from './components/TheoryCheatSheet';
 import { GuitarTuner } from './components/GuitarTuner';
+import { SongFollower } from './components/SongFollower';
 import { soundEngine, InstrumentType } from './utils/audio';
 
 // Default instrument for each tab — what sounds most natural on that page
@@ -23,10 +24,21 @@ const TAB_DEFAULT_INSTRUMENT: Record<string, InstrumentType> = {
   scales: 'acoustic-guitar',
   intervals: 'piano',
   rhythm: 'acoustic-guitar',
+  songs: 'acoustic-guitar',
   guide: 'acoustic-guitar',
 };
 
-const VALID_TABS = ['workbench', 'tuner', 'fretboard', 'piano', 'scales', 'intervals', 'rhythm', 'guide'];
+const VALID_TABS = [
+  'workbench',
+  'tuner',
+  'fretboard',
+  'piano',
+  'scales',
+  'intervals',
+  'rhythm',
+  'songs',
+  'guide',
+];
 
 function getTabFromHash(): string {
   const hash = window.location.hash.replace('#', '').trim().toLowerCase();
@@ -117,7 +129,10 @@ export function App() {
               microphone pitch detection, and play every concept back in real time.
             </p>
             <div className="screen-hero__actions">
-              <button className="btn btn-primary" onClick={() => setActiveTab('guide')}>
+              <button className="btn btn-primary" onClick={() => setActiveTab('songs')}>
+                Follow a song
+              </button>
+              <button className="btn btn-outline" onClick={() => setActiveTab('guide')}>
                 Start with the basics
               </button>
               <div className="key-selector">
@@ -229,7 +244,14 @@ export function App() {
             </section>
           )}
 
-          {/* Tab 7: Beginner Theory Guide */}
+          {/* Tab 7: Song Follower */}
+          {activeTab === 'songs' && (
+            <section className="tab-section">
+              <SongFollower />
+            </section>
+          )}
+
+          {/* Tab 8: Beginner Theory Guide */}
           {activeTab === 'guide' && (
             <section className="tab-section">
               <TheoryCheatSheet />

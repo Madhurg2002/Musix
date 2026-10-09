@@ -27,6 +27,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Practice',
     items: [
+      { id: 'songs', label: 'Songs', hint: 'Follow a chord chart' },
       { id: 'tuner', label: 'Tuner', hint: 'Mic pitch detection' },
       { id: 'rhythm', label: 'Rhythm', hint: 'Metronome & tempo' },
     ],

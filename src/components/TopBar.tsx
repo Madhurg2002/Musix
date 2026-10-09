@@ -17,6 +17,7 @@ const TAB_TITLES: Record<string, string> = {
   scales: 'Scales & Modes',
   intervals: 'Interval Explorer',
   rhythm: 'Rhythm & Metronome',
+  songs: 'Song Follower',
   guide: 'Beginner Guide',
 };
 

@@ -2805,3 +2805,243 @@ html[data-theme="arcade"] {
   --success-rgb: 0, 245, 212;
   --alert-rgb: 255, 77, 77;
 }
+
+/* ---------------------------------------------------------------------------
+   Song Follower
+   Paste a chord chart, then step through it with a highlighted, sounding chord.
+   --------------------------------------------------------------------------- */
+.song-follower {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.song-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.song-header h2 {
+  margin: 8px 0 6px;
+}
+
+.song-header p {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.song-note {
+  border-left: 3px solid var(--accent-primary);
+  border-radius: 0 10px 10px 0;
+  background: rgba(var(--accent-rgb), 0.08);
+  padding: 12px 16px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.song-note strong {
+  color: var(--text-primary);
+}
+
+.song-input {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.song-input__label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.song-textarea {
+  width: 100%;
+  min-height: 170px;
+  resize: vertical;
+  border: 1px solid rgba(var(--overlay-rgb), 0.14);
+  border-radius: 14px;
+  background: rgba(var(--inset-rgb), 0.28);
+  padding: 14px 16px;
+  color: var(--text-primary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.song-textarea:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.song-input-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.song-meta {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.song-transport {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid rgba(var(--overlay-rgb), 0.1);
+  border-radius: 16px;
+  background: rgba(var(--inset-rgb), 0.22);
+  padding: 14px 16px;
+}
+
+.song-transport__buttons,
+.song-transport__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.song-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.song-field output {
+  min-width: 4.5ch;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.song-field input[type='range'] {
+  width: 120px;
+  accent-color: var(--accent-primary);
+}
+
+.song-field--buttons .btn-nano {
+  padding: 2px 8px;
+}
+
+.song-progress {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  align-items: center;
+}
+
+.song-progress__now {
+  font-family: Georgia, serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--accent-primary);
+}
+
+.song-progress__count {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.song-progress__track {
+  grid-column: 1 / -1;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(var(--overlay-rgb), 0.12);
+  overflow: hidden;
+}
+
+.song-progress__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-primary);
+  transition: width 0.18s ease;
+}
+
+.is-off {
+  opacity: 0.55;
+}
+
+.song-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: min(58vh, 560px);
+  overflow-y: auto;
+  border-top: 1px solid rgba(var(--overlay-rgb), 0.1);
+  padding-top: 18px;
+}
+
+.song-chart__spacer {
+  height: 4px;
+}
+
+.song-chart__section {
+  align-self: flex-start;
+  border-radius: 999px;
+  background: rgba(var(--accent-2-rgb), 0.18);
+  padding: 3px 12px;
+  color: var(--text-primary);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.song-chart__chords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+}
+
+.song-chord {
+  border: 1px solid rgba(var(--overlay-rgb), 0.14);
+  border-radius: 9px;
+  background: rgba(var(--overlay-rgb), 0.05);
+  padding: 3px 11px;
+  color: var(--text-primary);
+  font-family: Georgia, serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+.song-chord--active {
+  border-color: var(--accent-primary);
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.25);
+}
+
+.song-chart__lyrics {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 640px) {
+  .song-header-actions,
+  .song-input-actions .btn {
+    width: 100%;
+  }
+
+  .song-field input[type='range'] {
+    width: 100%;
+  }
+
+  .song-chart {
+    max-height: 62vh;
+  }
+}
