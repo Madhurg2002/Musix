@@ -198,7 +198,9 @@ export const COMPREHENSIVE_CHORDS: ChordShape[] = [
   // F Chords
   {
     id: 'f-major',
-    name: 'F Major (Barre / Easy)',
+    // Barre shape only — the old "(Barre / Easy)" name promised an easy variant that
+    // does not exist in this table.
+    name: 'F Major (Barre)',
     root: 'F',
     type: 'Major',
     notes: ['F', 'A', 'C'],

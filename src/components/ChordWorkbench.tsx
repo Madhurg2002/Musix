@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { ChordCardItem, NoteName, ChordShape } from '../types';
-import {
-  COMPREHENSIVE_CHORDS,
-  findOrCreateChord,
-  asSafeChord,
-} from '../data/chordsData';
+import { findOrCreateChord, asSafeChord } from '../data/chordsData';
 import {
   ALL_NOTES,
   GUITAR_STRINGS,
@@ -140,10 +136,13 @@ interface ChordWorkbenchProps {
 }
 
 export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordForFretboard, onOpenTuner }) => {
-  const [cards, setCards] = useState<ChordCardItem[]>([
-    { id: 'card-1', chord: COMPREHENSIVE_CHORDS[0] ?? COMPREHENSIVE_CHORDS[0]!, transposeOffset: 0 }, // C Major
-    { id: 'card-2', chord: COMPREHENSIVE_CHORDS[4] ?? COMPREHENSIVE_CHORDS[4]!, transposeOffset: 0 }, // A Major
-    { id: 'card-3', chord: COMPREHENSIVE_CHORDS[12] ?? COMPREHENSIVE_CHORDS[12]!, transposeOffset: 0 }, // B Minor
+  // Resolve the starting cards by name rather than by array index: the old
+  // `COMPREHENSIVE_CHORDS[12]` default was commented "B Minor" but landed on D Major, and
+  // any reordering of the data file silently changed what the studio opened with.
+  const [cards, setCards] = useState<ChordCardItem[]>(() => [
+    { id: 'card-1', chord: findOrCreateChord('C', 'Major'), transposeOffset: 0 },
+    { id: 'card-2', chord: findOrCreateChord('A', 'Major'), transposeOffset: 0 },
+    { id: 'card-3', chord: findOrCreateChord('B', 'Minor'), transposeOffset: 0 },
   ]);
 
   const [selectedRootToAdd, setSelectedRootToAdd] = useState<NoteName>('G');
