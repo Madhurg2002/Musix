@@ -44,11 +44,12 @@ export function App() {
   // 'auto' = follow tab defaults; anything else = user explicitly chose an instrument
   const [userOverride, setUserOverride] = useState<InstrumentType | 'auto'>('auto');
 
-  // When tab changes AND user has not locked an instrument manually → auto-select
+  // When tab changes AND the user has not locked an instrument, leave the engine in 'auto'
+  // so each tool's own override decides the voice. Pinning a concrete instrument here would
+  // win over those overrides — which made the piano keys on the Scales tab play guitar.
   useEffect(() => {
     if (userOverride === 'auto') {
-      const defaultInst = TAB_DEFAULT_INSTRUMENT[activeTab] || 'acoustic-guitar';
-      soundEngine.setInstrument(defaultInst);
+      soundEngine.setInstrument('auto');
     }
   }, [activeTab, userOverride]);
 

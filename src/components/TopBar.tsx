@@ -45,12 +45,18 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   const handleInstrumentChange = (value: string) => {
     const next = value as InstrumentType | 'auto';
-    const resolved: InstrumentType = next === 'auto' ? tabDefaultInstrument : next;
 
     setUserOverride(next);
-    soundEngine.setInstrument(resolved);
-    // Confirm the choice audibly so the learner knows what they just picked.
-    soundEngine.playNote(261.63, 1.0, resolved);
+
+    if (next === 'auto') {
+      // Hand the choice back to the tools: each one plays its own voice again.
+      soundEngine.setInstrument('auto');
+      soundEngine.playNote(261.63, 1.0, tabDefaultInstrument);
+    } else {
+      soundEngine.setInstrument(next);
+      // Confirm the choice audibly so the learner knows what they just picked.
+      soundEngine.playNote(261.63, 1.0, next);
+    }
   };
 
   return (

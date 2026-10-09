@@ -17,6 +17,7 @@ not yet fixed.
 | F6 | `ChordWorkbench` labels the third default card `// B Minor`, but index 12 of `COMPREHENSIVE_CHORDS` is **D Major**. | `ChordWorkbench.tsx` | Wrong comment | **open** |
 | F7 | `public/metronome.js` is a comment-only stub with no implementation and no `<script>` tag loading it. The real metronome is the React component. | `public/metronome.js` | Dead asset shipped to production | **open** |
 | F8 | The BPM slider's fill referenced `var(--v, 50)`, but `--v` was never set, so the filled track sat at a fixed 27.8% instead of tracking the thumb. | `style.css`, `RhythmMetronome.tsx` | Slider fill never moved | **fixed** |
+| F9 | Auto mode pinned a concrete instrument on the sound engine, and the engine's priority order (`activeInstrument !== 'auto'` wins) then beat every per-call voice. On the Scales tab with the piano visualizer, clicking piano keys played **guitar**, and the engine could never return to `auto` once the tab effect had run. | `App.tsx`, `TopBar.tsx`, `utils/audio.ts` | Wrong instrument played | **fixed** |
 
 ## Dead code and unfinished logic
 
@@ -59,7 +60,8 @@ Full D1 list: `writeFileSync`, `relative`, `mdFiles` (build-pages), `useMemo` (A
 | --- | --- | --- | --- |
 | A1 | Around 30 classes used by components have **no stylesheet rule at all** (e.g. `interval-header`, `dual-visualizers-grid`, `chord-card-body`, `strum-btn`, `steel-name` wrappers), so those wrappers render unstyled. | `src/style.css` vs `src/components/*` | **open** |
 | A2 | Chord-card reordering is drag-only apart from an `Alt+↑/↓` fallback on the handle; touch users have no reorder affordance. | `ChordWorkbench.tsx` | **open** |
-| A3 | Audio depends on an `AudioContext` created inside a user gesture. It worked on desktop, but iOS Safari additionally requires an explicit resume on the first touch interaction. | `src/utils/audio.ts` | **fixed** |
+| A3 | Audio depends on an `AudioContext` created inside a user gesture, and iOS suspends that context whenever the tab is backgrounded. Desktop masked this; on iOS every play button stayed silent. | `src/utils/audio.ts` | **fixed** — one-shot pointer/touch/key listeners unlock on the first interaction and a `visibilitychange` handler resumes on return |
+| A4 | Touch targets were sized for a mouse (24–32px rail items) and there was no safe-area padding, so the rail sat under the notch and taps were fiddly. | `src/style.css` | **fixed** — 40px rail items, 44px buttons, `touch-action: manipulation`, `env(safe-area-inset-*)` |
 
 ## Performance
 

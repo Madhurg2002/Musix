@@ -67,6 +67,14 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Remove the 300ms double-tap-zoom delay on touch devices. */
+button,
+select,
+input,
+[role='button'] {
+  touch-action: manipulation;
+}
+
 /* Warm, always-visible keyboard focus */
 :focus-visible {
   outline: 2px solid var(--accent-primary);
@@ -1431,6 +1439,7 @@ body {
 .musix-footer {
   text-align: center;
   padding: 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
   color: var(--text-muted);
   font-size: 13px;
   border-top: 1px solid var(--card-border);
@@ -2604,8 +2613,10 @@ body {
     align-items: center;
     gap: 10px;
     padding: 10px 12px;
+    padding-top: max(10px, env(safe-area-inset-top));
     overflow-x: auto;
     overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
     border-right: 0;
     border-bottom: 1px solid var(--card-border);
     z-index: 70;
@@ -2640,6 +2651,14 @@ body {
     border-radius: var(--radius-sm);
     padding: 7px 12px;
     white-space: nowrap;
+    /* Comfortable tap target on touch devices. */
+    min-height: 40px;
+    justify-content: center;
+  }
+
+  .btn,
+  .nav-btn {
+    min-height: 44px;
   }
 
   .rail-item.active {

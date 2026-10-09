@@ -5,6 +5,40 @@ export type InstrumentType = 'acoustic-guitar' | 'electric-guitar' | 'piano' | '
 class SoundEngine {
   private ctx: AudioContext | null = null;
   private activeInstrument: InstrumentType | 'auto' = 'auto';
+  private unlockArmed = false;
+
+  constructor() {
+    this.armAudioUnlock();
+  }
+
+  /**
+   * Mobile browsers only allow audio to start inside a user gesture, and iOS suspends the
+   * context when the tab is backgrounded. Arm one-shot listeners so the first touch,
+   * pointer or key anywhere unlocks sound, and resume whenever the page becomes visible
+   * again — without this, the tuner and every play button stay silent on iOS.
+   */
+  private armAudioUnlock() {
+    if (this.unlockArmed || typeof window === 'undefined' || typeof document === 'undefined') {
+      return;
+    }
+    this.unlockArmed = true;
+
+    const resume = () => {
+      this.init();
+      const ctx = this.ctx;
+      if (ctx && ctx.state === 'suspended') {
+        void ctx.resume();
+      }
+    };
+
+    const options: AddEventListenerOptions = { passive: true };
+    window.addEventListener('pointerdown', resume, options);
+    window.addEventListener('touchstart', resume, options);
+    window.addEventListener('keydown', resume);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') resume();
+    });
+  }
 
   public setInstrument(inst: InstrumentType | 'auto') {
     this.activeInstrument = inst;
