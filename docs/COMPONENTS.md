@@ -41,9 +41,10 @@ Screen shell and the only owner of cross-tab state.
 - An effect applies the tab's default instrument whenever the tab changes and the user
   has not locked one.
 - `handleVisualizerChange` swaps between the piano and fretboard tabs as the toggle moves.
-- Renders the hero banner (with the key chips), the active tab section, and the footer.
+- Composes the shell: `Header` (nav rail), then `.musix-main-column` holding `TopBar`, the
+  screen hero, the active tab, and the footer.
 
-**Renders:** `Header`, then exactly one of `GuitarTuner`, `ChordWorkbench`,
+**Renders:** `Header` + `TopBar`, then exactly one of `GuitarTuner`, `ChordWorkbench`,
 `GuitarFretboard`, `PianoKeyboard`, `ScaleExplorer`, `IntervalExplorer`,
 `RhythmMetronome`, `TheoryCheatSheet`.
 
@@ -51,28 +52,52 @@ Screen shell and the only owner of cross-tab state.
 
 ## `src/components/Header.tsx` — `Header`
 
-Top navigation and global controls.
+The left navigation rail.
 
 **Props**
 
 | Prop | Type | Purpose |
 | --- | --- | --- |
-| `activeTab` | `string` | Highlights the current nav item |
+| `activeTab` | `string` | Highlights the current rail item |
 | `setActiveTab` | `(tab: string) => void` | Navigation |
-| `userOverride` | `InstrumentType \| 'auto'` | Current instrument lock |
-| `setUserOverride` | `(val) => void` | Changes the lock |
-| `selectedVisualizer` | `'piano' \| 'guitar'` | Which visualizer tab is shown |
+| `selectedVisualizer` | `'piano' \| 'guitar'` | Which visualizer is exposed |
 | `setSelectedVisualizer` | `(v) => void` | Visualizer toggle |
 
 **Behavior**
 
-- Renders eight tab buttons; filters out the `piano` or `fretboard` button unless the
-  matching visualizer is selected.
-- Instrument `<select>` with Auto + six instruments. Choosing a specific instrument
-  locks it and plays a C4 preview; choosing Auto restores the tab default.
-- A "sound-active-chip" shows whether sound is `Auto:` or `Locked:` and which instrument
-  is actually playing.
-- Visualizer toggle is a `role="group"` of two `aria-pressed` buttons.
+- Renders `nav.nav-rail`: the brand, then `NAV_GROUPS` — Practice (Tuner, Rhythm),
+  Fretboard (Fretboard, Scales, Intervals), Harmony (Chord Studio, Piano), Learn (Guide).
+- Filters out the `piano` or `fretboard` item unless the matching visualizer is selected,
+  so only one of that pair is listed.
+- Each item is a `rail-item` with a label and a one-line hint, `aria-current="page"` on
+  the active entry, and a brass left rule while active.
+- The footer holds the Piano/Guitar visualizer toggle as a `role="group"` of two
+  `aria-pressed` buttons.
+- Below 900px the rail lays out horizontally and becomes a scrollable top strip.
+
+---
+
+## `src/components/TopBar.tsx` — `TopBar`
+
+The control strip above the screen content.
+
+**Props**
+
+| Prop | Type | Purpose |
+| --- | --- | --- |
+| `activeTab` | `string` | Resolves the screen title from `TAB_TITLES` |
+| `userOverride` | `InstrumentType \| 'auto'` | Current instrument lock |
+| `setUserOverride` | `(val) => void` | Changes the lock |
+| `tabDefaultInstrument` | `InstrumentType` | Voice used while in Auto mode |
+
+**Behavior**
+
+- Shows an eyebrow plus the current screen name.
+- Instrument `<select>` with Auto + six instruments. Any change locks the choice, applies
+  it to `soundEngine`, and plays a C4 preview so the choice is audible.
+- A live chip reads `Auto · <voice>` or `Locked · <voice>` using the effective instrument
+  (`tabDefaultInstrument` while in Auto).
+- On small screens it stops being sticky, because the rail already owns the top edge.
 
 ---
 

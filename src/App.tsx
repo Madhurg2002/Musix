@@ -4,6 +4,7 @@ import './style.css';
 import { NoteName, ChordShape } from './types';
 import { COMPREHENSIVE_CHORDS } from './data/chordsData';
 import { Header } from './components/Header';
+import { TopBar } from './components/TopBar';
 import { GuitarFretboard } from './components/GuitarFretboard';
 import { ChordWorkbench } from './components/ChordWorkbench';
 import { PianoKeyboard } from './components/PianoKeyboard';
@@ -88,143 +89,159 @@ export function App() {
   };
 
   return (
-    <div className="musix-app-root">        <Header
+    <div className="musix-app-root">
+      <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        userOverride={userOverride}
-        setUserOverride={setUserOverride}
         selectedVisualizer={selectedVisualizer}
         setSelectedVisualizer={handleVisualizerChange}
       />
 
-      <main className="main-content-container">
-        {/* Quick Hero Banner */}
-        <section className="hero-banner glass-card">
-          <div className="hero-text">
-            <h2>Learn Music Theory Visually & Interactively</h2>
-            <p>
-              Compare chords side by side, inspect exact guitar finger press positions, tune your instrument with mic pitch detection, explore piano keys, and listen to real synthesized audio in real time.
+      <div className="musix-main-column">
+        <TopBar
+          activeTab={activeTab}
+          userOverride={userOverride}
+          setUserOverride={setUserOverride}
+          tabDefaultInstrument={TAB_DEFAULT_INSTRUMENT[activeTab] || 'acoustic-guitar'}
+        />
+
+        <main className="main-content-container">
+          {/* Screen hero: one idea, one action, one secondary control */}
+          <section className="screen-hero">
+            <p className="screen-hero__eyebrow">Music theory, made visible</p>
+            <h2 className="screen-hero__title">
+              Learn it by seeing it and hearing it
+            </h2>
+            <p className="screen-hero__lede">
+              Compare chords side by side, read exact guitar press positions, tune with
+              microphone pitch detection, and play every concept back in real time.
             </p>
-          </div>
-          <div className="hero-quick-keys">
-            <span className="quick-label">Active Key:</span>
-            <div className="key-badges-row">
-              {(['C', 'G', 'D', 'A', 'E', 'F'] as NoteName[]).map((key) => (
-                <button
-                  key={key}
-                  className={`btn-key-chip ${selectedRoot === key ? 'active' : ''}`}
-                  onClick={() => setSelectedRoot(key)}
-                >
-                  Key {key}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Tab 0: Tuner */}
-        {activeTab === 'tuner' && (
-          <section className="tab-section">
-            <GuitarTuner />
-          </section>
-        )}
-
-        {/* Tab 1: Side-by-Side Chord Studio */}
-        {activeTab === 'workbench' && (
-          <section className="tab-section">
-            <ChordWorkbench
-              onSelectChordForFretboard={handleSelectChordForFretboard}
-              onOpenTuner={() => setActiveTab('tuner')}
-            />
-          </section>
-        )}
-
-        {/* Tab 2: Guitar Fretboard Press Visualizer */}
-        {activeTab === 'fretboard' && (
-          <section className="tab-section">
-            {/* Chord Picker Bar for Fretboard */}
-            <div className="fretboard-chord-picker glass-card">
-              <label>Select Chord to view on Fretboard:</label>
-              <div className="chord-picker-buttons">
-                {COMPREHENSIVE_CHORDS.map((chord) => (
-                  <button
-                    key={chord.id}
-                    className={`btn-chord-chip ${
-                      activeChordForFretboard?.id === chord.id ? 'active' : ''
-                    }`}
-                    onClick={() => setActiveChordForFretboard(chord)}
-                  >
-                    {chord.name}
-                  </button>
-                ))}
+            <div className="screen-hero__actions">
+              <button className="btn btn-primary" onClick={() => setActiveTab('guide')}>
+                Start with the basics
+              </button>
+              <div className="key-selector">
+                <span className="key-selector__label">Key</span>
+                <div className="key-badges-row">
+                  {(['C', 'G', 'D', 'A', 'E', 'F'] as NoteName[]).map((key) => (
+                    <button
+                      key={key}
+                      className={`btn-key-chip ${selectedRoot === key ? 'active' : ''}`}
+                      aria-pressed={selectedRoot === key}
+                      onClick={() => setSelectedRoot(key)}
+                    >
+                      {key}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-
-            <GuitarFretboard
-              activeChord={activeChordForFretboard}
-              activeScaleNotes={activeScaleNotes}
-              rootNote={selectedRoot}
-              activeChordId={activeChordForFretboard?.id ?? null}
-            />
           </section>
-        )}
 
-        {/* Tab 3: Piano Keyboard */}
-  {activeTab === 'piano' && (
-          <section className="tab-section">
-            <PianoKeyboard
-              activeNotes={activeChordForFretboard ? activeChordForFretboard.notes : activeScaleNotes}
-              rootNote={selectedRoot}
-            />
-          </section>
-        )}
+          {/* Tab 0: Tuner */}
+          {activeTab === 'tuner' && (
+            <section className="tab-section">
+              <GuitarTuner />
+            </section>
+          )}
 
-        {/* Tab 4: Scales & Modes */}
-        {activeTab === 'scales' && (
-          <section className="tab-section">
-            <ScaleExplorer
-              selectedRoot={selectedRoot}
-              onRootChange={setSelectedRoot}
-              onScaleNotesChange={setActiveScaleNotes}
-            />
-            <div className="dual-visualizers-grid">
-              {selectedVisualizer === 'piano' ? (
-                <PianoKeyboard activeNotes={activeScaleNotes} rootNote={selectedRoot} />
-              ) : (
-                <GuitarFretboard
-                  activeScaleNotes={activeScaleNotes}
-                  rootNote={selectedRoot}
-                />
-              )}
-            </div>
-          </section>
-        )}
+          {/* Tab 1: Side-by-Side Chord Studio */}
+          {activeTab === 'workbench' && (
+            <section className="tab-section">
+              <ChordWorkbench
+                onSelectChordForFretboard={handleSelectChordForFretboard}
+                onOpenTuner={() => setActiveTab('tuner')}
+              />
+            </section>
+          )}
 
-        {/* Tab 5: Interval Calculator */}
-        {activeTab === 'intervals' && (
-          <section className="tab-section">
-            <IntervalExplorer />
-          </section>
-        )}
+          {/* Tab 2: Guitar Fretboard Press Visualizer */}
+          {activeTab === 'fretboard' && (
+            <section className="tab-section">
+              {/* Chord Picker Bar for Fretboard */}
+              <div className="fretboard-chord-picker glass-card">
+                <label>Select Chord to view on Fretboard:</label>
+                <div className="chord-picker-buttons">
+                  {COMPREHENSIVE_CHORDS.map((chord) => (
+                    <button
+                      key={chord.id}
+                      className={`btn-chord-chip ${
+                        activeChordForFretboard?.id === chord.id ? 'active' : ''
+                      }`}
+                      onClick={() => setActiveChordForFretboard(chord)}
+                    >
+                      {chord.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-        {/* Tab 6: Rhythm & Metronome */}
-        {activeTab === 'rhythm' && (
-          <section className="tab-section">
-            <RhythmMetronome />
-          </section>
-        )}
+              <GuitarFretboard
+                activeChord={activeChordForFretboard}
+                activeScaleNotes={activeScaleNotes}
+                rootNote={selectedRoot}
+                activeChordId={activeChordForFretboard?.id ?? null}
+              />
+            </section>
+          )}
 
-        {/* Tab 7: Beginner Theory Guide */}
-        {activeTab === 'guide' && (
-          <section className="tab-section">
-            <TheoryCheatSheet />
-          </section>
-        )}
-      </main>
+          {/* Tab 3: Piano Keyboard */}
+          {activeTab === 'piano' && (
+            <section className="tab-section">
+              <PianoKeyboard
+                activeNotes={activeChordForFretboard ? activeChordForFretboard.notes : activeScaleNotes}
+                rootNote={selectedRoot}
+              />
+            </section>
+          )}
 
-      <footer className="musix-footer">
-        <p>Musix — Built for music learners. Interactive Guitar, Tuner & Piano Visualizers.</p>
-      </footer>
+          {/* Tab 4: Scales & Modes */}
+          {activeTab === 'scales' && (
+            <section className="tab-section">
+              <ScaleExplorer
+                selectedRoot={selectedRoot}
+                onRootChange={setSelectedRoot}
+                onScaleNotesChange={setActiveScaleNotes}
+              />
+              <div className="dual-visualizers-grid">
+                {selectedVisualizer === 'piano' ? (
+                  <PianoKeyboard activeNotes={activeScaleNotes} rootNote={selectedRoot} />
+                ) : (
+                  <GuitarFretboard
+                    activeScaleNotes={activeScaleNotes}
+                    rootNote={selectedRoot}
+                  />
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Tab 5: Interval Calculator */}
+          {activeTab === 'intervals' && (
+            <section className="tab-section">
+              <IntervalExplorer />
+            </section>
+          )}
+
+          {/* Tab 6: Rhythm & Metronome */}
+          {activeTab === 'rhythm' && (
+            <section className="tab-section">
+              <RhythmMetronome />
+            </section>
+          )}
+
+          {/* Tab 7: Beginner Theory Guide */}
+          {activeTab === 'guide' && (
+            <section className="tab-section">
+              <TheoryCheatSheet />
+            </section>
+          )}
+        </main>
+
+        <footer className="musix-footer">
+          <p>Musix — a warm studio for learning music theory. Guitar, tuner &amp; piano visualizers.</p>
+        </footer>
+      </div>
     </div>
   );
 }

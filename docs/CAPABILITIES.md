@@ -18,9 +18,13 @@ capability that makes it work.
 - URL hash routing: `#workbench`, `#tuner`, `#fretboard`, `#piano`, `#scales`,
   `#intervals`, `#rhythm`, `#guide`. Unknown or missing hashes land on `#workbench`.
 - Browser back/forward navigation moves between tabs (`hashchange` + `popstate`).
-- The header can hide the Piano or Guitar tab to match the current visualizer choice.
-- A hero banner shows quick key chips for **C, G, D, A, E, F**; the selected key is shared
-  with the scales, fretboard, and piano screens.
+- Navigation is a **left rail** grouped by intent (Practice, Fretboard, Harmony, Learn)
+  rather than one flat row of tabs. It hides the Piano or Guitar item to match the current
+  visualizer choice and becomes a scrollable top strip on small screens.
+- A **top bar** above the content names the current screen and owns the instrument control.
+- A **hero** opens each visit with a headline, a primary "Start with the basics" action,
+  and secondary key chips for **C, G, D, A, E, F**; the selected key is shared with the
+  scales, fretboard, and piano screens.
 
 **Technical**
 
@@ -29,6 +33,8 @@ capability that makes it work.
   `userOverride` (instrument lock).
 - Tab list is validated against `VALID_TABS`; `getTabFromHash()` normalizes and
   whitelists the hash.
+- The shell is `Header` (nav rail) plus `.musix-main-column`, which contains `TopBar`, the
+  `main.main-content-container` (hero + active tab), and the footer.
 - Each tab maps to one component under `src/components/`, wrapped in a `.tab-section`.
 
 ---
@@ -302,7 +308,9 @@ capability that makes it work.
 
 **User-facing**
 
-- Dark, glass-card visual theme with a single global stylesheet.
+- One warm **"Analog Studio"** theme: espresso canvas, cream text, a single brass accent
+  with copper/terracotta support and sage for "in tune", glass-card surfaces, and global
+  focus rings.
 - Fully static — works as a plain static site with no server or database.
 - Responsive layout and hover states across every tool.
 
@@ -310,6 +318,8 @@ capability that makes it work.
 
 - Vite + React 19 + TypeScript (strict, with `noUncheckedIndexedAccess`).
 - Single theme file `src/style.css`, imported both from `index.html` and `src/main.tsx`.
+- Design tokens live in `:root` (surfaces, one brass accent, radii, elevation, motion), so
+  the palette is changed in one place.
 - Dev server on port 5173, preview on 4173, both bound to `0.0.0.0`.
 - `bun build` produces a static `dist/`.
 

@@ -2,6 +2,9 @@
 
 Status legend: `[x]` done and committed · `[ ]` planned · `[~]` in progress
 
+**Progress:** Phase 1 (design language) and Phase 2 (shell) are implemented, verified,
+and pushed. Phases 3–4 and the follow-up list below are open.
+
 ## The reimagining in one line
 
 Turn Musix from a **neon cyber dashboard** (glassmorphism, cyan/purple glows, 8 tabs crammed
@@ -54,7 +57,7 @@ Rules that keep it coherent:
 
 ## Phases
 
-### Phase 1 — Design language (theme + tokens)
+### Phase 1 — Design language (theme + tokens) — done
 
 - [ ] Replace the `:root` token block with the Analog Studio palette and add tokens for
       radii, elevation, motion, and focus rings.
@@ -67,7 +70,7 @@ Rules that keep it coherent:
 **Verify:** `bunx tsc -b --noEmit`, `bun test`, preview renders on every tab with no leftover
 cyan/purple.
 
-### Phase 2 — Shell reimagining (navigation + hero)
+### Phase 2 — Shell reimagining (navigation + hero) — done
 
 - [ ] Replace the crowded top tab bar with a **left navigation rail** (desktop) that collapses
       to an icon-free, horizontally scrollable bar on small screens.
@@ -130,7 +133,11 @@ Ordered by value; none block the phases above.
       as "B Minor" when it is D Major.
 - [ ] **Persist learner state.** Remember the active key, instrument, scale, and chord cards
       across reloads (localStorage) so practice resumes where it left off.
-- [ ] **Add SVG icons** to replace emoji in nav and buttons (feeds Phase 4).
+- [ ] **Finish de-emoji-ing the screens.** The rail and top bar are text-only now, but the
+      remaining tools still use emoji in headings and buttons.
+- [ ] **Close the CSS/component class drift.** Around 30 classes used by components (e.g.
+      `interval-header`, `dual-visualizers-grid`, `chord-card-body`, `strum-btn`) have no
+      stylesheet rule at all, so those wrappers render unstyled.
 - [ ] **Resolve `public/metronome.js`.** It is a comment-only stub; either implement it or
       remove it and the reference.
 - [ ] **Reconcile `.gitignore`.** `public/data/*.json` and `scripts/build-pages.ts` are listed

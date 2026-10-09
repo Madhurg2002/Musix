@@ -130,8 +130,13 @@ src/utils/musicTheory.ts ─┘
 
 - **No external state library, router, or UI framework.** React `useState` / `useEffect`
   / `useRef` / `useCallback` only, plus plain CSS classes.
-- The app root is `<div className="musix-app-root">` containing a `Header`, a
-  `main.main-content-container` with the hero banner and the active tab, and a footer.
+- The app root (`div.musix-app-root`) is a two-column flex shell: `Header` renders the
+  left navigation rail (`nav.nav-rail`), and `div.musix-main-column` holds `TopBar`, the
+  `main.main-content-container` (screen hero + active tab), and the footer. Below 900px
+  the rail becomes a scrollable top strip and the top bar stops being sticky.
+- The visual language is defined by the design tokens in `:root` (`src/style.css`): warm
+  surfaces, one brass accent, and shared radii / elevation / motion primitives. Components
+  read tokens rather than hardcoding color.
 - Every screen is a self-contained card component (`.glass-card`), so tabs can be
   developed in isolation without touching the shell.
 - Strict TypeScript with `noUncheckedIndexedAccess` is enabled, so data lookups use
@@ -140,11 +145,12 @@ src/utils/musicTheory.ts ─┘
 ## Extending the architecture
 
 - **New tab** → add an id to `VALID_TABS` and `TAB_DEFAULT_INSTRUMENT` in `App.tsx`, add
-  a nav entry in `Header.tsx`, and render a `<section className="tab-section">`.
+  a `NAV_GROUPS` item in `Header.tsx`, a `TAB_TITLES` entry in `TopBar.tsx`, and render a
+  `<section className="tab-section">`.
 - **New scale / interval** → add to `src/data/scalesData.ts` (and the JSON source if the
   bundled copy should match).
 - **New chord** → add to `COMPREHENSIVE_CHORDS` in `src/data/chordsData.ts`.
 - **New instrument** → add a case to `playNote` in `src/utils/audio.ts`, extend
-  `InstrumentType`, and add a header option.
+  `InstrumentType`, and add an option in `TopBar.tsx`.
 - **New note-level helper** → put it in `src/utils/musicTheory.ts` rather than in a
   component, so all tabs share one implementation.
