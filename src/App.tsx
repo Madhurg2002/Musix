@@ -160,15 +160,19 @@ export function App() {
 
         <main className="main-content-container">
           {/* Screen hero: one idea, one action, one secondary control */}
-          <section className="screen-hero">
-            <p className="screen-hero__eyebrow">Music theory, made visible</p>
-            <h2 className="screen-hero__title">Learn it by seeing it and hearing it</h2>
-            <p className="screen-hero__lede">
+          <section className="flex flex-col gap-3 px-0.5 pt-1.5">
+            <p className="text-[11px] font-bold uppercase tracking-[1.8px] text-accent">
+              Music theory, made visible
+            </p>
+            <h2 className="max-w-[20ch] text-[clamp(28px,3.6vw,42px)] font-extrabold leading-[1.06] tracking-[-1px] text-ink">
+              Learn it by seeing it and hearing it
+            </h2>
+            <p className="max-w-[64ch] text-[16px] text-ink-soft">
               Follow a song from its chord chart, compare chords side by side, read exact
               guitar press positions, tune with microphone pitch detection, and play every
               concept back in real time.
             </p>
-            <div className="screen-hero__actions">
+            <div className="mt-1.5 flex flex-wrap items-center gap-5">
               <button
                 className="btn btn-primary"
                 data-tip="Open the Song Follower and step through a chord chart"
@@ -183,13 +187,19 @@ export function App() {
               >
                 Start with the basics
               </button>
-              <div className="key-selector">
-                <span className="key-selector__label">Key</span>
-                <div className="key-badges-row">
+              <div className="flex items-center gap-2.5">
+                <span className="text-[10px] font-bold uppercase tracking-[1.5px] text-ink-muted">
+                  Key
+                </span>
+                <div className="flex flex-wrap gap-1.5">
                   {(['C', 'G', 'D', 'A', 'E', 'F'] as NoteName[]).map((key) => (
                     <button
                       key={key}
-                      className={`btn-key-chip ${selectedRoot === key ? 'active' : ''}`}
+                      className={`cursor-pointer rounded-xl border px-3.5 py-1.5 text-[13px] font-semibold transition-all duration-200 ${
+                        selectedRoot === key
+                          ? 'border-accent bg-accent text-[#1a1208]'
+                          : 'border-hairline bg-chip text-ink'
+                      }`}
                       aria-pressed={selectedRoot === key}
                       data-tip={`Practise in the key of ${key} — every tool follows it`}
                       onClick={() => setSelectedRoot(key)}

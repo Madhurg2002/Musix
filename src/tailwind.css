@@ -24,6 +24,7 @@
   --color-hairline-strong: var(--card-border-strong);
   --color-line-soft: rgba(var(--overlay-rgb), 0.16);
   --color-tint: rgba(var(--overlay-rgb), 0.04);
+  --color-chip: rgba(var(--overlay-rgb), 0.06);
   --color-tint-accent: rgba(var(--accent-rgb), 0.14);
   --color-glass: rgba(var(--bg-primary-rgb), 0.85);
   --color-field: rgba(var(--bg-primary-rgb), 0.9);
