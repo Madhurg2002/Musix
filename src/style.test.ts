@@ -19,10 +19,10 @@ const REQUIRED_MARKERS: string[] = [
   'html[data-theme="nocturne"]',
   'html[data-theme="paper"]',
   'html[data-theme="arcade"]',
+  '@layer components {', // the sheet stays in the components layer so utilities win
   '.nav-rail {', // app shell
   '.topbar {',
   '.btn {', // shared controls
-  '.musix-footer {',
   '.tuna-arc-gauge {', // tuner screen
   '.metronome-page {', // metronome screen
   '[data-tip]::after {', // tooltip layer

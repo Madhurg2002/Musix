@@ -22,6 +22,9 @@
   --color-card: var(--card-bg);
   --color-hairline: var(--card-border);
   --color-hairline-strong: var(--card-border-strong);
+  --color-line-soft: rgba(var(--overlay-rgb), 0.16);
+  --color-tint: rgba(var(--overlay-rgb), 0.04);
+  --color-tint-accent: rgba(var(--accent-rgb), 0.14);
 
   --color-accent: var(--accent-primary);
   --color-copper: var(--accent-secondary);

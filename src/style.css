@@ -1442,15 +1442,6 @@ body {
   color: var(--text-secondary);
 }
 
-.musix-footer {
-  text-align: center;
-  padding: 24px;
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
-  color: var(--text-muted);
-  font-size: 13px;
-  border-top: 1px solid var(--card-border);
-}
-
 /* Tuner Component Styling */
 .tuner-container {
   display: flex;
@@ -3086,53 +3077,8 @@ html[data-theme="arcade"] {
 }
 
 /* ---------------------------------------------------------------------------
-   Footer
+   Footer — styled with Tailwind utilities in src/components/Footer.tsx.
    --------------------------------------------------------------------------- */
-.musix-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: center;
-  text-align: center;
-}
-
-.musix-footer__tagline {
-  max-width: 62ch;
-  margin: 0;
-}
-
-.musix-footer__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 8px;
-  justify-content: center;
-}
-
-.footer-link {
-  border: 1px solid rgba(var(--overlay-rgb), 0.16);
-  border-radius: 999px;
-  background: rgba(var(--overlay-rgb), 0.04);
-  padding: 6px 14px;
-  color: var(--text-primary);
-  font: inherit;
-  font-size: 0.82rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
-}
-
-.footer-link:hover,
-.footer-link:focus-visible {
-  border-color: var(--accent-primary);
-  background: rgba(var(--accent-rgb), 0.14);
-  color: var(--accent-primary);
-}
-
-.musix-footer__legal {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
 
 /* ---------------------------------------------------------------------------
    Contact screen
@@ -3233,17 +3179,6 @@ html[data-theme="arcade"] {
   background: rgba(var(--overlay-rgb), 0.08);
   padding: 1px 5px;
   font-size: 0.85em;
-}
-
-@media (max-width: 640px) {
-  .musix-footer__links {
-    width: 100%;
-  }
-
-  .footer-link {
-    flex: 1 1 45%;
-    text-align: center;
-  }
 }
 
 /* ---------------------------------------------------------------------------
