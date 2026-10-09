@@ -45,6 +45,8 @@ Full D1 list: `writeFileSync`, `relative`, `mdFiles` (build-pages), `useMemo` (A
 | C5 | `src/env.d.ts` declares Astro-era `PUBLIC_SITE_URL` / `PUBLIC_API_URL` / `PUBLIC_SITE_NAME` / `PORT` env vars that nothing in the app reads. | `src/env.d.ts` | Stale types | **fixed** |
 | C6 | `.gitignore` listed `public/data/*.json` and `scripts/build-pages.ts` as ignored while both are **tracked**, and ignored legacy Astro paths that no longer exist. | `.gitignore` | Misleading; hides real new files | **fixed** |
 | C7 | `tsconfig.tsbuildinfo` (a generated build cache) was committed, so every typecheck dirtied the tree. | repo root | Commit churn | **fixed** |
+| C8 | The readme said "MIT" but the repo shipped no `LICENSE` file, and a public static site had no `robots.txt`. | repo root, `public/` | Licence claim unverifiable; no crawl policy | **fixed** — `LICENSE` (MIT, 2026) and `public/robots.txt` |
+| C9 | The shell kept its own tab list (`VALID_TABS`, `TAB_DEFAULT_INSTRUMENT`), the rail kept `NAV_GROUPS`, and the top bar kept `TAB_TITLES`, so adding a screen meant editing three files that could silently disagree. Every screen was also imported eagerly. | `App.tsx`, `Header.tsx`, `TopBar.tsx` | Duplication; one big first-load bundle | **fixed** — one `ROUTES` table and a `React.lazy` chunk per screen |
 
 ## Data and content faults
 
@@ -72,8 +74,11 @@ Full D1 list: `writeFileSync`, `relative`, `mdFiles` (build-pages), `useMemo` (A
 
 ## Test coverage gaps
 
-- `bun test` covers only `src/utils/musicTheory.ts` (24 tests). No component, audio, or
-  tuner behaviour is covered, so the audio and UI fixes above were verified by inspection
-  and in the preview rather than by assertions.
+- `bun test` now covers 66 tests across four files — `musicTheory.ts` (24), `chordChart.ts`
+  (24), `utils/router.ts` (12), and the `routes.tsx` table (6). Still **no** component,
+  audio, or tuner behaviour is covered, so the audio and UI fixes above were verified by
+  inspection and in the preview rather than by assertions.
 - `getChordPosition` (fret-window generation and finger numbering) and `handleTranspose`
   are untested — T3 in particular would have been caught by a test.
+- The screen components themselves are untested. A DOM test runner would be the next step;
+  today the pure logic is pulled out into `utils/` specifically so it can be asserted.

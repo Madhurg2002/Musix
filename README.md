@@ -6,6 +6,8 @@ concept looks like before they touch an instrument.
 
 ## What's inside
 
+- **Song Follower** — paste a chord chart and step through it: the current chord is
+  highlighted, sounded with the instrument you picked, and transposable into another key.
 - **Pitch & frequencies** — note names, chromatic staff, and a frequency preview you can
   play with the mouse or keyboard.
 - **Intervals** — all 12 interval names, quality, and semitone distance, with a quick lookup
@@ -54,16 +56,23 @@ The full documentation set lives in [`docs/`](docs/README.md):
 index.html            # Loads /src/main.tsx
 package.json          # Vite + React only
 vite.config.js        # React plugin, dev/preview ports
+LICENSE               # MIT licence
 public/
   data/               # Bundled reference data (intervals, scales, chords, guitar maps)
   favicon.svg         # App icon
+  robots.txt          # Crawling policy
 src/
   main.tsx            # React entry
-  App.tsx             # Screen shell, nav, and tab routing
-  style.css           # Dark theme and component styles
+  App.tsx             # Screen shell and shared state
+  routes.tsx          # Route table: ids, titles, rail groups, lazy screens
+  style.css           # Theme tokens and component styles
   types.ts            # Shared types
   components/
-    Header.tsx        # Top nav and sound selector
+    Header.tsx        # Navigation rail and theme picker
+    TopBar.tsx        # Screen title and instrument selector
+    Footer.tsx        # Contact, GitHub, and licence links
+    Contact.tsx       # Contact screen
+    SongFollower.tsx  # Follow a pasted chord chart
     ChordWorkbench.tsx
     GuitarFretboard.tsx
     GuitarTuner.tsx
@@ -77,7 +86,11 @@ src/
     scalesData.ts     # Scale definitions + intervals
   utils/
     audio.ts          # Web Audio sound engine
+    chordChart.ts     # Chord-chart parser for the song follower
     musicTheory.ts    # Note names, guitar strings, helper lookups
+    router.ts         # Hash routing helpers
+    theme.ts          # Selectable themes
+    links.ts          # Project + GitHub addresses
 scripts/
   build-pages.ts      # Data copy helper for the app (plain Node ESM)
 music-theory-reference/

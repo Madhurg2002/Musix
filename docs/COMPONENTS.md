@@ -17,28 +17,103 @@ Document shell. Loads Google Fonts (Outfit, JetBrains Mono), `src/style.css`, an
 
 ---
 
+## `src/routes.tsx`
+
+The route table — the single source of truth for the app's screens.
+
+| Export | Purpose |
+| --- | --- |
+| `ROUTES` | Non-empty tuple of `RouteDefinition`, in display order |
+| `ROUTE_IDS` | The ids, derived from `ROUTES` |
+| `DEFAULT_ROUTE_ID` | `'workbench'`, where an unknown hash lands |
+| `routeFor(id)` | The matching route, or the default |
+| `visualizerForRoute(id)` | `'guitar'` for `fretboard`, `'piano'` for `piano`, else `null` |
+| `ScreenContext` | Shared state/callbacks handed to a route's `render` |
+
+A `RouteDefinition` holds `id`, `title`, `group` (`Practice` / `Fretboard` / `Harmony` /
+`Learn` / `Project`), `label`, `hint`, `instrument` (the Auto-mode voice), an optional
+`visibleFor` for the Piano/Fretboard pair, and `render(context)`.
+
+Every screen is imported with `React.lazy` at the top of the file via
+`import('./components/X').then((m) => ({ default: m.X }))`, because the components use named
+exports. **Adding a screen means one entry here plus a lazily imported component.**
+
+The Fretboard route owns the chord-picker bar (it needs `COMPREHENSIVE_CHORDS` and
+`context.setActiveChord`), which keeps screen-specific markup out of `App`.
+
+`src/routes.test.ts` asserts the table's invariants so a bad entry fails the suite rather
+than a screen.
+
+---
+
+## `src/utils/router.ts`
+
+Hash routing, no React and no dependencies.
+
+- `readHashRoute(validIds, fallback)` — strips `#`, tolerates a leading `/`, trims and
+  lowercases, and returns the id only when it is in `validIds`.
+- `writeHashRoute(id)` — sets the fragment, skipping the write when it is already current so
+  history does not fill with duplicates.
+- `subscribeToRoute(listener)` — listens to `hashchange` **and** `popstate`, returning the
+  unsubscribe function.
+
+Covered by `src/utils/router.test.ts` against a stubbed `window` (6 read cases, 3 write
+cases, 2 subscription cases).
+
+---
+
+## `src/utils/links.ts`
+
+The project's own addresses in one place so the footer, the Contact screen, and the readme
+agree: `GITHUB_OWNER`, `GITHUB_PROFILE_URL`, `GITHUB_REPO_URL`, `GITHUB_ISSUES_URL`,
+`GITHUB_NEW_ISSUE_URL`, `GITHUB_LICENSE_URL`, `GITHUB_ROBOTS_URL`, `GITHUB_SOURCE_URL`, plus
+`LICENSE_NAME` and `LICENSE_YEAR`.
+
+---
+
+## `src/components/Footer.tsx` — `Footer`
+
+Props: `onNavigate(routeId)`.
+
+Renders the tagline, a link row (**Contact** as an in-app button, **GitHub**, the licence,
+and `robots.txt`), and the legal line. The Contact entry is a button rather than an anchor
+because it changes the route instead of leaving the page.
+
+---
+
+## `src/components/Contact.tsx` — `Contact`
+
+Props: none.
+
+Renders the contact lede, a card grid of GitHub destinations — **Open an issue** (marked
+primary), existing issues, the profile, the source tree, and the repository — and two
+sections: the MIT licence with a link to the full text, and a note that the Song Follower
+works from pasted chart text rather than scraping tab sites.
+
+---
+
 ## `src/App.tsx` — `App`
 
-Screen shell and the only owner of cross-tab state.
+Screen shell and the only owner of cross-screen state.
 
 **State**
 
-- `activeTab: string` — initialized from the URL hash.
+- `activeTab: string` — initialized from the URL hash via `readHashRoute`.
 - `selectedRoot: NoteName` — default `'C'`.
 - `activeChordForFretboard: ChordShape | null` — default `COMPREHENSIVE_CHORDS[0]`.
 - `selectedVisualizer: 'piano' | 'guitar'`.
 - `activeScaleNotes: NoteName[]`.
 - `userOverride: InstrumentType | 'auto'`.
 
-**Constants**
-
-- `TAB_DEFAULT_INSTRUMENT` — the per-tab auto instrument map.
-- `VALID_TABS` — the hash whitelist.
-
 **Behavior**
 
-- `setActiveTab` writes the hash; a `hashchange`/`popstate` listener reads it back.
-- An effect applies the tab's default instrument whenever the tab changes and the user
+- `setActiveTab` writes the hash; `subscribeToRoute` reads it back on `hashchange`/
+  `popstate` and syncs the visualizer when the route implies one.
+- The active screen is `routeFor(activeTab).render(screenContext)` inside a `<Suspense>` whose
+  fallback is the `ScreenLoading` pulse.
+- `screenContext` is memoized and carries the key, the active chord, the scale notes, the
+  visualizer, and the navigation callbacks the screens need.
+- An effect applies the screen's default instrument whenever the route changes and the user
   has not locked one.
 - `handleVisualizerChange` swaps between the piano and fretboard tabs as the toggle moves.
 - Composes the shell: `Header` (nav rail), then `.musix-main-column` holding `TopBar`, the
@@ -65,10 +140,11 @@ The left navigation rail.
 
 **Behavior**
 
-- Renders `nav.nav-rail`: the brand, then `NAV_GROUPS` — Practice (Tuner, Rhythm),
-  Fretboard (Fretboard, Scales, Intervals), Harmony (Chord Studio, Piano), Learn (Guide).
-- Filters out the `piano` or `fretboard` item unless the matching visualizer is selected,
-  so only one of that pair is listed.
+- Renders `nav.nav-rail`: the brand, then the rail built from `ROUTES`, grouped in
+  `GROUP_ORDER` — Practice (Songs, Tuner, Rhythm), Fretboard (Fretboard, Scales, Intervals),
+  Harmony (Chord Studio, Piano), Learn (Guide), Project (Contact).
+- Filters out the `piano` or `fretboard` item unless the matching visualizer is selected
+  (`route.visibleFor`), so only one of that pair is listed.
 - Each item is a `rail-item` with a label and a one-line hint, `aria-current="page"` on
   the active entry, and a brass left rule while active.
 - The footer holds the theme `<select>` (from `THEMES`) and the Piano/Guitar visualizer
@@ -86,7 +162,7 @@ The control strip above the screen content.
 
 | Prop | Type | Purpose |
 | --- | --- | --- |
-| `activeTab` | `string` | Resolves the screen title from `TAB_TITLES` |
+| `activeTab` | `string` | Resolves the screen title via `routeFor(activeTab).title` |
 | `userOverride` | `InstrumentType \| 'auto'` | Current instrument lock |
 | `setUserOverride` | `(val) => void` | Changes the lock |
 | `tabDefaultInstrument` | `InstrumentType` | Voice used while in Auto mode |

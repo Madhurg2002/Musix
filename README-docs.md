@@ -16,8 +16,12 @@ looks like before they touch an instrument.
   be shown together so you can compare a chord, a slash chord, and a bass-note variant.
 - **Guitar fretboard** — press a chord shape and watch the exact frets and strings to press.
   Includes standard tuning, alternate tunings, and Caged/3NP shapes.
+- **Song Follower** — paste a chord chart and step through it: the current chord is
+  highlighted, sounded with the instrument you chose, and transposable into another key.
 - **Rhythm studio** — tempo, accents, and a visual beat clock with metronome audio.
 - **Tuner** — microphone-based pitch detection with a visual headstock and arc meter.
+- **Four themes** — Analog Studio, Nocturne, Sheet Paper, and Arcade, chosen in the rail.
+- **Contact** — the footer and the `#contact` screen link to the project on GitHub.
 
 ## Run it locally
 
@@ -42,17 +46,24 @@ Outputs `dist/`.
 index.html                # Loads /src/main.tsx
 package.json              # Vite + React only
 vite.config.js            # React plugin, dev/preview ports
+LICENSE                   # MIT licence
 public/
   data/                   # Bundled reference data (intervals, scales, chords, guitar maps)
   favicon.svg             # App icon
+  robots.txt              # Crawling policy
 src/
   main.tsx                # Vite React entry
-  App.tsx                 # Screen shell and navigation
-  style.css               # App theme
+  App.tsx                 # Screen shell and shared state
+  routes.tsx              # Route table: ids, titles, rail groups, lazy screens
+  style.css               # Theme tokens and component styles
   types.ts                # Shared types
   components/
     Header.tsx
     ChordWorkbench.tsx
+    TopBar.tsx
+    Footer.tsx
+    Contact.tsx
+    SongFollower.tsx
     GuitarFretboard.tsx
     GuitarTuner.tsx
     PianoKeyboard.tsx
@@ -65,7 +76,11 @@ src/
     scalesData.ts
   utils/
     audio.ts
+    chordChart.ts
+    links.ts
     musicTheory.ts
+    router.ts
+    theme.ts
 scripts/
   build-pages.ts          # Data copy helper for the app (plain Node ESM)
 music-theory-reference/
@@ -93,6 +108,8 @@ Start at [`docs/README.md`](docs/README.md). It indexes:
 - [`docs/DATA-MODEL.md`](docs/DATA-MODEL.md) — types and data schemas.
 - [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — setup, scripts, conventions, traps.
 - [`docs/MUSIC-THEORY.md`](docs/MUSIC-THEORY.md) — theory reference map.
+- [`docs/BUGS.md`](docs/BUGS.md) — bug audit with status per finding.
+- [`docs/PLAN.md`](docs/PLAN.md) — reimagining plan and follow-up backlog.
 
 ## Reference data and docs
 
@@ -116,18 +133,22 @@ bun scripts/build-pages.ts
 
 When you are making a change and want to reduce the chance of breaking the app:
 
-1. Read `src/App.tsx` first if the change touches navigation or tab behavior.
-2. Read `src/types.ts` before changing shared data shapes.
-3. Read the relevant component before editing it; the app reuses props and helpers across tabs.
-4. Keep the same shape for new theory data as the existing data files.
-5. Run `bunx tsc -b --noEmit` after type-related changes.
-6. Run `bun build` or `bun dev` after dependency or build-related changes.
-7. If the preview looks broken, check that the global CSS file is still imported and that the
+1. Read `src/routes.tsx` first: adding a screen is one entry there plus a lazily imported
+   component, and the rail, title, deep link, and instrument all follow from it.
+2. Read `src/App.tsx` if the change touches shared state or the shell layout.
+3. Read `src/types.ts` before changing shared data shapes.
+4. Read the relevant component before editing it; the app reuses props and helpers across screens.
+5. Keep the same shape for new theory data as the existing data files.
+6. Run `bunx tsc -b --noEmit` and `bun test` after changes.
+7. Run `bun dev` after dependency or build-related changes.
+8. If the preview looks broken, check that the global CSS file is still imported and that the
    app root layout is intact.
 
 If you want to learn the app quickly, start at these entry points:
 
-- `src/App.tsx` for the overall screen model
+- `src/routes.tsx` for the screen table, then `src/App.tsx` for the shared state
+- `src/utils/router.ts` for how the URL fragment maps to a screen
+- `src/components/SongFollower.tsx` and `src/utils/chordChart.ts` for the song follower
 - `src/utils/musicTheory.ts` for note and guitar-string fundamentals
 - `src/components/ChordWorkbench.tsx` for the chord studio
 - `src/components/GuitarFretboard.tsx` for the fretboard press visualizer

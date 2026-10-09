@@ -3,8 +3,9 @@
 Status legend: `[x]` done and committed · `[ ]` planned · `[~]` in progress
 
 **Progress:** Phase 1 (design language), Phase 2 (shell), the user-selectable theme system,
-and the repository bug audit (`docs/BUGS.md`) are implemented, verified, and pushed.
-Phases 3–4 and the follow-up list below are open.
+the repository bug audit (`docs/BUGS.md`), the mobile audio fixes, the Song Follower, the
+route table with lazy loading, and the licence/contact work are all implemented, verified,
+and pushed. Phases 3–4 and the follow-up list below are still open.
 
 ## The reimagining in one line
 
@@ -84,6 +85,28 @@ cyan/purple.
 **Verify:** all 8 tabs reachable, hash routing and back/forward still work, instrument lock
 still follows tabs, responsive at ≤720px.
 
+### Cross-cutting — shipped alongside the phases
+
+- [x] **Bug audit** (`docs/BUGS.md`) — systematic pass using the compiler's unused-code
+      checks as a probe, plus manual review of logic, config, data, and accessibility.
+- [x] **Mobile audio** — one-shot pointer/touch/key unlock plus a `visibilitychange` resume,
+      so iOS no longer plays nothing after the tab is backgrounded.
+- [x] **Instrument-specific sounds everywhere** — Auto mode no longer pins a concrete voice,
+      so per-tool overrides win again (the piano keys on Scales used to play guitar).
+- [x] **Selectable themes** — four palettes behind channel tokens, chosen in the rail and
+      remembered across reloads.
+- [x] **Song Follower** — paste a chord chart and follow it chord by chord, with tempo,
+      beats-per-chord, transpose, and sound on/off. Parser is pure and unit tested.
+- [x] **Route table + lazy loading** — one `ROUTES` entry per screen drives the rail, the
+      title, the deep link, and the Auto-mode instrument; each screen is a separate chunk.
+- [x] **Licence, robots, and contact** — MIT `LICENSE`, `public/robots.txt`, a Contact screen,
+      and a footer that links to both.
+- [x] **`.gitignore` reconciled** — the tracked-but-ignored paths were untracked or
+      un-ignored, and the stale build cache was purged.
+- **Not done: Tailwind.** The request allowed it "if not using already", and this project
+  explicitly does not use it. Adopting it would mean rewriting a 3,200-line hand-tuned
+  stylesheet and the token system the four themes depend on. The tokens do the same job.
+
 ### Phase 3 — Screen-level craft
 
 - [ ] Chord Studio: clearer card hierarchy, obvious add/compare affordances, better empty state.
@@ -108,11 +131,21 @@ still follows tabs, responsive at ≤720px.
 
 One commit per working change, pushed after verification:
 
-1. Docs set + typecheck/test repair (previous change, already verified).
+1. Docs set + typecheck/test repair.
 2. This plan.
 3. Phase 1 theme.
 4. Phase 2 shell.
-5. …and so on, each verified with `bunx tsc -b --noEmit` + `bun test` before committing.
+5. Bug audit fixes and `.gitignore` reconciliation.
+6. Selectable themes.
+7. Mobile audio and the per-tool instrument fix.
+8. Song Follower (parser + screen + tests).
+9. Song Follower docs.
+10. MIT licence and robots policy.
+11. Route table, lazy loading, Contact screen, and footer.
+12. The docs this invalidated.
+
+Each was verified with `bunx tsc -b --noEmit` and `bun test` (and a preview check) before
+being committed.
 
 Files that are pure build artefacts (`tsconfig.tsbuildinfo`) are intentionally left
 uncommitted to keep the history about source changes.
@@ -141,11 +174,17 @@ Ordered by value; none block the phases above.
       stylesheet rule at all, so those wrappers render unstyled.
 - [ ] **Resolve `public/metronome.js`.** It is a comment-only stub; either implement it or
       remove it and the reference.
-- [ ] **Reconcile `.gitignore`.** `public/data/*.json` and `scripts/build-pages.ts` are listed
-      as ignored but are tracked in git.
+- [ ] **Reconcile `.gitignore`.** Done — the tracked-but-ignored paths were reconciled and
+      the stale `tsconfig.tsbuildinfo` was purged.
 - [ ] **Align `tsconfig.json` include** with the real config filename (`vite.config.js`, not
       `vite.config.ts`).
 - [ ] **Accessibility audit.** Contrast check on the new palette, and keyboard flows for the
       chord card drag-and-drop (which currently has Alt+↑/↓ as the keyboard fallback).
 - [ ] **Progressions.** Turn the "Play Progression" feature into a real chord-progression
       builder with named presets (I–V–vi–IV, ii–V–I, 12-bar blues).
+- [ ] **Save and share a followed song.** The Song Follower keeps its chart only in memory;
+      persisting the pasted chart and transpose choice (localStorage) would resume practice.
+- [ ] **Render a PDF/page export of the follower.** Print stylesheet so a learner can take the
+      graded chart away from the screen.
+- [ ] **Serve `LICENSE` from the built site.** The footer links to GitHub's copy; a `public/`
+      copy would also make `/LICENSE` reachable in production builds (dev already serves it).

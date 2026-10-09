@@ -69,12 +69,18 @@ The suite runs on **Bun's built-in test runner**, so no test dependency is neede
 bun test
 ```
 
-`src/utils/musicTheory.test.ts` covers the note tables, aliases, semitone normalization,
-fret resolution, transposition, MIDI→frequency math, and the safe lookup helpers in
-`src/utils/musicTheory.ts` (24 tests, all passing).
+The suite is **66 tests across 4 files**, all passing:
+
+| File | Covers |
+| --- | --- |
+| `src/utils/musicTheory.test.ts` | Note tables, aliases, semitone normalization, fret resolution, transposition, MIDI→frequency math, safe lookups (24) |
+| `src/utils/chordChart.test.ts` | Chord-symbol parsing, chart parsing, chord tones/voicings, transposition, descriptions (24) |
+| `src/utils/router.test.ts` | Hash reads, writes, and the route subscription, against a stubbed `window` (12) |
+| `src/routes.test.ts` | Route-table invariants: unique ids, required metadata, known instruments, one route per visualizer (6) |
 
 - The globals `describe`, `test`, and `expect` are typed by `src/test-globals.d.ts`, so the
-  suite passes the strict type check without pulling in the full Bun typings.
+  suite passes the strict type check without pulling in the full Bun typings. Add a matcher
+  there if a new one is used; do not weaken an assertion to dodge a missing type.
 - Component, audio, and tuner behavior are **not** covered by tests yet; verify those in
   the preview.
 - Keep `bun test` and `bunx tsc -b --noEmit` green together; both are real gates.
@@ -105,13 +111,15 @@ fret resolution, transposition, MIDI→frequency math, and the safe lookup helpe
 - **Blank or unstyled preview** → check that `src/main.tsx` still imports `./style.css`,
   that `index.html` still links the stylesheet, and that the `musix-app-root` /
   `main-content-container` layout classes are intact.
-- **New tab renders nothing** → the id must be in `VALID_TABS`; otherwise the hash
-  normalizes back to `workbench`.
+- **New screen renders nothing** → the id must be an entry in `ROUTES`
+  (`src/routes.tsx`); otherwise `readHashRoute` normalizes back to `DEFAULT_ROUTE_ID`.
 - **Sound stops working after an edit** → remember instrument resolution: a header lock
   (`userOverride !== 'auto'`) overrides the per-call `overrideInstrument`, so a locked
   instrument can make a component's intended voice appear ignored.
 - **Hash routing quirks** → changing `activeTab` state without writing the hash desyncs
-  the URL; always navigate through `setActiveTab`.
+  the URL; always navigate through `setActiveTab`, which calls `writeHashRoute`.
+- **A screen flashes the loader every time** → the lazy import is being recreated. Keep
+  `lazy(...)` calls at module scope in `src/routes.tsx`, never inside a `render` function.
 - **Strict-null errors** → `noUncheckedIndexedAccess` makes `array[i]` possibly
   `undefined`. Use the safe helpers (`asSafeChord`, `getNoteByCheckedIndex`,
   `resolveGuitarString`) instead of `!` where practical.
@@ -122,11 +130,14 @@ fret resolution, transposition, MIDI→frequency math, and the safe lookup helpe
 
 **A new screen**
 
-1. Add the id to `VALID_TABS` and `TAB_DEFAULT_INSTRUMENT` in `src/App.tsx`.
-2. Add a nav button in `src/components/Header.tsx`.
-3. Create `src/components/YourScreen.tsx` and render it inside a
-   `<section className="tab-section">` in `App.tsx`.
-4. Style it in `src/style.css` using the existing `glass-card` pattern.
+1. Create `src/components/YourScreen.tsx` and export it as a named export.
+2. Add one entry to `ROUTES` in `src/routes.tsx`: `id`, `title`, `group`, `label`, `hint`,
+   `instrument`, and a `render`. Import the component lazily at the top of that file.
+3. Style it in `src/style.css` using the existing `glass-card` pattern.
+
+That single entry gives the screen a deep link, a rail item, a top-bar title, an Auto-mode
+instrument, and its own code chunk. `App.tsx` and `Header.tsx` need no edits, and
+`src/routes.test.ts` will tell you if the entry is malformed.
 
 **A new chord / scale / interval**
 

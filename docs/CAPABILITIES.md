@@ -370,10 +370,10 @@ capability that makes it work.
 
 Documented so the docs stay honest about the current state:
 
-- **Tests cover only the theory helpers.** `src/utils/musicTheory.test.ts` and
-  `src/utils/chordChart.test.ts` (24 tests each, 48 total) run with Bun's built-in runner
-  (`bun test`), but no component or audio behavior is covered. There is no `test` script in
-  `package.json`, so `bun test` must be run directly.
+- **No component or audio tests.** `bun test` runs 66 tests across four files —
+  `musicTheory.ts` (24), `chordChart.ts` (24), `utils/router.ts` (12), and the `routes.tsx`
+  table (6) — but every screen component is verified by hand in the preview. There is still
+  no `test` script in `package.json`, so `bun test` is run directly.
 - **Pitch detection is implemented twice.** `detectPitch` exists in
   `src/utils/musicTheory.ts` and again (as both `detectPitch` and `autoCorrelate`) inside
   `src/components/GuitarTuner.tsx`.
@@ -381,13 +381,20 @@ Documented so the docs stay honest about the current state:
   `noteNameFromIndex` do the same thing, as do `stringInfoAt`, `getGuitarStringInfo`, and
   `resolveGuitarString`; `getFindIndex` only masks its argument.
 - **A default-card comment is stale.** `ChordWorkbench` labels
-  `COMPREHENSIVE_CHORDS[12]` as "B Minor", but index 12 in `chordsData.ts` is D Major.
+  `COMPREHENSIVE_CHORDS[12]` as "B Minor", but index 12 in `chordsData.ts` is D Major
+  (F6 in `docs/BUGS.md`).
+- **The licence is not served by a production build.** The footer links to GitHub's copy; a
+  `public/LICENSE` would also expose it at `/LICENSE` on the deployed site.
 - **`public/metronome.js` is a stub.** It contains documentation comments only; the real
   metronome lives in `src/components/RhythmMetronome.tsx`.
-- **`tsconfig.json` includes `vite.config.ts`** while the actual file is
-  `vite.config.js`.
 - **`public/data/*.json` and `scripts/build-pages.ts` are listed in `.gitignore`** yet
   are tracked in git, so ignore rules do not currently exclude them.
-- **`LicenseSection`/`Contact` live behind the route table.** `src/utils/router.ts` is the
-  single source for routes, titles, rail groups, and per-screen instrument defaults; adding
-  a screen means adding one entry there plus a lazily imported component.
+- **A new screen means editing the route table.** `src/routes.tsx` is the single source for
+  ids, titles, rail groups, and per-screen instrument defaults, so adding a screen is one
+  `RouteDefinition` entry plus a lazily imported component — but it does mean that file
+  grows with the app.
+- **The Song Follower keeps nothing.** A pasted chart, the transpose choice, and the tempo
+  are all in memory, so a reload loses the chart. Persisting them is on the follow-up list in
+  `docs/PLAN.md`.
+- **There is no URL import for songs.** Ultimate Guitar pages are not fetchable from a
+  browser and their terms disallow scraping, so chart text is pasted by hand.

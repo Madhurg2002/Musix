@@ -65,17 +65,33 @@ state (e.g. which mic preset is selected, which cards exist).
 
 ## Routing
 
-Routing is hash-based and dependency-free:
+Routing is hash-based and dependency-free, in two files:
 
-- `getTabFromHash()` strips `#`, lowercases, and returns the tab only if it is in
-  `VALID_TABS`; otherwise `'workbench'`.
-- `setActiveTab(tab)` updates state **and** writes `window.location.hash`.
-- A `useEffect` subscribes to both `hashchange` and `popstate` so browser
-  back/forward keeps state in sync, and it also syncs `selectedVisualizer` when the hash
-  points at `fretboard` or `piano`.
-- Piano and Guitar tabs are hidden from the nav unless the matching visualizer is
-  selected (`Header` filters them), so the visualizer toggle is the single control for
-  that pair.
+- **`src/routes.tsx` — the route table.** One `RouteDefinition` per screen carries the
+  fragment id, top-bar title, rail group/label/hint, the instrument that screen uses in
+  Auto mode, and a `render(context)` function. `App` renders from it, `Header` builds the
+  rail from it, and `TopBar` titles the screen from it, so those three cannot drift.
+- **`src/utils/router.ts` — the address.** `readHashRoute(validIds, fallback)` strips the
+  `#`, tolerates a leading `/`, normalizes case, and returns the id only when it is known;
+  `writeHashRoute(id)` sets the fragment without duplicating history entries; and
+  `subscribeToRoute(listener)` wires both `hashchange` and `popstate` and returns the
+  unsubscribe function.
+
+Consequences worth knowing:
+
+- **Every screen is code-split.** `routes.tsx` imports each component through `React.lazy`,
+  and `App` wraps the render in `<Suspense fallback={<ScreenLoading …/>}>`. The first paint
+  carries the shell plus the opened screen only.
+- **Deep links work anywhere.** Because routes live in the fragment, no static host needs a
+  rewrite rule: `#songs`, `#contact`, and `#/contact` all resolve.
+- **Opening `#fretboard` or `#piano` selects the matching visualizer**
+  (`visualizerForRoute`), so the rail never hides the screen that is on display.
+- **Piano and Fretboard share one rail slot.** `Header` filters on `visibleFor`, so the
+  visualizer toggle is the single control for that pair.
+- Adding a screen is two steps: add an entry to `ROUTES`, and import the component lazily.
+  `src/routes.test.ts` asserts the table's invariants (unique ids, required metadata, known
+  instruments, one route per visualizer), and `src/utils/router.test.ts` covers the hash
+  helpers against a stubbed `window`.
 
 ## Audio architecture
 
@@ -144,9 +160,9 @@ src/utils/musicTheory.ts ─┘
 
 ## Extending the architecture
 
-- **New tab** → add an id to `VALID_TABS` and `TAB_DEFAULT_INSTRUMENT` in `App.tsx`, add
-  a `NAV_GROUPS` item in `Header.tsx`, a `TAB_TITLES` entry in `TopBar.tsx`, and render a
-  `<section className="tab-section">`.
+- **New screen** → add one `RouteDefinition` to `ROUTES` in `src/routes.tsx` with a lazily
+  imported component. That is the whole change: the rail, the top-bar title, the deep link,
+  the Auto-mode instrument, and the code split all follow from the entry.
 - **New scale / interval** → add to `src/data/scalesData.ts` (and the JSON source if the
   bundled copy should match).
 - **New chord** → add to `COMPREHENSIVE_CHORDS` in `src/data/chordsData.ts`.
