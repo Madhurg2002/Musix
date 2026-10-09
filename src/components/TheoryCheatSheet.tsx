@@ -2,18 +2,18 @@ import React from 'react';
 
 export const TheoryCheatSheet: React.FC = () => {
   return (
-    <div className="cheat-sheet-container glass-card">
-      <div className="cheat-header">
+    <div className="glass-card">
+      <div>
         <span className="section-badge">📚 Beginner Starter Guide</span>
         <h2>Visual Music Theory Basics</h2>
         <p>Everything you need to understand guitar cards, scale formulas, and pitch movement.</p>
       </div>
 
-      <div className="cheat-grid">
-        <div className="cheat-card">
-          <div className="card-icon">🎸</div>
-          <h3>Reading Guitar Cards</h3>
-          <ul>
+      <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-5">
+        <div className="rounded-xl border border-hairline bg-[rgba(var(--overlay-rgb),0.03)] p-5">
+          <div className="mb-2 text-[32px]">🎸</div>
+          <h3 className="mb-3 text-[18px]">Reading Guitar Cards</h3>
+          <ul className="flex list-none flex-col gap-2 text-[14px] text-ink-soft">
             <li><strong>Strings 6 to 1:</strong> String 6 is the thickest (Low E, bottom). String 1 is the thinnest (High E, top).</li>
             <li><strong>Fret Numbers:</strong> Numbers like <code>1, 2, 3</code> tell you which fret space to press.</li>
             <li><strong>Finger Numbers:</strong> 1 = Index, 2 = Middle, 3 = Ring, 4 = Pinky.</li>
@@ -21,10 +21,10 @@ export const TheoryCheatSheet: React.FC = () => {
           </ul>
         </div>
 
-        <div className="cheat-card">
-          <div className="card-icon">🎹</div>
-          <h3>Half Steps & Whole Steps</h3>
-          <ul>
+        <div className="rounded-xl border border-hairline bg-[rgba(var(--overlay-rgb),0.03)] p-5">
+          <div className="mb-2 text-[32px]">🎹</div>
+          <h3 className="mb-3 text-[18px]">Half Steps & Whole Steps</h3>
+          <ul className="flex list-none flex-col gap-2 text-[14px] text-ink-soft">
             <li><strong>Half Step (Semitone):</strong> Moving 1 key on piano or 1 fret on guitar (e.g. C ➔ C♯, or E ➔ F).</li>
             <li><strong>Whole Step (Tone):</strong> Moving 2 keys on piano or 2 frets on guitar (e.g. C ➔ D, or F ➔ G).</li>
             <li><strong>Sharps (♯):</strong> Raise note by 1 half step.</li>
@@ -32,10 +32,10 @@ export const TheoryCheatSheet: React.FC = () => {
           </ul>
         </div>
 
-        <div className="cheat-card">
-          <div className="card-icon">🎼</div>
-          <h3>Building Chords</h3>
-          <ul>
+        <div className="rounded-xl border border-hairline bg-[rgba(var(--overlay-rgb),0.03)] p-5">
+          <div className="mb-2 text-[32px]">🎼</div>
+          <h3 className="mb-3 text-[18px]">Building Chords</h3>
+          <ul className="flex list-none flex-col gap-2 text-[14px] text-ink-soft">
             <li><strong>Major Triad:</strong> Root (1) + Major 3rd (4 semitones) + Perfect 5th (7 semitones). Happy sound.</li>
             <li><strong>Minor Triad:</strong> Root (1) + Minor 3rd (3 semitones) + Perfect 5th (7 semitones). Sad/Somber sound.</li>
             <li><strong>Dominant 7th:</strong> Major Triad + Flat 7th. Bluesy, tense sound pointing back to root.</li>
