@@ -1,0 +1,49 @@
+// The stylesheet *is* the app: without it every screen renders as bare HTML on a white
+// page. Commit 5846cf8 once replaced src/style.css with a fragment instead of appending to
+// it and silently dropped ~2,750 lines — the build, the type check, and the unit tests all
+// stayed green. This file makes that failure loud: it asserts the sheet still carries the
+// token block, each layer's marker rule, balanced braces, and roughly its full length.
+
+import { readFileSync } from 'node:fs';
+
+const css = readFileSync(new URL('./style.css', import.meta.url), 'utf8');
+const lineCount = css.split('\n').length;
+
+/**
+ * One marker per layer of the sheet. Every entry names a rule that only exists in its own
+ * section, so losing any of them means a section (or the whole file) went missing.
+ */
+const REQUIRED_MARKERS: string[] = [
+  ':root {', // the palette every theme derives from
+  '--accent-primary',
+  'html[data-theme="nocturne"]',
+  'html[data-theme="paper"]',
+  'html[data-theme="arcade"]',
+  '.nav-rail {', // app shell
+  '.topbar {',
+  '.btn {', // shared controls
+  '.musix-footer {',
+  '.tuna-arc-gauge {', // tuner screen
+  '.metronome-page {', // metronome screen
+  '[data-tip]::after {', // tooltip layer
+];
+
+describe('src/style.css', () => {
+  test('is still a full stylesheet, not a fragment', () => {
+    // The intact sheet is ~3,800 lines; a truncated one lands far below this.
+    expect(lineCount).toBeGreaterThan(3000);
+    expect(css.trimEnd().endsWith('}')).toBe(true);
+  });
+
+  test('keeps every layer reachable', () => {
+    const missing = REQUIRED_MARKERS.filter((marker) => !css.includes(marker));
+    expect(missing).toEqual([]);
+  });
+
+  test('has balanced braces, so one bad edit cannot swallow the rules after it', () => {
+    const opens = css.split('{').length - 1;
+    const closes = css.split('}').length - 1;
+    expect(opens).toBe(closes);
+    expect(opens).toBeGreaterThan(400);
+  });
+});
