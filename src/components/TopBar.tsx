@@ -1,25 +1,14 @@
 import React from 'react';
+import { routeFor } from '../routes';
 import { soundEngine, InstrumentType } from '../utils/audio';
 
 interface TopBarProps {
   activeTab: string;
   userOverride: InstrumentType | 'auto';
   setUserOverride: (value: InstrumentType | 'auto') => void;
-  /** Instrument the current page would use in Auto mode. */
+  /** Instrument the current screen would use in Auto mode. */
   tabDefaultInstrument: InstrumentType;
 }
-
-const TAB_TITLES: Record<string, string> = {
-  workbench: 'Chord Studio',
-  tuner: 'Instrument Tuner',
-  fretboard: 'Guitar Fretboard',
-  piano: 'Piano Visualizer',
-  scales: 'Scales & Modes',
-  intervals: 'Interval Explorer',
-  rhythm: 'Rhythm & Metronome',
-  songs: 'Song Follower',
-  guide: 'Beginner Guide',
-};
 
 const INSTRUMENT_LABELS: Record<InstrumentType | 'auto', string> = {
   'auto': 'Follow page',
@@ -33,7 +22,7 @@ const INSTRUMENT_LABELS: Record<InstrumentType | 'auto', string> = {
 
 /**
  * The instrument control lives here rather than in the navigation rail so the rail stays a
- * pure table of contents, and the page title always sits next to the sound that page uses.
+ * pure table of contents, and the screen title always sits next to the sound it uses.
  */
 export const TopBar: React.FC<TopBarProps> = ({
   activeTab,
@@ -64,7 +53,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     <header className="topbar">
       <div className="topbar__heading">
         <span className="topbar__eyebrow">Now viewing</span>
-        <h2 className="topbar__title">{TAB_TITLES[activeTab] ?? 'Musix'}</h2>
+        <h2 className="topbar__title">{routeFor(activeTab).title}</h2>
       </div>
 
       <div className="header-sound-selector">

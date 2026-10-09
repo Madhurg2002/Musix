@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ROUTES, type NavGroupLabel } from '../routes';
 import { THEMES, applyTheme, readTheme, type ThemeId } from '../utils/theme';
 
 interface HeaderProps {
@@ -8,63 +9,32 @@ interface HeaderProps {
   setSelectedVisualizer: (visualizer: 'piano' | 'guitar') => void;
 }
 
-interface NavItem {
-  id: string;
-  label: string;
-  hint: string;
-}
+const GROUP_ORDER: NavGroupLabel[] = ['Practice', 'Fretboard', 'Harmony', 'Learn', 'Project'];
 
-interface NavGroup {
-  label: string;
-  items: NavItem[];
-}
+const GROUP_LABELS: Record<NavGroupLabel, string> = {
+  Practice: 'Practice',
+  Fretboard: 'Fretboard',
+  Harmony: 'Harmony',
+  Learn: 'Learn',
+  Project: 'Project',
+};
 
 /**
- * The tool list is grouped by what a learner is trying to do rather than dumped into one
- * flat row, so the rail reads as a study plan instead of a toolbar.
+ * The rail is built from the route table, grouped by what a learner is trying to do rather
+ * than dumped into one flat row, so it reads as a study plan instead of a toolbar.
  */
-const NAV_GROUPS: NavGroup[] = [
-  {
-    label: 'Practice',
-    items: [
-      { id: 'songs', label: 'Songs', hint: 'Follow a chord chart' },
-      { id: 'tuner', label: 'Tuner', hint: 'Mic pitch detection' },
-      { id: 'rhythm', label: 'Rhythm', hint: 'Metronome & tempo' },
-    ],
-  },
-  {
-    label: 'Fretboard',
-    items: [
-      { id: 'fretboard', label: 'Fretboard', hint: 'Press positions' },
-      { id: 'scales', label: 'Scales', hint: 'Modes & formulas' },
-      { id: 'intervals', label: 'Intervals', hint: 'Distance & ear training' },
-    ],
-  },
-  {
-    label: 'Harmony',
-    items: [
-      { id: 'workbench', label: 'Chord Studio', hint: 'Compare side by side' },
-      { id: 'piano', label: 'Piano', hint: 'Keyboard visualizer' },
-    ],
-  },
-  {
-    label: 'Learn',
-    items: [{ id: 'guide', label: 'Guide', hint: 'Start here' }],
-  },
-];
-
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   selectedVisualizer,
   setSelectedVisualizer,
 }) => {
-  // Piano and Fretboard are two views of the same idea, so only the selected one is listed.
-  const isVisible = (id: string) =>
-    (id !== 'piano' || selectedVisualizer === 'piano') &&
-    (id !== 'fretboard' || selectedVisualizer === 'guitar');
-
   const [theme, setTheme] = useState<ThemeId>(() => readTheme());
+
+  // Piano and Fretboard are two views of the same idea, so only the selected one is listed.
+  const visibleRoutes = ROUTES.filter(
+    (route) => !route.visibleFor || route.visibleFor === selectedVisualizer
+  );
 
   const handleThemeChange = (value: string) => {
     const next = value as ThemeId;
@@ -85,13 +55,13 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="nav-rail__groups">
-        {NAV_GROUPS.map((group) => {
-          const items = group.items.filter((item) => isVisible(item.id));
+        {GROUP_ORDER.map((group) => {
+          const items = visibleRoutes.filter((route) => route.group === group);
           if (items.length === 0) return null;
 
           return (
-            <div className="nav-group" key={group.label}>
-              <span className="nav-group__label">{group.label}</span>
+            <div className="nav-group" key={group}>
+              <span className="nav-group__label">{GROUP_LABELS[group]}</span>
               {items.map((item) => {
                 const isActive = activeTab === item.id;
                 return (

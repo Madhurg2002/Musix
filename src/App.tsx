@@ -1,104 +1,105 @@
-import { useState, useEffect } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import './style.css';
-import { NoteName, ChordShape } from './types';
+import type { ChordShape, NoteName } from './types';
 import { COMPREHENSIVE_CHORDS } from './data/chordsData';
 import { Header } from './components/Header';
 import { TopBar } from './components/TopBar';
-import { GuitarFretboard } from './components/GuitarFretboard';
-import { ChordWorkbench } from './components/ChordWorkbench';
-import { PianoKeyboard } from './components/PianoKeyboard';
-import { ScaleExplorer } from './components/ScaleExplorer';
-import { IntervalExplorer } from './components/IntervalExplorer';
-import { RhythmMetronome } from './components/RhythmMetronome';
-import { TheoryCheatSheet } from './components/TheoryCheatSheet';
-import { GuitarTuner } from './components/GuitarTuner';
-import { SongFollower } from './components/SongFollower';
-import { soundEngine, InstrumentType } from './utils/audio';
+import { Footer } from './components/Footer';
+import {
+  DEFAULT_ROUTE_ID,
+  ROUTE_IDS,
+  routeFor,
+  visualizerForRoute,
+  type ScreenContext,
+} from './routes';
+import { readHashRoute, subscribeToRoute, writeHashRoute } from './utils/router';
+import { soundEngine, type InstrumentType } from './utils/audio';
 
-// Default instrument for each tab — what sounds most natural on that page
-const TAB_DEFAULT_INSTRUMENT: Record<string, InstrumentType> = {
-  workbench: 'acoustic-guitar',
-  tuner: 'acoustic-guitar',
-  fretboard: 'acoustic-guitar',
-  piano: 'piano',
-  scales: 'acoustic-guitar',
-  intervals: 'piano',
-  rhythm: 'acoustic-guitar',
-  songs: 'acoustic-guitar',
-  guide: 'acoustic-guitar',
-};
-
-const VALID_TABS = [
-  'workbench',
-  'tuner',
-  'fretboard',
-  'piano',
-  'scales',
-  'intervals',
-  'rhythm',
-  'songs',
-  'guide',
-];
-
-function getTabFromHash(): string {
-  const hash = window.location.hash.replace('#', '').trim().toLowerCase();
-  return VALID_TABS.includes(hash) ? hash : 'workbench';
+/** Shown while a route's code chunk loads. */
+function ScreenLoading({ title }: { title: string }) {
+  return (
+    <div className="screen-loading" role="status" aria-live="polite">
+      <span className="screen-loading__pulse" aria-hidden="true" />
+      <span>Loading {title}…</span>
+    </div>
+  );
 }
 
 export function App() {
-  const [activeTab, setActiveTabState] = useState<string>(() => getTabFromHash());
-  const [selectedRoot, setSelectedRoot] = useState<NoteName>('C');
-  const [activeChordForFretboard, setActiveChordForFretboard] = useState<ChordShape | null>(COMPREHENSIVE_CHORDS[0] ?? null);
-  const [selectedVisualizer, setSelectedVisualizer] = useState<'piano' | 'guitar'>(() =>
-    getTabFromHash() === 'fretboard' ? 'guitar' : 'piano'
+  const [activeTab, setActiveTabState] = useState<string>(() =>
+    readHashRoute(ROUTE_IDS, DEFAULT_ROUTE_ID)
   );
-  const [activeScaleNotes, setActiveScaleNotes] = useState<NoteName[]>(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
-  // 'auto' = follow tab defaults; anything else = user explicitly chose an instrument
+  const [selectedRoot, setSelectedRoot] = useState<NoteName>('C');
+  const [activeChordForFretboard, setActiveChordForFretboard] = useState<ChordShape | null>(
+    COMPREHENSIVE_CHORDS[0] ?? null
+  );
+  const [selectedVisualizer, setSelectedVisualizer] = useState<'piano' | 'guitar'>(
+    () => visualizerForRoute(readHashRoute(ROUTE_IDS, DEFAULT_ROUTE_ID)) ?? 'piano'
+  );
+  const [activeScaleNotes, setActiveScaleNotes] = useState<NoteName[]>([
+    'C', 'D', 'E', 'F', 'G', 'A', 'B',
+  ]);
+  // 'auto' = follow the route's default instrument; anything else = the user chose one.
   const [userOverride, setUserOverride] = useState<InstrumentType | 'auto'>('auto');
 
-  // When tab changes AND the user has not locked an instrument, leave the engine in 'auto'
-  // so each tool's own override decides the voice. Pinning a concrete instrument here would
-  // win over those overrides — which made the piano keys on the Scales tab play guitar.
+  const route = routeFor(activeTab);
+
+  // Keep the engine in 'auto' unless the user locked an instrument, so each tool's own
+  // override decides the voice. Pinning a concrete instrument here would win over those
+  // overrides — which made the piano keys on the Scales screen play guitar.
   useEffect(() => {
     if (userOverride === 'auto') {
       soundEngine.setInstrument('auto');
     }
   }, [activeTab, userOverride]);
 
-  // Sync state with URL hash and listen for browser back/forward navigation
   const setActiveTab = (tab: string) => {
     setActiveTabState(tab);
-    window.location.hash = tab;
+    writeHashRoute(tab);
   };
 
-  const handleVisualizerChange = (visualizer: 'piano' | 'guitar') => {
+  const setVisualizer = (visualizer: 'piano' | 'guitar') => {
     setSelectedVisualizer(visualizer);
     if (visualizer === 'piano' && activeTab === 'fretboard') setActiveTab('piano');
     if (visualizer === 'guitar' && activeTab === 'piano') setActiveTab('fretboard');
   };
 
-  useEffect(() => {
-    const handleHashChange = () => {
-      const currentTab = getTabFromHash();
-      setActiveTabState(currentTab);
-      if (currentTab === 'fretboard') setSelectedVisualizer('guitar');
-      if (currentTab === 'piano') setSelectedVisualizer('piano');
-    };
+  // Every way the address can change — link clicks, back/forward, manual edits — lands here.
+  useEffect(
+    () =>
+      subscribeToRoute(() => {
+        const nextRoute = readHashRoute(ROUTE_IDS, DEFAULT_ROUTE_ID);
+        setActiveTabState(nextRoute);
 
-    window.addEventListener('hashchange', handleHashChange);
-    window.addEventListener('popstate', handleHashChange);
+        const implied = visualizerForRoute(nextRoute);
+        if (implied) setSelectedVisualizer(implied);
+      }),
+    []
+  );
 
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-      window.removeEventListener('popstate', handleHashChange);
-    };
-  }, []);
-
-  const handleSelectChordForFretboard = (chord: ChordShape) => {
+  const selectChordForFretboard = (chord: ChordShape) => {
     setActiveChordForFretboard(chord);
     setSelectedVisualizer('guitar');
     setActiveTab('fretboard');
   };
+
+  const screenContext: ScreenContext = useMemo(
+    () => ({
+      selectedRoot,
+      setSelectedRoot,
+      activeChord: activeChordForFretboard,
+      setActiveChord: setActiveChordForFretboard,
+      activeScaleNotes,
+      setActiveScaleNotes,
+      visualizer: selectedVisualizer,
+      setVisualizer,
+      selectChordForFretboard,
+      openTuner: () => setActiveTab('tuner'),
+    }),
+    // Handlers below are stable enough for this shell; re-creating the context per render is
+    // cheap and keeps the dependency list honest.
+    [selectedRoot, activeChordForFretboard, activeScaleNotes, selectedVisualizer, activeTab],
+  );
 
   return (
     <div className="musix-app-root">
@@ -106,7 +107,7 @@ export function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         selectedVisualizer={selectedVisualizer}
-        setSelectedVisualizer={handleVisualizerChange}
+        setSelectedVisualizer={setVisualizer}
       />
 
       <div className="musix-main-column">
@@ -114,19 +115,18 @@ export function App() {
           activeTab={activeTab}
           userOverride={userOverride}
           setUserOverride={setUserOverride}
-          tabDefaultInstrument={TAB_DEFAULT_INSTRUMENT[activeTab] || 'acoustic-guitar'}
+          tabDefaultInstrument={route.instrument}
         />
 
         <main className="main-content-container">
           {/* Screen hero: one idea, one action, one secondary control */}
           <section className="screen-hero">
             <p className="screen-hero__eyebrow">Music theory, made visible</p>
-            <h2 className="screen-hero__title">
-              Learn it by seeing it and hearing it
-            </h2>
+            <h2 className="screen-hero__title">Learn it by seeing it and hearing it</h2>
             <p className="screen-hero__lede">
-              Compare chords side by side, read exact guitar press positions, tune with
-              microphone pitch detection, and play every concept back in real time.
+              Follow a song from its chord chart, compare chords side by side, read exact
+              guitar press positions, tune with microphone pitch detection, and play every
+              concept back in real time.
             </p>
             <div className="screen-hero__actions">
               <button className="btn btn-primary" onClick={() => setActiveTab('songs')}>
@@ -153,115 +153,14 @@ export function App() {
             </div>
           </section>
 
-          {/* Tab 0: Tuner */}
-          {activeTab === 'tuner' && (
-            <section className="tab-section">
-              <GuitarTuner />
-            </section>
-          )}
-
-          {/* Tab 1: Side-by-Side Chord Studio */}
-          {activeTab === 'workbench' && (
-            <section className="tab-section">
-              <ChordWorkbench
-                onSelectChordForFretboard={handleSelectChordForFretboard}
-                onOpenTuner={() => setActiveTab('tuner')}
-              />
-            </section>
-          )}
-
-          {/* Tab 2: Guitar Fretboard Press Visualizer */}
-          {activeTab === 'fretboard' && (
-            <section className="tab-section">
-              {/* Chord Picker Bar for Fretboard */}
-              <div className="fretboard-chord-picker glass-card">
-                <label>Select Chord to view on Fretboard:</label>
-                <div className="chord-picker-buttons">
-                  {COMPREHENSIVE_CHORDS.map((chord) => (
-                    <button
-                      key={chord.id}
-                      className={`btn-chord-chip ${
-                        activeChordForFretboard?.id === chord.id ? 'active' : ''
-                      }`}
-                      onClick={() => setActiveChordForFretboard(chord)}
-                    >
-                      {chord.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <GuitarFretboard
-                activeChord={activeChordForFretboard}
-                activeScaleNotes={activeScaleNotes}
-                rootNote={selectedRoot}
-              />
-            </section>
-          )}
-
-          {/* Tab 3: Piano Keyboard */}
-          {activeTab === 'piano' && (
-            <section className="tab-section">
-              <PianoKeyboard
-                activeNotes={activeChordForFretboard ? activeChordForFretboard.notes : activeScaleNotes}
-                rootNote={selectedRoot}
-              />
-            </section>
-          )}
-
-          {/* Tab 4: Scales & Modes */}
-          {activeTab === 'scales' && (
-            <section className="tab-section">
-              <ScaleExplorer
-                selectedRoot={selectedRoot}
-                onRootChange={setSelectedRoot}
-                onScaleNotesChange={setActiveScaleNotes}
-              />
-              <div className="dual-visualizers-grid">
-                {selectedVisualizer === 'piano' ? (
-                  <PianoKeyboard activeNotes={activeScaleNotes} rootNote={selectedRoot} />
-                ) : (
-                  <GuitarFretboard
-                    activeScaleNotes={activeScaleNotes}
-                    rootNote={selectedRoot}
-                  />
-                )}
-              </div>
-            </section>
-          )}
-
-          {/* Tab 5: Interval Calculator */}
-          {activeTab === 'intervals' && (
-            <section className="tab-section">
-              <IntervalExplorer />
-            </section>
-          )}
-
-          {/* Tab 6: Rhythm & Metronome */}
-          {activeTab === 'rhythm' && (
-            <section className="tab-section">
-              <RhythmMetronome />
-            </section>
-          )}
-
-          {/* Tab 7: Song Follower */}
-          {activeTab === 'songs' && (
-            <section className="tab-section">
-              <SongFollower />
-            </section>
-          )}
-
-          {/* Tab 8: Beginner Theory Guide */}
-          {activeTab === 'guide' && (
-            <section className="tab-section">
-              <TheoryCheatSheet />
-            </section>
-          )}
+          <section className="tab-section">
+            <Suspense fallback={<ScreenLoading title={route.title} />}>
+              {route.render(screenContext)}
+            </Suspense>
+          </section>
         </main>
 
-        <footer className="musix-footer">
-          <p>Musix — a warm studio for learning music theory. Guitar, tuner &amp; piano visualizers.</p>
-        </footer>
+        <Footer onNavigate={setActiveTab} />
       </div>
     </div>
   );
