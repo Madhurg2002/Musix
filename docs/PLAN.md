@@ -17,6 +17,7 @@ Do **not** rewrite every doc on every change. The rule from here on:
 | 2 | `f919b4f`, `84ca95f` | `ARCHITECTURE.md`, `COMPONENTS.md`, `DEVELOPMENT.md`, `BUGS.md`, `README.md`, `README-docs.md`, docs index |
 | 3 | `938fd47`, `c5ce232`, `07483ff`, `975ae19` | **this file only** |
 | 4 | `93d7acc`, `42398c9`, `de04710`, `22954b4`, `d6dcf4a` | `CAPABILITIES.md` (tooltips), `CONTRIBUTING.md` (new), this file |
+| 5 | `bebfafe`, `5decd5d`, `9e45dc2`, `cc5ef5a` | this file only (Tailwind migration starts) |
 
 ### Deferred doc edits (sweep up in the next batch)
 
@@ -158,6 +159,16 @@ still follows tabs, responsive at ≤720px.
   not change while markup moves over; design tokens stay in `:root` and are exposed to
   Tailwind as theme colours so the four themes keep working; screens migrate one commit at
   a time, and `src/style.test.ts` guards the stylesheet until each layer has moved.
+
+  Done so far: setup (`5decd5d` — layer order declared so `utilities` beats `components`,
+  whole sheet wrapped in `@layer components`, tints exposed as `--color-*`), footer
+  (`9e45dc2`), top bar (`cc5ef5a`). Each screen's rules are deleted from `src/style.css`
+  when its markup moves, and the guard test marker is swapped to a rule that still exists.
+
+  Remaining, in order: the navigation rail + hero (shell), then Chord Studio, Song
+  Follower, Fretboard, Scales, Intervals, Tuner, Metronome, Piano, Guide, Contact — and
+  finally the leftovers utilities do not reach (SVG internals, fretboard grid, keyframes,
+  print), which stay as CSS.
 
 ### Phase 3 — Screen-level craft
 
