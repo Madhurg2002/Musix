@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/Madhurg2002/Musix/tree/main/docs
+    about: Capabilities, architecture, components, and the theory map — check here first.
+  - name: Beginner guide (in the app)
+    url: https://github.com/Madhurg2002/Musix#readme
+    about: What Musix covers and how to run it locally.

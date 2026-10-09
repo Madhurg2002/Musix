@@ -1,0 +1,61 @@
+name: Feature request
+description: Suggest a new tool, a theory concept to add, or an improvement to an existing screen.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Musix is a beginner-focused theory reference: every feature should help someone see
+        or hear a concept. Ideas that fit that goal are the easiest to say yes to.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where it belongs
+      options:
+        - Song Follower
+        - Tuner
+        - Rhythm / Metronome
+        - Fretboard
+        - Scales
+        - Intervals
+        - Chord Studio
+        - Piano
+        - Beginner Guide
+        - App shell (navigation, themes, accessibility)
+        - Theory content / data
+        - New screen
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to learn or do?
+      description: The learner's goal matters more than the implementation.
+      placeholder: I want to hear a I–V–vi–IV progression before I try to play it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to happen
+      description: Describe the behaviour or the new tool in your own words.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Workarounds you use today
+      description: Optional — what do you do instead right now?
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues for a similar request.
+          required: true

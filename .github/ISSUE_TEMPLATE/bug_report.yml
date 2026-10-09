@@ -1,0 +1,78 @@
+name: Bug report
+description: Something in Musix misbehaves — a wrong chord shape, silent audio, a broken layout.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Musix runs entirely in the browser,
+        so the more detail you give about *where* it happened, the faster it can be fixed.
+
+  - type: dropdown
+    id: screen
+    attributes:
+      label: Which screen
+      description: Open it from the navigation rail — the name in the top bar is the route.
+      options:
+        - Song Follower
+        - Tuner
+        - Rhythm / Metronome
+        - Fretboard
+        - Scales
+        - Intervals
+        - Chord Studio
+        - Piano
+        - Beginner Guide
+        - Contact
+        - App shell (rail, top bar, footer, themes)
+        - Not sure / somewhere else
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Describe the behaviour you saw, including any message in the browser console.
+      placeholder: The transposed card still shows the old frets after pressing +1.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The shortest path from a fresh page load to the bug.
+      placeholder: |
+        1. Open #workbench
+        2. Press +1 on the first card
+        3. Look at the fret diagram
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and OS
+      description: Musix is browser-only, so the engine matters (Chrome, Safari, Firefox, Edge + version).
+      placeholder: Safari 18 on macOS 15
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues for this bug.
+          required: true
+        - label: I reproduced it on a fresh page load in the preview build.
+          required: true
