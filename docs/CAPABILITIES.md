@@ -351,6 +351,11 @@ capability that makes it work.
   Sheet Paper (light), and Arcade (the original neon) — chosen from the navigation rail and
   remembered across reloads, with glass-card surfaces, global focus rings, and warm
   scrollbars.
+- **Tooltips on every interactive control** — buttons, chips, pegs, dots and links carry a
+  `data-tip` bubble (shown on hover and on keyboard focus, positioned above, below, or to the
+  side of the anchor), while `select` and range inputs fall back to the native `title`
+  attribute because form controls cannot render pseudo-elements. The rules live at the end of
+  `src/style.css`.
 - Fully static — works as a plain static site with no server or database.
 - Responsive layout and hover states across every tool.
 

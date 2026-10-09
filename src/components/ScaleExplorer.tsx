@@ -67,7 +67,11 @@ export const ScaleExplorer: React.FC<ScaleExplorerProps> = ({
           <p>{currentScaleDef.description}</p>
         </div>
 
-        <button className="btn btn-primary" onClick={handlePlayScale}>
+        <button
+          className="btn btn-primary"
+          data-tip="Play the scale note by note, then land on the octave above"
+          onClick={handlePlayScale}
+        >
           ▶ Play Scale Ascending
         </button>
       </div>
@@ -81,6 +85,7 @@ export const ScaleExplorer: React.FC<ScaleExplorerProps> = ({
               <button
                 key={n}
                 className={`btn-note ${n === selectedRoot ? 'selected' : ''}`}
+                data-tip={`Build the scale on ${n}`}
                 onClick={() => onRootChange(n)}
                 style={{
                   borderColor: n === selectedRoot ? NOTE_COLORS[n] : undefined,
@@ -97,6 +102,7 @@ export const ScaleExplorer: React.FC<ScaleExplorerProps> = ({
           <select
             className="select-input scale-select"
             value={selectedScaleId}
+            title="Choose the scale or mode — each one shows its own formula"
             onChange={(e) => setSelectedScaleId(e.target.value)}
           >
             {COMPREHENSIVE_SCALES.map((s) => (

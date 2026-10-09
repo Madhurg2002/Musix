@@ -70,6 +70,8 @@ export const Header: React.FC<HeaderProps> = ({
                     type="button"
                     className={`rail-item ${isActive ? 'active' : ''}`}
                     aria-current={isActive ? 'page' : undefined}
+                    data-tip={`${item.label} — ${item.hint}`}
+                    data-tip-pos="right"
                     onClick={() => setActiveTab(item.id)}
                   >
                     <span className="rail-item__label">{item.label}</span>
@@ -88,6 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
           <select
             className="select-input rail-theme-select"
             value={theme}
+            title="Studio theme — repaints every screen at once"
             onChange={(event) => handleThemeChange(event.target.value)}
           >
             {THEMES.map((option) => (
@@ -105,6 +108,7 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               aria-pressed={selectedVisualizer === 'piano'}
               className={selectedVisualizer === 'piano' ? 'active' : ''}
+              data-tip="Light up notes on the piano — swaps the Fretboard tab for Piano"
               onClick={() => setSelectedVisualizer('piano')}
             >
               Piano
@@ -113,6 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               aria-pressed={selectedVisualizer === 'guitar'}
               className={selectedVisualizer === 'guitar' ? 'active' : ''}
+              data-tip="Light up notes on the guitar neck — swaps the Piano tab for Fretboard"
               onClick={() => setSelectedVisualizer('guitar')}
             >
               Guitar

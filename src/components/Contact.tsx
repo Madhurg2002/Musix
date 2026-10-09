@@ -67,6 +67,7 @@ export const Contact: React.FC = () => {
             <a
               className={`contact-link ${link.primary ? 'contact-link--primary' : ''}`}
               href={link.href}
+              data-tip="Opens GitHub in a new tab"
               target="_blank"
               rel="noreferrer noopener"
             >
@@ -92,7 +93,12 @@ export const Contact: React.FC = () => {
         <p>
           The theory notes in <code>music-theory-reference/</code> and the bundled JSON in{' '}
           <code>public/data/</code> are covered by the same {LICENSE_NAME} licence.{' '}
-          <a href={GITHUB_LICENSE_URL} target="_blank" rel="noreferrer noopener">
+          <a
+            href={GITHUB_LICENSE_URL}
+            data-tip="Read the licence on GitHub"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
             Read the full licence text
           </a>
           .

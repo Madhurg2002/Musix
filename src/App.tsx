@@ -166,10 +166,18 @@ export function App() {
               concept back in real time.
             </p>
             <div className="screen-hero__actions">
-              <button className="btn btn-primary" onClick={() => setActiveTab('songs')}>
+              <button
+                className="btn btn-primary"
+                data-tip="Open the Song Follower and step through a chord chart"
+                onClick={() => setActiveTab('songs')}
+              >
                 Follow a song
               </button>
-              <button className="btn btn-outline" onClick={() => setActiveTab('guide')}>
+              <button
+                className="btn btn-outline"
+                data-tip="Open the beginner guide to steps, chords, and notation"
+                onClick={() => setActiveTab('guide')}
+              >
                 Start with the basics
               </button>
               <div className="key-selector">
@@ -180,6 +188,7 @@ export function App() {
                       key={key}
                       className={`btn-key-chip ${selectedRoot === key ? 'active' : ''}`}
                       aria-pressed={selectedRoot === key}
+                      data-tip={`Practise in the key of ${key} — every tool follows it`}
                       onClick={() => setSelectedRoot(key)}
                     >
                       {key}

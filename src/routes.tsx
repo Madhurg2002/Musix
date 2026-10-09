@@ -119,6 +119,7 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
               <button
                 key={chord.id}
                 className={`btn-chord-chip ${context.activeChord?.id === chord.id ? 'active' : ''}`}
+                data-tip={`Show ${chord.name} pressed on the neck`}
                 onClick={() => context.setActiveChord(chord)}
               >
                 {chord.name}

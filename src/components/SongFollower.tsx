@@ -158,7 +158,11 @@ export const SongFollower: React.FC = () => {
           </p>
         </div>
         <div className="song-header-actions">
-          <button className="btn btn-outline" onClick={() => { setDraft(SAMPLE_CHART); loadChart(SAMPLE_CHART); }}>
+          <button
+            className="btn btn-outline"
+            data-tip="Fill the editor with a short sample song"
+            onClick={() => { setDraft(SAMPLE_CHART); loadChart(SAMPLE_CHART); }}
+          >
             Load sample
           </button>
         </div>
@@ -185,12 +189,14 @@ export const SongFollower: React.FC = () => {
         <div className="song-input-actions">
           <button
             className="btn btn-outline"
+            data-tip="Replace the current song with the sample chart"
             onClick={() => loadChart(SAMPLE_CHART)}
           >
             Use sample chart
           </button>
           <button
             className="btn btn-primary"
+            data-tip="Parse the pasted text and start following it"
             disabled={draft.trim().length === 0}
             onClick={() => loadChart(draft)}
           >
@@ -208,19 +214,34 @@ export const SongFollower: React.FC = () => {
         <>
           <div className="song-transport">
             <div className="song-transport__buttons">
-              <button className="btn btn-outline btn-sm" onClick={() => goTo(position - 1)} aria-label="Previous chord">
+              <button
+                className="btn btn-outline btn-sm"
+                data-tip="Step back one chord and hear it"
+                onClick={() => goTo(position - 1)}
+                aria-label="Previous chord"
+              >
                 ◀ Prev
               </button>
               <button
                 className={`btn ${isPlaying ? 'btn-danger' : 'btn-primary'} btn-sm`}
+                data-tip={isPlaying ? 'Pause on the current chord' : 'Walk through the chart at the chosen tempo'}
                 onClick={() => setIsPlaying((playing) => !playing)}
               >
                 {isPlaying ? '⏸ Pause' : '▶ Follow'}
               </button>
-              <button className="btn btn-outline btn-sm" onClick={() => goTo(position + 1)} aria-label="Next chord">
+              <button
+                className="btn btn-outline btn-sm"
+                data-tip="Skip to the next chord and hear it"
+                onClick={() => goTo(position + 1)}
+                aria-label="Next chord"
+              >
                 Next ▶
               </button>
-              <button className="btn btn-outline btn-sm" onClick={() => goTo(0)}>
+              <button
+                className="btn btn-outline btn-sm"
+                data-tip="Jump back to the first chord"
+                onClick={() => goTo(0)}
+              >
                 ⟲ Restart
               </button>
             </div>
@@ -233,6 +254,7 @@ export const SongFollower: React.FC = () => {
                   min="40"
                   max="200"
                   step="1"
+                  title="Drag to set how fast the follower advances"
                   value={bpm}
                   onChange={(event) => setBpm(Number(event.target.value))}
                 />
@@ -244,6 +266,7 @@ export const SongFollower: React.FC = () => {
                 <select
                   className="select-input"
                   value={beatsPerChord}
+                  title="How many beats each chord is held for"
                   onChange={(event) => setBeatsPerChord(Number(event.target.value))}
                 >
                   {BEATS_PER_CHORD_OPTIONS.map((beats) => (
@@ -256,13 +279,26 @@ export const SongFollower: React.FC = () => {
 
               <div className="song-field song-field--buttons">
                 <span>Transpose</span>
-                <button className="btn-nano" onClick={() => setTranspose((value) => value - 1)}>
+                <button
+                  className="btn-nano"
+                  data-tip="Transpose the whole song down a semitone"
+                  onClick={() => setTranspose((value) => value - 1)}
+                >
                   −1
                 </button>
-                <button className="btn-nano" onClick={() => setTranspose((value) => value + 1)}>
+                <button
+                  className="btn-nano"
+                  data-tip="Transpose the whole song up a semitone"
+                  onClick={() => setTranspose((value) => value + 1)}
+                >
                   +1
                 </button>
-                <button className="btn-nano" onClick={() => setTranspose(0)} disabled={transpose === 0}>
+                <button
+                  className="btn-nano"
+                  data-tip="Back to the key the chart was written in"
+                  onClick={() => setTranspose(0)}
+                  disabled={transpose === 0}
+                >
                   reset
                 </button>
                 <output>{transpose > 0 ? `+${transpose}` : transpose}</output>
@@ -271,6 +307,7 @@ export const SongFollower: React.FC = () => {
               <button
                 className={`btn btn-outline btn-sm ${soundOn ? '' : 'is-off'}`}
                 aria-pressed={soundOn}
+                data-tip={soundOn ? 'Silence the chords — the follower keeps highlighting' : 'Play each chord as it comes up'}
                 onClick={() => setSoundOn((value) => !value)}
               >
                 {soundOn ? '♪ Sound on' : '♪ Sound off'}

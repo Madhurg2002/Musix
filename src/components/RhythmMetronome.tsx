@@ -136,6 +136,11 @@ export const RhythmMetronome: React.FC = () => {
         </div>
         <button
           className={`btn ${isPlaying ? 'btn-danger' : 'btn-primary'}`}
+          data-tip={
+            isPlaying
+              ? 'Stop the click and settle the pendulum'
+              : `Start clicking at ${bpm} BPM`
+          }
           onClick={() => setIsPlaying(!isPlaying)}
           id="metronome-play-btn"
         >
@@ -286,7 +291,11 @@ export const RhythmMetronome: React.FC = () => {
                 <div
                   key={beatNum}
                   className={`beat-dot ${isActive ? 'dot-active' : ''} ${beatNum === 1 ? 'dot-downbeat' : ''}`}
-                  title={`Beat ${beatNum}`}
+                  data-tip={
+                    beatNum === 1
+                      ? `Beat 1 — the downbeat, accented (beat ${beatNum} of ${beatsPerMeasure})`
+                      : `Beat ${beatNum} of ${beatsPerMeasure}`
+                  }
                 >
                   <span className="dot-num">{beatNum}</span>
                 </div>
@@ -309,6 +318,7 @@ export const RhythmMetronome: React.FC = () => {
               min="40" max="220" step="1"
               value={bpm}
               className="bpm-slider"
+              title="Drag to set the tempo (40–220 BPM)"
               // CSS custom properties are not part of React's CSSProperties type.
               style={{ '--v': bpm } as unknown as React.CSSProperties}
               onChange={(e) => setBpm(Number(e.target.value))}
@@ -328,6 +338,7 @@ export const RhythmMetronome: React.FC = () => {
               <button
                 key={t}
                 className={`tempo-preset-btn ${bpm === t ? 'preset-active' : ''}`}
+                data-tip={`Jump to ${t} BPM (${getTempoName(t)})`}
                 onClick={() => setBpm(t)}
               >
                 {t}
@@ -342,6 +353,7 @@ export const RhythmMetronome: React.FC = () => {
               <select
                 className="select-input"
                 value={beatsPerMeasure}
+                title="Beats per measure — how many clicks before the pattern repeats"
                 onChange={(e) => { setBeatsPerMeasure(Number(e.target.value)); setCurrentBeat(1); }}
                 id="time-signature-select"
               >
@@ -357,6 +369,7 @@ export const RhythmMetronome: React.FC = () => {
 
             <button
               className="tap-btn"
+              data-tip="Tap this in time — the tempo follows your last six taps"
               onPointerDown={handleTapTempo}
               id="tap-tempo-btn"
             >

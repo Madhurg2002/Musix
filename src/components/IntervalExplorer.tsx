@@ -40,10 +40,18 @@ export const IntervalExplorer: React.FC = () => {
         </div>
 
         <div className="interval-actions">
-          <button className="btn btn-outline" onClick={() => playInterval('melodic')}>
+          <button
+            className="btn btn-outline"
+            data-tip="Play the two notes one after the other"
+            onClick={() => playInterval('melodic')}
+          >
             🎵 Play Melodic (One by One)
           </button>
-          <button className="btn btn-primary" onClick={() => playInterval('harmonic')}>
+          <button
+            className="btn btn-primary"
+            data-tip="Play both notes at once so the interval rings together"
+            onClick={() => playInterval('harmonic')}
+          >
             🎶 Play Harmonic (Together)
           </button>
         </div>
@@ -57,6 +65,7 @@ export const IntervalExplorer: React.FC = () => {
               <button
                 key={n}
                 className={`btn-note ${n === note1 ? 'selected' : ''}`}
+                data-tip={`Use ${n} as the starting note`}
                 onClick={() => setNote1(n)}
                 style={{ backgroundColor: n === note1 ? NOTE_COLORS[n] : undefined }}
               >
@@ -80,6 +89,7 @@ export const IntervalExplorer: React.FC = () => {
               <button
                 key={n}
                 className={`btn-note ${n === note2 ? 'selected' : ''}`}
+                data-tip={`Use ${n} as the target note`}
                 onClick={() => setNote2(n)}
                 style={{ backgroundColor: n === note2 ? NOTE_COLORS[n] : undefined }}
               >

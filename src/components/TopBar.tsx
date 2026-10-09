@@ -64,6 +64,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <select
             className="select-input sound-select"
             aria-label="Instrument sound"
+            title="Sound every tool plays — Auto follows the screen you are on"
             value={userOverride}
             onChange={(event) => handleInstrumentChange(event.target.value)}
           >

@@ -75,7 +75,11 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
         </div>
 
         {activeChord && (
-          <button className="btn btn-primary strum-btn" onClick={() => handleStrum()}>
+          <button
+            className="btn btn-primary strum-btn"
+            data-tip="Strum every pressed string in this shape"
+            onClick={() => handleStrum()}
+          >
             <span>🔊</span> Strum Chord
           </button>
         )}

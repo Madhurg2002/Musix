@@ -24,12 +24,18 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       </p>
 
       <nav className="musix-footer__links" aria-label="Project links">
-        <button type="button" className="footer-link" onClick={() => onNavigate('contact')}>
+        <button
+          type="button"
+          className="footer-link"
+          data-tip="Open the Contact screen"
+          onClick={() => onNavigate('contact')}
+        >
           Contact
         </button>
         <a
           className="footer-link"
           href={GITHUB_REPO_URL}
+          data-tip="Open the Musix source on GitHub"
           target="_blank"
           rel="noreferrer noopener"
         >
@@ -38,6 +44,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <a
           className="footer-link"
           href={`${GITHUB_REPO_URL}/blob/main/LICENSE`}
+          data-tip={`Read the full ${LICENSE_NAME} licence text`}
           target="_blank"
           rel="noreferrer noopener"
         >
@@ -46,6 +53,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <a
           className="footer-link"
           href="/robots.txt"
+          data-tip="See what crawlers may index on this site"
           target="_blank"
           rel="noreferrer noopener"
         >

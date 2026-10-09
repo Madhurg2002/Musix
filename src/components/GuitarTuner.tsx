@@ -200,6 +200,7 @@ export const GuitarTuner: React.FC = () => {
           <select
             className="select-input preset-select"
             value={selectedPresetIndex}
+            title="Tuning preset — sets the pitch every string should match"
             onChange={(e) => setSelectedPresetIndex(Number(e.target.value))}
           >
             {TUNING_PRESETS.map((p, idx) => (
@@ -211,17 +212,30 @@ export const GuitarTuner: React.FC = () => {
 
           <button
             className={`btn ${autoDetectMode ? 'btn-primary' : 'btn-outline'}`}
+            data-tip={
+              autoDetectMode
+                ? 'Auto: the meter follows whichever string you pluck'
+                : 'Manual: locked to one string until you pick another'
+            }
             onClick={() => setAutoDetectMode(!autoDetectMode)}
           >
             {autoDetectMode ? '⚡ Auto String Detection' : '🔒 Manual Lock String'}
           </button>
 
           {!isMicListening ? (
-            <button className="btn btn-accent" onClick={startMic}>
+            <button
+              className="btn btn-accent"
+              data-tip="Listen through the microphone and draw your pitch on the meter"
+              onClick={startMic}
+            >
               🎙️ Enable Microphone
             </button>
           ) : (
-            <button className="btn btn-danger" onClick={stopMic}>
+            <button
+              className="btn btn-danger"
+              data-tip="Stop listening and release the microphone"
+              onClick={stopMic}
+            >
               Stop Mic
             </button>
           )}
@@ -326,6 +340,7 @@ export const GuitarTuner: React.FC = () => {
                 <div
                   key={str.index}
                   className={`tuning-peg-card ${isActive ? 'active-peg' : ''}`}
+                  data-tip={`Play the reference tone — string ${str.index} (${str.note}${str.octave}) at ${str.frequency} Hz`}
                   onClick={() => str && handlePegClickExt(str)}
                 >
                   <div className="peg-info">
@@ -366,6 +381,7 @@ export const GuitarTuner: React.FC = () => {
                 <div
                   key={str.index}
                   className={`tuning-peg-card ${isActive ? 'active-peg' : ''}`}
+                  data-tip={`Play the reference tone — string ${str.index} (${str.note}${str.octave}) at ${str.frequency} Hz`}
                   onClick={() => str && handlePegClickExt(str)}
                 >
                   <div className="peg-circle-badge">

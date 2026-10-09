@@ -43,6 +43,7 @@ const CardFretboard: React.FC<{
           max={20}
           step={1}
           value={position}
+          title="Slide the fingering up the neck (0 = the shape as written)"
           aria-label={`${safeChord.name} fret position`}
           onChange={(event) => onPositionChange(Number(event.currentTarget.value))}
         />
@@ -236,6 +237,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
             <select
               className="select-input"
               value={selectedRootToAdd}
+              title="Root note of the chord you are adding"
               onChange={(e) => setSelectedRootToAdd(e.target.value as NoteName)}
             >
               {ALL_NOTES.map((n: NoteName) => (
@@ -248,6 +250,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
             <select
               className="select-input"
               value={selectedTypeToAdd}
+              title="Chord quality — major, minor, or a seventh"
               onChange={(e) => setSelectedTypeToAdd(e.target.value)}
             >
               <option value="Major">Major</option>
@@ -256,18 +259,30 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
               <option value="Major 7th">Major 7th</option>
             </select>
 
-            <button className="btn btn-accent" onClick={handleAddCard}>
+            <button
+              className="btn btn-accent"
+              data-tip={`Add ${selectedRootToAdd} ${selectedTypeToAdd} as another card`}
+              onClick={handleAddCard}
+            >
               + Add Card
             </button>
           </div>
 
           {onOpenTuner && (
-            <button className="btn btn-outline" onClick={onOpenTuner}>
+            <button
+              className="btn btn-outline"
+              data-tip="Jump to the microphone tuner"
+              onClick={onOpenTuner}
+            >
               🎯 Open Tuner
             </button>
           )}
 
-          <button className="btn btn-primary" onClick={handlePlayProgression}>
+          <button
+            className="btn btn-primary"
+            data-tip="Strum every card in order so you can hear them as a progression"
+            onClick={handlePlayProgression}
+          >
             ▶ Play Progression
           </button>
         </div>
@@ -309,7 +324,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                     draggable
                     aria-label={`Drag to reorder ${chord.name}`}
                     aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
-                    title="Drag to reorder; Alt+Up/Down also works"
+                    data-tip="Drag to reorder — Alt+↑/↓ also works"
                     onDragStart={(event) => {
                       event.dataTransfer.setData('text/plain', item.id);
                       event.dataTransfer.effectAllowed = 'move';
@@ -336,14 +351,14 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                     className="btn-icon"
                     type="button"
                     aria-label={`Duplicate ${chord.name}`}
-                    title="Duplicate chord card"
+                    data-tip="Duplicate this card"
                     onClick={() => handleDuplicateCard(item.id)}
                   >
                     ⧉
                   </button>
                   <button
                     className="btn-icon"
-                    title={isMuted ? 'Unmute' : 'Mute'}
+                    data-tip={isMuted ? 'Unmute — let this card play again' : 'Mute — skip this card during playback'}
                     type="button"
                     onClick={() =>
                       setCards(
@@ -357,7 +372,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                     className="btn-icon close-btn"
                     type="button"
                     aria-label={`Remove ${chord.name}`}
-                    title="Remove Card"
+                    data-tip="Remove this card"
                     onClick={() => handleRemoveCard(item.id)}
                   >
                     ✕
@@ -396,14 +411,14 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                     <button
                       className="btn-nano"
                       onClick={() => handleTranspose(item.id, -1)}
-                      title="Key -1 Semitone"
+                      data-tip="Down one semitone — the shape moves with the name"
                     >
                       -1
                     </button>
                     <button
                       className="btn-nano"
                       onClick={() => handleTranspose(item.id, 1)}
-                      title="Key +1 Semitone"
+                      data-tip="Up one semitone — the shape moves with the name"
                     >
                       +1
                     </button>
@@ -414,12 +429,16 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                       <button
                         className="btn btn-outline btn-sm"
                         onClick={() => onSelectChordForFretboard(chord)}
-                        title={`Open ${chord.name} on the full fretboard`}
+                        data-tip={`Show ${chord.name} on the full fretboard`}
                       >
                         🎸 Open Fretboard
                       </button>
                     )}
-                    <button className="btn btn-primary btn-sm" onClick={() => handlePlayChord(item)}>
+                    <button
+                      className="btn btn-primary btn-sm"
+                      data-tip="Strum this voicing as it is drawn"
+                      onClick={() => handlePlayChord(item)}
+                    >
                       ▶ Play Audio
                     </button>
                   </div>

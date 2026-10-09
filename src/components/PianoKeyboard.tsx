@@ -52,6 +52,7 @@ export const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
             <div
               key={i}
               className={keyClass}
+              data-tip={`${noteName}${Math.floor(midi / 12) - 1} · ${midiToFrequency(midi).toFixed(1)} Hz${isActive ? ' · in the current scale' : ''}`}
               onClick={() => handleKeyClick(midi)}
               style={{ borderColor: isActive ? noteColorFor(noteName) : undefined }}
             >
