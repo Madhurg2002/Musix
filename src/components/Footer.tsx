@@ -43,21 +43,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         </a>
         <a
           className="footer-link"
-          href={`${GITHUB_REPO_URL}/blob/main/LICENSE`}
+          href="/LICENSE"
           data-tip={`Read the full ${LICENSE_NAME} licence text`}
           target="_blank"
           rel="noreferrer noopener"
         >
           {LICENSE_NAME} licence
-        </a>
-        <a
-          className="footer-link"
-          href="/robots.txt"
-          data-tip="See what crawlers may index on this site"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          robots.txt
         </a>
       </nav>
 
