@@ -5,6 +5,7 @@ import { COMPREHENSIVE_CHORDS } from './data/chordsData';
 import { Header } from './components/Header';
 import { TopBar } from './components/TopBar';
 import { Footer } from './components/Footer';
+import { CookieConsent } from './components/CookieConsent';
 import {
   DEFAULT_ROUTE_ID,
   ROUTE_IDS,
@@ -67,6 +68,8 @@ export function App() {
   const [userOverride, setUserOverride] = useState<InstrumentType | 'auto'>(() =>
     readPreference(PREFERENCE_KEYS.instrument, 'auto' as const, isInstrumentChoice)
   );
+  // True while the footer has asked to reopen the preference-cookie panel.
+  const [cookiePanelOpen, setCookiePanelOpen] = useState<boolean>(false);
 
   const route = routeFor(activeTab);
 
@@ -206,7 +209,15 @@ export function App() {
           </section>
         </main>
 
-        <Footer onNavigate={setActiveTab} />
+        <Footer
+          onNavigate={setActiveTab}
+          onCookieSettings={() => setCookiePanelOpen(true)}
+        />
+
+        <CookieConsent
+          forceOpen={cookiePanelOpen}
+          onClose={() => setCookiePanelOpen(false)}
+        />
       </div>
     </div>
   );

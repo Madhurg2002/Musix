@@ -1,5 +1,8 @@
 // Tests for the preference store. Storage is stubbed the same way as in router.test.ts, so
-// the validation rules can be exercised without a DOM.
+// the validation rules can be exercised without a DOM. Preferences now live in cookies and
+// are only written with permission, so this file also stubs a `document.cookie` jar and
+// grants permission for the store's own tests (the permission gate itself is covered in
+// consent.test.ts).
 
 import {
   PREFERENCE_KEYS,
@@ -14,6 +17,7 @@ import {
   readPreference,
   writePreference,
 } from './preferences';
+import { grantConsent } from './consent';
 
 const store = new Map<string, string>();
 
@@ -28,6 +32,28 @@ const stubLocalStorage = {
 };
 
 (globalThis as unknown as { localStorage: unknown }).localStorage = stubLocalStorage;
+
+// Cookie jar stub: assigning adds or replaces a cookie in an accumulating jar, and
+// Max-Age=0 removes it — the two pieces of real document.cookie behaviour the store uses.
+const jar = new Map<string, string>();
+
+(globalThis as unknown as { document: unknown }).document = {
+  get cookie(): string {
+    return [...jar].map(([name, value]) => `${name}=${value}`).join('; ');
+  },
+  set cookie(assignment: string) {
+    const [pair = '', ...attributes] = assignment.split(';').map((part) => part.trim());
+    const separator = pair.indexOf('=');
+    const name = pair.slice(0, separator);
+    const value = pair.slice(separator + 1);
+    const expired = attributes.some((attribute) => /^max-age=0$/i.test(attribute));
+    if (expired) jar.delete(name);
+    else jar.set(name, value);
+  },
+};
+
+// The store's own tests run as if the learner already allowed preference storage.
+jar.set('musix.consent', 'granted');
 
 describe('preference store', () => {
   test('round-trips a stored value', () => {
@@ -114,5 +140,45 @@ describe('preference validators', () => {
     expect(isBoolean('false')).toBe(false);
     expect(isText('')).toBe(true);
     expect(isText(0)).toBe(false);
+  });
+});
+
+describe('cookie-backed preference storage', () => {
+  test('a granted preference is written to a first-party cookie', () => {
+    writePreference(PREFERENCE_KEYS.songTranspose, 3);
+    expect(document.cookie).toContain('musix.pref.songTranspose=');
+    expect(readPreference(PREFERENCE_KEYS.songTranspose, 0, isIntegerInRange(-11, 11))).toBe(3);
+  });
+
+  test('a value too big for a cookie falls back to local storage', () => {
+    const chart = `[Verse]\n${'C G Am F '.repeat(600)}`; // ~5.4 KB, over the cookie cap
+    expect(chart.length).toBeGreaterThan(3500);
+
+    writePreference(PREFERENCE_KEYS.songChart, chart);
+    expect(store.has('musix.pref.songChart')).toBe(true);
+    expect(document.cookie).not.toContain('musix.pref.songChart=');
+    expect(readPreference(PREFERENCE_KEYS.songChart, '', isText)).toBe(chart);
+  });
+
+  test('nothing is written before permission, and granting releases it', () => {
+    jar.delete('musix.consent'); // back to "not asked yet"
+    store.clear();
+
+    writePreference(PREFERENCE_KEYS.root, 'G');
+    expect(document.cookie).not.toContain('musix.pref.root=');
+    expect(readPreference(PREFERENCE_KEYS.root, 'C', isNoteName)).toBe('C');
+
+    grantConsent();
+    expect(document.cookie).toContain('musix.pref.root=');
+    expect(readPreference(PREFERENCE_KEYS.root, 'C', isNoteName)).toBe('G');
+  });
+
+  test('clearPreference removes both the cookie and the overflow copy', () => {
+    writePreference(PREFERENCE_KEYS.songTranspose, -2);
+    expect(document.cookie).toContain('musix.pref.songTranspose=');
+
+    clearPreference(PREFERENCE_KEYS.songTranspose);
+    expect(document.cookie).not.toContain('musix.pref.songTranspose=');
+    expect(readPreference(PREFERENCE_KEYS.songTranspose, 0, isIntegerInRange(-11, 11))).toBe(0);
   });
 });

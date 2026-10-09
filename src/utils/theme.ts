@@ -3,6 +3,12 @@
 // A theme is just a palette: every tint in style.css derives from the channel tokens
 // (--accent-rgb, --overlay-rgb, …), so switching `data-theme` on <html> restyles the whole
 // app without touching component markup.
+//
+// Remembering the choice is preference storage, so it goes through the same permission
+// gate as everything else: the theme always applies for the session, but it is only saved
+// once the learner allows preference cookies.
+
+import { hasConsent, whenGranted } from './consent';
 
 export const THEMES = [
   { id: 'studio', label: 'Analog Studio' },
@@ -22,6 +28,8 @@ function isThemeId(value: unknown): value is ThemeId {
 
 /** Read the saved theme, falling back to the default when storage is empty or blocked. */
 export function readTheme(): ThemeId {
+  // Before permission is given nothing was stored, so the default is the honest answer.
+  if (!hasConsent()) return DEFAULT_THEME;
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     return isThemeId(stored) ? stored : DEFAULT_THEME;
@@ -30,12 +38,14 @@ export function readTheme(): ThemeId {
   }
 }
 
-/** Apply a theme to the document and remember the choice. */
+/** Apply a theme to the document and remember the choice once permission exists. */
 export function applyTheme(id: ThemeId): void {
   document.documentElement.dataset.theme = id;
-  try {
-    localStorage.setItem(STORAGE_KEY, id);
-  } catch {
-    // Private mode can block storage; the theme still applies for this session.
-  }
+  whenGranted(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, id);
+    } catch {
+      // Private mode can block storage; the theme still applies for this session.
+    }
+  });
 }

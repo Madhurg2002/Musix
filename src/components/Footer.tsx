@@ -9,13 +9,15 @@ import {
 interface FooterProps {
   /** Navigate to an in-app route, e.g. the Contact screen. */
   onNavigate: (routeId: string) => void;
+  /** Reopen the preference-cookie panel. */
+  onCookieSettings?: () => void;
 }
 
 /**
  * The footer is the project's identity strip: it carries the licence, the source link, and
  * the way to reach the author, so none of that has to be hunted for inside the tools.
  */
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate, onCookieSettings }) => {
   return (
     <footer className="musix-footer">
       <p className="musix-footer__tagline">
@@ -50,6 +52,16 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         >
           {LICENSE_NAME} licence
         </a>
+        {onCookieSettings && (
+          <button
+            type="button"
+            className="footer-link"
+            data-tip="Review what Musix remembers on this device"
+            onClick={onCookieSettings}
+          >
+            Cookie settings
+          </button>
+        )}
       </nav>
 
       <p className="musix-footer__legal">
