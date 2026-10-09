@@ -37,7 +37,9 @@ export function App() {
   const [activeTab, setActiveTabState] = useState<string>(() => getTabFromHash());
   const [selectedRoot, setSelectedRoot] = useState<NoteName>('C');
   const [activeChordForFretboard, setActiveChordForFretboard] = useState<ChordShape | null>(COMPREHENSIVE_CHORDS[0] ?? null);
-  const [selectedVisualizer, setSelectedVisualizer] = useState<'piano' | 'guitar'>('piano');
+  const [selectedVisualizer, setSelectedVisualizer] = useState<'piano' | 'guitar'>(() =>
+    getTabFromHash() === 'fretboard' ? 'guitar' : 'piano'
+  );
   const [activeScaleNotes, setActiveScaleNotes] = useState<NoteName[]>(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
   // 'auto' = follow tab defaults; anything else = user explicitly chose an instrument
   const [userOverride, setUserOverride] = useState<InstrumentType | 'auto'>('auto');
@@ -56,10 +58,18 @@ export function App() {
     window.location.hash = tab;
   };
 
+  const handleVisualizerChange = (visualizer: 'piano' | 'guitar') => {
+    setSelectedVisualizer(visualizer);
+    if (visualizer === 'piano' && activeTab === 'fretboard') setActiveTab('piano');
+    if (visualizer === 'guitar' && activeTab === 'piano') setActiveTab('fretboard');
+  };
+
   useEffect(() => {
     const handleHashChange = () => {
       const currentTab = getTabFromHash();
       setActiveTabState(currentTab);
+      if (currentTab === 'fretboard') setSelectedVisualizer('guitar');
+      if (currentTab === 'piano') setSelectedVisualizer('piano');
     };
 
     window.addEventListener('hashchange', handleHashChange);
@@ -73,6 +83,7 @@ export function App() {
 
   const handleSelectChordForFretboard = (chord: ChordShape) => {
     setActiveChordForFretboard(chord);
+    setSelectedVisualizer('guitar');
     setActiveTab('fretboard');
   };
 
@@ -83,7 +94,7 @@ export function App() {
         userOverride={userOverride}
         setUserOverride={setUserOverride}
         selectedVisualizer={selectedVisualizer}
-        setSelectedVisualizer={setSelectedVisualizer}
+        setSelectedVisualizer={handleVisualizerChange}
       />
 
       <main className="main-content-container">

@@ -15,15 +15,50 @@ import {
 } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 
-const CardFretboard: React.FC<{ chord: ChordShape; voicingOffset?: number }> = ({
-  chord,
-  voicingOffset = 0,
-}) => {
+function getChordPosition(chord: ChordShape, position: number): { frets: number[]; fingers: (number | string | undefined)[] } {
   const safeChord = asSafeChord(chord);
-  const frets = safeChord.frets.map((fret) => fret >= 0 ? fret + voicingOffset : fret);
-  const fingers = safeChord.fingers?.map((finger, index) =>
-    safeChord.frets[index] === 0 && voicingOffset > 0 ? 1 : finger
-  );
+  if (position === 0) {
+    return {
+      frets: [...safeChord.frets],
+      fingers: safeChord.frets.map((_, index) => safeChord.fingers?.[index]),
+    };
+  }
+
+  const chordNotes = safeChord.notes.map((note) => ALL_NOTES.indexOf(note)).filter((note) => note >= 0);
+  const chordNoteSet = new Set(chordNotes);
+  const minimumFret = Math.max(0, position - 2);
+  const maximumFret = Math.min(20, position + 2);
+  const frets = GUITAR_STRINGS.map((_, stringIndex) => {
+    const preferredNote = chordNotes[stringIndex % chordNotes.length];
+    let bestFret = -1;
+    let bestScore = Number.POSITIVE_INFINITY;
+
+    for (let fret = minimumFret; fret <= maximumFret; fret += 1) {
+      const note = getFretMidi(stringIndex, fret) % 12;
+      if (!chordNoteSet.has(note)) continue;
+
+      const score = Math.abs(fret - position) + (note === preferredNote ? 0 : 0.25);
+      if (score < bestScore) {
+        bestFret = fret;
+        bestScore = score;
+      }
+    }
+
+    return bestFret;
+  });
+  const pressedFrets = [...new Set(frets.filter((fret) => fret > 0))].sort((left, right) => left - right);
+  const fingers = frets.map((fret) => fret <= 0 ? 0 : Math.min(pressedFrets.indexOf(fret) + 1, 4));
+
+  return { frets, fingers };
+}
+
+const CardFretboard: React.FC<{
+  chord: ChordShape;
+  position: number;
+  onPositionChange: (position: number) => void;
+}> = ({ chord, position, onPositionChange }) => {
+  const safeChord = asSafeChord(chord);
+  const { frets, fingers } = getChordPosition(chord, position);
   const pressedFrets = frets.filter((fret) => fret > 0);
   const lowestFret = pressedFrets.length > 0 ? Math.min(...pressedFrets) : 1;
   const highestFret = Math.max(0, ...pressedFrets);
@@ -34,10 +69,32 @@ const CardFretboard: React.FC<{ chord: ChordShape; voicingOffset?: number }> = (
   const fretNumbers = Array.from({ length: fretCount }, (_, index) => firstFret + index);
 
   return (
-    <div className="card-fretboard" role="img" aria-label={`${safeChord.name} guitar fingering, high E to low E`}>
+    <div className="card-fretboard">
       <div className="card-fretboard-heading">
-        <span>{voicingOffset > 0 ? 'Octave higher voicing' : 'Guitar fingering'}</span>
-        {firstFret > 1 && <span>Frets {firstFret}-{firstFret + fretCount - 1}</span>}
+        <span>{position === 0 ? 'Original fingering' : `Position ${position} / 20`}</span>
+        <div className="card-fretboard-controls">
+          {firstFret > 1 && <span>Frets {firstFret}-{firstFret + fretCount - 1}</span>}
+          <button
+            className="btn-icon"
+            type="button"
+            aria-label={`Move ${safeChord.name} to fret position ${Math.max(0, position - 1)}`}
+            title="Previous fret position"
+            disabled={position === 0}
+            onClick={() => onPositionChange(Math.max(0, position - 1))}
+          >
+            ‹
+          </button>
+          <button
+            className="btn-icon"
+            type="button"
+            aria-label={`Move ${safeChord.name} to fret position ${Math.min(20, position + 1)}`}
+            title="Next fret position"
+            disabled={position === 20}
+            onClick={() => onPositionChange(Math.min(20, position + 1))}
+          >
+            ›
+          </button>
+        </div>
       </div>
       <div
         className="card-fretboard-numbers"
@@ -92,7 +149,8 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
 
   const [selectedRootToAdd, setSelectedRootToAdd] = useState<NoteName>('G');
   const [selectedTypeToAdd, setSelectedTypeToAdd] = useState<string>('Major');
-  const [selectedVoicing, setSelectedVoicing] = useState<'standard' | 'octave'>('standard');
+  const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
+  const [dropTargetCardId, setDropTargetCardId] = useState<string | null>(null);
 
   // Add new card
   const handleAddCard = () => {
@@ -101,7 +159,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
       id: `card-${Date.now()}`,
       chord: newChord,
       transposeOffset: 0,
-      voicingOffset: selectedVoicing === 'octave' ? 12 : 0,
+      fretPosition: 0,
     };
     setCards([...cards, newCard]);
   };
@@ -109,6 +167,49 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
   // Remove card
   const handleRemoveCard = (id: string) => {
     setCards(cards.filter((c) => c.id !== id));
+  };
+
+  const handleDuplicateCard = (id: string) => {
+    const cardIndex = cards.findIndex((card) => card.id === id);
+    if (cardIndex < 0) return;
+
+    const duplicate = { ...cards[cardIndex]!, id: `card-${crypto.randomUUID()}` };
+    setCards([...cards.slice(0, cardIndex + 1), duplicate, ...cards.slice(cardIndex + 1)]);
+  };
+
+  const handleMoveCard = (id: string, offset: -1 | 1) => {
+    setCards((currentCards) => {
+      const index = currentCards.findIndex((card) => card.id === id);
+      const targetIndex = index + offset;
+      if (index < 0 || targetIndex < 0 || targetIndex >= currentCards.length) return currentCards;
+
+      const reorderedCards = [...currentCards];
+      [reorderedCards[index], reorderedCards[targetIndex]] = [reorderedCards[targetIndex]!, reorderedCards[index]!];
+      return reorderedCards;
+    });
+  };
+
+  const handleReorderCard = (sourceId: string, targetId: string) => {
+    if (sourceId === targetId) return;
+
+    setCards((currentCards) => {
+      const sourceIndex = currentCards.findIndex((card) => card.id === sourceId);
+      const targetIndex = currentCards.findIndex((card) => card.id === targetId);
+      if (sourceIndex < 0 || targetIndex < 0) return currentCards;
+
+      const reorderedCards = [...currentCards];
+      const [movedCard] = reorderedCards.splice(sourceIndex, 1);
+      if (!movedCard) return currentCards;
+      const insertionIndex = sourceIndex < targetIndex ? targetIndex - 1 : targetIndex;
+      reorderedCards.splice(insertionIndex, 0, movedCard);
+      return reorderedCards;
+    });
+  };
+
+  const handleCardPositionChange = (id: string, position: number) => {
+    setCards((currentCards) => currentCards.map((card) =>
+      card.id === id ? { ...card, fretPosition: position } : card
+    ));
   };
 
   // Transpose a card
@@ -136,12 +237,12 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
   const handlePlayChord = (card: ChordCardItem) => {
     const freqs: number[] = [];
     const notes = asSafeChord(card.chord).notes;
-    const frets = asSafeChord(card.chord).frets;
+    const { frets } = getChordPosition(card.chord, card.fretPosition ?? 0);
 
     frets.forEach((fret: number, sIdx: number) => {
       if (fret >= 0) {
         const midi = getFretMidi(sIdx, fret);
-        freqs.push(midiToFrequency(midi + card.transposeOffset + (card.voicingOffset ?? 0)));
+        freqs.push(midiToFrequency(midi + card.transposeOffset));
       }
     });
 
@@ -149,7 +250,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
     if (freqs.length === 0) {
       notes.forEach((n: NoteName, i: number) => {
         const idx = ALL_NOTES.indexOf(n);
-        freqs.push(midiToFrequency(60 + idx + i * 3 + card.transposeOffset + (card.voicingOffset ?? 0)));
+        freqs.push(midiToFrequency(60 + idx + i * 3 + card.transposeOffset));
       });
     }
     soundEngine.strumChord(freqs, 0.07, 'acoustic-guitar');
@@ -202,16 +303,6 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
               <option value="Major 7th">Major 7th</option>
             </select>
 
-            <select
-              className="select-input"
-              aria-label="Guitar voicing"
-              value={selectedVoicing}
-              onChange={(e) => setSelectedVoicing(e.target.value as 'standard' | 'octave')}
-            >
-              <option value="standard">Original position</option>
-              <option value="octave">Octave higher</option>
-            </select>
-
             <button className="btn btn-accent" onClick={handleAddCard}>
               + Add Card
             </button>
@@ -234,14 +325,73 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
         {cards.map((item, index) => {
           const { chord, isMuted } = item;
           return (
-            <div key={item.id} className={`chord-card glass-card ${isMuted ? 'muted-card' : ''}`}>
+            <div
+              key={item.id}
+              className={`chord-card glass-card ${isMuted ? 'muted-card' : ''} ${draggedCardId === item.id ? 'dragging' : ''} ${dropTargetCardId === item.id ? 'drag-over' : ''}`}
+              onDragOver={(event) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'move';
+                setDropTargetCardId(item.id);
+              }}
+              onDragLeave={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                  setDropTargetCardId(null);
+                }
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                const sourceId = event.dataTransfer.getData('text/plain');
+                if (sourceId) handleReorderCard(sourceId, item.id);
+                setDraggedCardId(null);
+                setDropTargetCardId(null);
+              }}
+            >
               <div className="card-top-bar">
                 <span className="card-index-badge">#{index + 1}</span>
                 <span className="difficulty-tag">{chord.difficulty}</span>
                 <div className="card-window-controls">
                   <button
+                    className="btn-icon card-drag-handle"
+                    type="button"
+                    draggable
+                    aria-label={`Drag to reorder ${chord.name}`}
+                    aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
+                    title="Drag to reorder; Alt+Up/Down also works"
+                    onDragStart={(event) => {
+                      event.dataTransfer.setData('text/plain', item.id);
+                      event.dataTransfer.effectAllowed = 'move';
+                      setDraggedCardId(item.id);
+                    }}
+                    onDragEnd={() => {
+                      setDraggedCardId(null);
+                      setDropTargetCardId(null);
+                    }}
+                    onKeyDown={(event) => {
+                      if (!event.altKey) return;
+                      if (event.key === 'ArrowUp') {
+                        event.preventDefault();
+                        handleMoveCard(item.id, -1);
+                      } else if (event.key === 'ArrowDown') {
+                        event.preventDefault();
+                        handleMoveCard(item.id, 1);
+                      }
+                    }}
+                  >
+                    ⠿
+                  </button>
+                  <button
+                    className="btn-icon"
+                    type="button"
+                    aria-label={`Duplicate ${chord.name}`}
+                    title="Duplicate chord card"
+                    onClick={() => handleDuplicateCard(item.id)}
+                  >
+                    ⧉
+                  </button>
+                  <button
                     className="btn-icon"
                     title={isMuted ? 'Unmute' : 'Mute'}
+                    type="button"
                     onClick={() =>
                       setCards(
                         cards.map((c) => (c.id === item.id ? { ...c, isMuted: !c.isMuted } : c))
@@ -252,6 +402,8 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                   </button>
                   <button
                     className="btn-icon close-btn"
+                    type="button"
+                    aria-label={`Remove ${chord.name}`}
                     title="Remove Card"
                     onClick={() => handleRemoveCard(item.id)}
                   >
@@ -277,7 +429,11 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                   ))}
                 </div>
 
-                <CardFretboard chord={chord} voicingOffset={item.voicingOffset} />
+                <CardFretboard
+                  chord={chord}
+                  position={item.fretPosition ?? 0}
+                  onPositionChange={(position) => handleCardPositionChange(item.id, position)}
+                />
 
                 {/* Transpose & Action Footer */}
                 <div className="chord-card-actions">

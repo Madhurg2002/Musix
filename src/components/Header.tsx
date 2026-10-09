@@ -49,6 +49,10 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'rhythm', label: '⏱️ Rhythm & Metronome' },
     { id: 'guide', label: '📚 Beginner Guide' },
   ];
+  const visibleTabs = tabs.filter((tab) =>
+    (tab.id !== 'piano' || selectedVisualizer === 'piano') &&
+    (tab.id !== 'fretboard' || selectedVisualizer === 'guitar')
+  );
 
   // The currently active instrument (auto resolved or user-picked)
   const effectiveInstrument: InstrumentType =
@@ -82,7 +86,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <nav className="header-nav">
-        {tabs.map((tab) => (
+        {visibleTabs.map((tab) => (
           <button
             key={tab.id}
             className={`nav-btn ${activeTab === tab.id ? 'active' : ''}`}
@@ -118,29 +122,27 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {activeTab === 'scales' && (
-        <div className="header-visualizer-control" role="group" aria-label="Scale visualizer">
-          <span className="header-visualizer-label">Show</span>
-          <div className="header-visualizer-options">
-            <button
-              type="button"
-              aria-pressed={selectedVisualizer === 'piano'}
-              className={selectedVisualizer === 'piano' ? 'active' : ''}
-              onClick={() => setSelectedVisualizer('piano')}
-            >
-              Piano
-            </button>
-            <button
-              type="button"
-              aria-pressed={selectedVisualizer === 'guitar'}
-              className={selectedVisualizer === 'guitar' ? 'active' : ''}
-              onClick={() => setSelectedVisualizer('guitar')}
-            >
-              Guitar
-            </button>
-          </div>
+      <div className="header-visualizer-control" role="group" aria-label="Choose instrument view">
+        <span className="header-visualizer-label">Show</span>
+        <div className="header-visualizer-options">
+          <button
+            type="button"
+            aria-pressed={selectedVisualizer === 'piano'}
+            className={selectedVisualizer === 'piano' ? 'active' : ''}
+            onClick={() => setSelectedVisualizer('piano')}
+          >
+            Piano
+          </button>
+          <button
+            type="button"
+            aria-pressed={selectedVisualizer === 'guitar'}
+            className={selectedVisualizer === 'guitar' ? 'active' : ''}
+            onClick={() => setSelectedVisualizer('guitar')}
+          >
+            Guitar
+          </button>
         </div>
-      )}
+      </div>
     </header>
   );
 };

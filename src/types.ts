@@ -65,5 +65,5 @@ export interface ChordCardItem {
   chord: ChordShape;
   isMuted?: boolean;
   transposeOffset: number; // semitones shift
-  voicingOffset?: 0 | 12;
+  fretPosition?: number;
 }

@@ -549,6 +549,42 @@ body {
   text-transform: uppercase;
 }
 
+.card-fretboard-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.card-fretboard-controls .btn-icon:disabled,
+.card-window-controls .btn-icon:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.card-drag-handle {
+  cursor: grab;
+  touch-action: none;
+}
+
+.card-drag-handle:active {
+  cursor: grabbing;
+}
+
+.chord-card.dragging {
+  opacity: 0.55;
+}
+
+.chord-card.drag-over {
+  outline: 2px dashed var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+.card-fretboard-controls .btn-icon {
+  padding: 0 3px;
+  line-height: 1;
+}
+
 .card-fretboard-numbers,
 .card-fretboard-string-row {
   display: grid;
