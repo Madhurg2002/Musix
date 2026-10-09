@@ -549,17 +549,44 @@ body {
   text-transform: uppercase;
 }
 
-.card-fretboard-controls {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-}
-
-.card-fretboard-controls .btn-icon:disabled,
 .card-window-controls .btn-icon:disabled {
   cursor: not-allowed;
   opacity: 0.35;
+}
+
+.card-fret-position-control {
+  display: grid;
+  gap: 3px;
+  margin: 0 0 8px;
+}
+
+.card-fret-position-control label,
+.card-fret-position-endpoints {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.card-fret-position-control output {
+  color: var(--accent-cyan);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-fret-position-control input {
+  width: 100%;
+  min-width: 0;
+  height: 18px;
+  accent-color: var(--accent-cyan);
+  cursor: pointer;
+}
+
+.card-fret-position-endpoints {
+  color: var(--text-muted);
+  font-size: 10px;
 }
 
 .card-drag-handle {
@@ -578,11 +605,6 @@ body {
 .chord-card.drag-over {
   outline: 2px dashed var(--accent-cyan);
   outline-offset: 2px;
-}
-
-.card-fretboard-controls .btn-icon {
-  padding: 0 3px;
-  line-height: 1;
 }
 
 .card-fretboard-numbers,

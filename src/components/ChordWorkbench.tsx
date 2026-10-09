@@ -54,9 +54,10 @@ function getChordPosition(chord: ChordShape, position: number): { frets: number[
 
 const CardFretboard: React.FC<{
   chord: ChordShape;
+  cardId: string;
   position: number;
   onPositionChange: (position: number) => void;
-}> = ({ chord, position, onPositionChange }) => {
+}> = ({ chord, cardId, position, onPositionChange }) => {
   const safeChord = asSafeChord(chord);
   const { frets, fingers } = getChordPosition(chord, position);
   const pressedFrets = frets.filter((fret) => fret > 0);
@@ -71,29 +72,27 @@ const CardFretboard: React.FC<{
   return (
     <div className="card-fretboard">
       <div className="card-fretboard-heading">
-        <span>{position === 0 ? 'Original fingering' : `Position ${position} / 20`}</span>
-        <div className="card-fretboard-controls">
-          {firstFret > 1 && <span>Frets {firstFret}-{firstFret + fretCount - 1}</span>}
-          <button
-            className="btn-icon"
-            type="button"
-            aria-label={`Move ${safeChord.name} to fret position ${Math.max(0, position - 1)}`}
-            title="Previous fret position"
-            disabled={position === 0}
-            onClick={() => onPositionChange(Math.max(0, position - 1))}
-          >
-            ‹
-          </button>
-          <button
-            className="btn-icon"
-            type="button"
-            aria-label={`Move ${safeChord.name} to fret position ${Math.min(20, position + 1)}`}
-            title="Next fret position"
-            disabled={position === 20}
-            onClick={() => onPositionChange(Math.min(20, position + 1))}
-          >
-            ›
-          </button>
+        <span>Guitar fingering</span>
+        {firstFret > 1 && <span>Frets {firstFret}-{firstFret + fretCount - 1}</span>}
+      </div>
+      <div className="card-fret-position-control">
+        <label htmlFor={`fret-position-${cardId}`}>
+          <span>Fret position</span>
+          <output>{position === 0 ? 'Original' : `Fret ${position}`}</output>
+        </label>
+        <input
+          id={`fret-position-${cardId}`}
+          type="range"
+          min={0}
+          max={20}
+          step={1}
+          value={position}
+          aria-label={`${safeChord.name} fret position`}
+          onChange={(event) => onPositionChange(Number(event.currentTarget.value))}
+        />
+        <div className="card-fret-position-endpoints" aria-hidden="true">
+          <span>Original</span>
+          <span>Fret 20</span>
         </div>
       </div>
       <div
@@ -431,6 +430,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
 
                 <CardFretboard
                   chord={chord}
+                  cardId={item.id}
                   position={item.fretPosition ?? 0}
                   onPositionChange={(position) => handleCardPositionChange(item.id, position)}
                 />
