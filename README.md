@@ -143,4 +143,14 @@ If you add content:
 
 ## License
 
-MIT
+MIT — see [`LICENSE`](LICENSE). Copyright (c) 2026 Madhurg2002.
+
+You are free to use, modify, and redistribute the code, including commercially, as long as
+the copyright notice and the licence text ship with it. The bundled theory notes and JSON
+data under `music-theory-reference/` and `public/data/` are covered by the same licence.
+
+## Contact
+
+The project lives at **https://github.com/Madhurg2002/Musix** — open an issue there for bugs,
+content corrections, or feature requests. The in-app **Contact** screen (`#contact`) links to
+the same profile.
