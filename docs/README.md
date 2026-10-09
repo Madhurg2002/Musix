@@ -1,0 +1,73 @@
+# Musix Documentation
+
+Complete documentation for **Musix**, a browser-only interactive music theory reference.
+This folder covers every part of the project: what it can do, how it is built, its data,
+and how to work on it.
+
+## Contents
+
+| Doc | Read it for |
+| --- | --- |
+| [CAPABILITIES.md](./CAPABILITIES.md) | **Everything the app can do**, feature by feature, plus known gaps |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Runtime model, layers, state ownership, routing, audio and data flow |
+| [COMPONENTS.md](./COMPONENTS.md) | Per-file reference: props, state, behavior for every component and module |
+| [DATA-MODEL.md](./DATA-MODEL.md) | Shared types, TS data tables, and the bundled JSON schemas |
+| [DEVELOPMENT.md](./DEVELOPMENT.md) | Setup, scripts, verification, conventions, and common traps |
+| [MUSIC-THEORY.md](./MUSIC-THEORY.md) | The theory reference library and the theory the code implements |
+
+Related docs outside this folder:
+
+- [`../README.md`](../README.md) — short project readme
+- [`../README-docs.md`](../README-docs.md) — longer-form readme
+- [`../AGENTS.md`](../AGENTS.md) — agent workflow notes
+- [`../music-theory-reference/`](../music-theory-reference/) — hand-written theory notes
+
+## What Musix is
+
+A single static Vite + React + TypeScript site that teaches music theory through
+interactive tools. A learner can compare chords side by side, see exact guitar finger
+positions, tune with microphone pitch detection, play a piano or fretboard, explore
+scales and intervals, and practice with a visual metronome — with real synthesized audio
+for all of it. There is no backend and no database.
+
+## Quick answers
+
+**How do I run it?**
+
+```bash
+bun install
+bun dev
+```
+
+Then open http://localhost:5173.
+
+**How do I check a change?**
+
+```bash
+bunx tsc -b --noEmit   # type check (strict)
+bun test               # unit tests (Bun's built-in runner)
+bun build              # production build into dist/
+```
+
+**Where is the app's entry point?** `src/main.tsx` mounts `src/App.tsx`, which owns tab
+routing and all shared state. See [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+**Where do I add a chord, scale, or interval?** `src/data/chordsData.ts` and
+`src/data/scalesData.ts`. If the bundled JSON should match, also update
+`music-theory-reference/04-data/` and run `bun scripts/build-pages.ts`. See
+[DATA-MODEL.md](./DATA-MODEL.md).
+
+**How do I run the tests?** `bun test` runs the suite on Bun's built-in test runner (no
+extra dependency). It currently covers the theory helpers in `src/utils/musicTheory.ts`.
+See [DEVELOPMENT.md](./DEVELOPMENT.md#tests).
+
+## Tech stack
+
+| Concern | Choice |
+| --- | --- |
+| Build | Vite 8 |
+| UI | React 19 + TypeScript (strict) |
+| Styling | One global stylesheet, `src/style.css` (no Tailwind) |
+| Audio | Web Audio API, synthesized in the browser |
+| Data | Static TS modules + bundled JSON |
+| Backend | None |

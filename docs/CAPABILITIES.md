@@ -1,0 +1,338 @@
+# Musix — Capabilities
+
+Everything the app can currently do, feature by feature, plus the technical capabilities
+behind each feature. Every claim here maps to a file in `src/`.
+
+Legend: **User-facing** = what a learner can click or hear. **Technical** = the code
+capability that makes it work.
+
+---
+
+## 1. App shell and navigation
+
+**User-facing**
+
+- Eight tab screens: Instrument Tuner, Guitar Fretboard, Side-by-Side Cards (chord
+  studio), Piano Visualizer, Scales & Modes, Intervals, Rhythm & Metronome, and the
+  Beginner Guide.
+- URL hash routing: `#workbench`, `#tuner`, `#fretboard`, `#piano`, `#scales`,
+  `#intervals`, `#rhythm`, `#guide`. Unknown or missing hashes land on `#workbench`.
+- Browser back/forward navigation moves between tabs (`hashchange` + `popstate`).
+- The header can hide the Piano or Guitar tab to match the current visualizer choice.
+- A hero banner shows quick key chips for **C, G, D, A, E, F**; the selected key is shared
+  with the scales, fretboard, and piano screens.
+
+**Technical**
+
+- `src/App.tsx` holds all shared state: `activeTab`, `selectedRoot`,
+  `activeChordForFretboard`, `selectedVisualizer`, `activeScaleNotes`, and
+  `userOverride` (instrument lock).
+- Tab list is validated against `VALID_TABS`; `getTabFromHash()` normalizes and
+  whitelists the hash.
+- Each tab maps to one component under `src/components/`, wrapped in a `.tab-section`.
+
+---
+
+## 2. Sound engine (real-time synthesis)
+
+**User-facing**
+
+- Six instruments, all synthesized live in the browser (no audio files, no backend):
+  Acoustic Guitar, Electric Guitar, Grand Piano, Bass Guitar, Ukulele, and Synth Pad.
+- **Auto** mode follows the current page (e.g. Piano on the piano tab, Acoustic Guitar
+  elsewhere); picking an instrument **locks** it across tabs.
+- Changing the instrument plays a short C4 preview so you can hear the choice.
+- Single notes, strummed chords (arpeggiated), and metronome clicks are all generated
+  on the fly.
+
+**Technical**
+
+- `src/utils/audio.ts` exports a `SoundEngine` singleton as `soundEngine`.
+  - `setInstrument(inst | 'auto')` / `getInstrument()`
+  - `playNote(freq, duration = 1.6, overrideInstrument?)`
+  - `strumChord(frequencies, arpeggioDelay = 0.05, overrideInstrument?)`
+  - `playClick(isHighBeat = false)`
+- Instrument resolution order: an explicit user lock wins; otherwise the call's
+  `overrideInstrument`; otherwise acoustic guitar.
+- Synthesis details:
+  - **Acoustic guitar** — 30 ms band-passed noise attack transient, five harmonic
+    oscillators (`1,2,3,4,6`), a pitch-drop of +0.8% decaying in 15 ms, a sweeping
+    low-pass "pluck" filter, and a 220 Hz peaking "body" resonance.
+  - **Electric guitar** — sawtooth → `WaveShaper` distortion curve (amount 18) →
+    band-pass cabinet tone at 1400 Hz.
+  - **Piano** — five harmonics (sine fundamental + triangle partials) with
+    weighted decay per partial.
+  - **Bass** — sine + triangle through a 450 Hz low-pass.
+  - **Ukulele** — short, bright triangle pluck.
+  - **Synth** — sawtooth + slightly detuned square pad with a slow attack.
+- The `AudioContext` is created lazily and resumed on demand; all audio calls are
+  wrapped so a blocked/unsupported context fails silently instead of crashing the UI.
+
+---
+
+## 3. Instrument Tuner (GuitarTuna-style)
+
+**User-facing**
+
+- Three tuning presets: **Standard (E A D G B E)**, **Drop D (D A D G B E)**, and
+  **Half Step Down (E♭ A♭ D♭ G♭ B♭ E♭)**.
+- **Auto String Detection** finds the nearest string automatically; **Manual Lock String**
+  pins detection to a chosen string.
+- Live microphone pitch detection with a note readout (`E2`, `A4`, …) and Hz value.
+- A curved arc gauge with a needle that swings ±45° across ±50 cents.
+- Accuracy badges: **IN TUNE** (within 4 cents), **TOO LOW (tune up)**, or
+  **TOO HIGH (tune down)**.
+- A success chime plays when a string lands in tune (rate-limited to once per 2 s).
+- Clicking any tuning peg plays a 2.5 s reference tone for that string.
+- Visual headstock with the three low strings (6, 5, 4) on the left and the three high
+  strings (3, 2, 1) on the right; the detected string's peg lights up.
+- Clear, actionable banner if the microphone is denied or unavailable.
+
+**Technical**
+
+- `src/components/GuitarTuner.tsx`.
+- `navigator.mediaDevices.getUserMedia({ audio: true })` → `AudioContext` →
+  `AnalyserNode` (`fftSize = 2048`), sampled every animation frame.
+- Autocorrelation pitch detection with an RMS gate (`rms < 0.012` returns "no pitch")
+  and parabolic interpolation around the correlation peak.
+- Frequency → note via `noteNum = 12·log2(f/440) + 69`; cents = `100·(noteNum − round)`.
+- Valid pitch range is restricted to 60–1000 Hz; string match tolerance is < 1.8
+  semitones of error.
+- Cleanup stops all mic tracks and closes the audio context on stop/unmount.
+
+---
+
+## 4. Guitar Fretboard visualizer
+
+**User-facing**
+
+- A 12-fret neck (configurable via `fretsCount`) drawn from **High E (top) to Low E
+  (bottom)**, matching how a player looks at the instrument.
+- Fret markers on frets 3, 5, 7, 9, 15 (single) and 12 (double).
+- Nut indicators for every string showing **✕ Mute**, **○ Open**, or **Fret N
+  (Finger N)**.
+- Chord press positions highlighted in cyan with the finger number on the badge.
+- Root notes and scale notes highlighted in their per-note colors.
+- Click any fret to hear it; the footer shows the hovered note, string number and name,
+  fret, and exact frequency in Hz.
+- A **Strum Chord** button plays the whole chord with a 60 ms arpeggio.
+- A chord picker bar above the neck lets you jump between all 17 built-in chords.
+
+**Technical**
+
+- `src/components/GuitarFretboard.tsx`.
+- Fret notes come from `getFretNote(stringIndex, fret)`; frequencies from
+  `getFretMidi` + `midiToFrequency`.
+- A `displayedChordId` state promotes the chord sent from the Chord Studio once, so
+  closing the studio never blanks the neck.
+- String wire thickness scales with string index for a realistic look.
+
+---
+
+## 5. Side-by-Side Chord Studio (workbench)
+
+**User-facing**
+
+- Independent chord cards you can compare next to each other (start state: C Major,
+  A Major, and the chord at index 12 of the data file — currently D Major).
+- Add a card by choosing any root (12 notes) and type (Major, Minor, 7th, Major 7th).
+- Per-card controls: transpose ±1 semitone, mute/unmute, duplicate, remove, reorder.
+- Reorder by dragging the ⠿ handle or with **Alt+↑ / Alt+↓**.
+- Each card shows a mini fretboard with a **Fret position** slider (Original → Fret 20)
+  that generates a new voicing near that position and shifts the displayed fret window.
+- Play a single card, or **Play Progression** to hear every unmuted card in sequence
+  (1.2 s apart).
+- **Open Fretboard** sends any card's chord to the full fretboard tab.
+
+**Technical**
+
+- `src/components/ChordWorkbench.tsx` (with an internal `CardFretboard` renderer).
+- Transposition uses `transposeNote` on the root and every chord tone.
+- `getChordPosition(chord, position)` searches ±2 frets around the target position for
+  the best chord-tone fret per string, then derives finger numbers from the sorted
+  pressed frets.
+- Audio: `soundEngine.strumChord(freqs, 0.07, 'acoustic-guitar')`, with a synthetic
+  fallback if the voicing produces no playable notes.
+- Cards are ordered by an array of `ChordCardItem`; drag-and-drop uses the HTML5
+  `dragstart`/`dragover`/`drop` events with the card id in `text/plain`.
+
+---
+
+## 6. Piano visualizer
+
+**User-facing**
+
+- Two octaves of playable piano starting at C3 (MIDI 48), 24 keys.
+- Active chord or scale notes light up in their note color; the root key is tagged
+  **ROOT**.
+- Click any key to hear it (piano voice).
+- Used both as its own tab and as the alternative visualizer on the Scales screen.
+
+**Technical**
+
+- `src/components/PianoKeyboard.tsx`; props `activeNotes`, `rootNote`, `octaves`.
+- Black/white keys are derived from whether the note name contains `♯`.
+
+---
+
+## 7. Scales & Modes explorer
+
+**User-facing**
+
+- Eight scales/modes: Major (Ionian), Natural Minor (Aeolian), Minor Pentatonic,
+  Blues, Dorian, Mixolydian, Phrygian, and Lydian.
+- Pick any of the 12 roots; the title, description, and note cards update live.
+- Shows the step pattern (`W - W - H …`), each scale degree label, and the semitone
+  offset for every note.
+- **Play Scale Ascending** plays the scale note-by-note (350 ms apart) and finishes on
+  the octave.
+- The chosen scale notes are pushed to the shared visualizer, so the piano or fretboard
+  below highlights them.
+
+**Technical**
+
+- `src/components/ScaleExplorer.tsx` + `src/data/scalesData.ts`.
+- Scale notes are computed as `intervals.map(semi => transposeNote(root, semi))`, so a
+  single root change recomputes the whole scale.
+- An effect calls `onScaleNotesChange` whenever the root or scale changes.
+
+---
+
+## 8. Interval explorer
+
+**User-facing**
+
+- Pick any two of the 12 notes and read the exact distance in semitones.
+- Shows the interval name, short code (`m3`, `P5`, …), quality tag (perfect / major /
+  minor / tritone), and a plain-language description.
+- **Play Melodic** plays the two notes one after the other; **Play Harmonic** plays them
+  together — beginner ear training.
+
+**Technical**
+
+- `src/components/IntervalExplorer.tsx` + `COMPREHENSIVE_INTERVALS` in
+  `src/data/scalesData.ts` (13 entries, 0–12 semitones).
+- Distance is `(idx2 − idx1 + 12) % 12`, looked up in the interval table with a safe
+  fallback entry.
+
+---
+
+## 9. Rhythm & Metronome
+
+**User-facing**
+
+- Tempo from 40 to 220 BPM with a slider and quick presets (60/80/100/120/140/160).
+- Live tempo name (Larghissimo → Prestissimo) and milliseconds per beat.
+- An animated pendulum metronome (SVG) whose weight slides higher as the tempo rises,
+  plus a pulsing glow ring and beat flash on every click.
+- Beat dots for the current measure with the downbeat visually distinct.
+- Time signatures: 2/4, 3/4, 4/4, 6/8, 5/4, 7/8, and 1/8.
+- **Tap Tempo**: tap the button and the BPM is averaged from your last taps
+  (clamped to 40–240).
+
+**Technical**
+
+- `src/components/RhythmMetronome.tsx`.
+- Beats are driven by `setInterval` at `(60 / bpm) * 1000` ms; the pendulum swing is a
+  `requestAnimationFrame` loop with an in-out-sine easing between two angles.
+- Accented (first) beats play a 1200 Hz click, all other beats 800 Hz.
+
+---
+
+## 10. Beginner theory guide
+
+**User-facing**
+
+- A static starter guide split into three cards: reading guitar cards (strings, frets,
+  finger numbers, ○/✕ symbols), half steps vs whole steps, and building chords
+  (major triad, minor triad, dominant 7th).
+
+**Technical**
+
+- `src/components/TheoryCheatSheet.tsx` — presentational only, no state.
+
+---
+
+## 11. Music theory data layer
+
+**User-facing**
+
+- 17 named guitar chords with notes, interval formulas, fingerings, and difficulty tags.
+- 8 scales/modes with step patterns, interval formulas, and short-form degree names.
+- 13 intervals with semitone distance, quality, and descriptions.
+- 12-color note badge system so the same note always looks the same everywhere.
+
+**Technical**
+
+- `src/data/chordsData.ts` — `COMPREHENSIVE_CHORDS`, plus `findOrCreateChord(root, type)`
+  (falls back to a generic shape for unlisted chords) and `asSafeChord(chord)` (never
+  returns null; used to keep strict builds happy).
+- `src/data/scalesData.ts` — `COMPREHENSIVE_SCALES`, `COMPREHENSIVE_INTERVALS`.
+- `src/utils/musicTheory.ts` — note tables, aliases, colors, transposition, fret math,
+  MIDI→Hz, and pitch detection.
+- `src/types.ts` — all shared interfaces (`ChordShape`, `ScaleDefinition`,
+  `IntervalDefinition`, `ChordCardItem`, safe variants).
+
+---
+
+## 12. Bundled static data
+
+**User-facing**
+
+- The app also ships JSON editions of the theory tables under `public/data/` for anyone
+  who wants to consume the same numbers as plain files.
+
+**Technical**
+
+- `public/data/intervals.json` — 13 intervals with just-intonation ratios, 12-TET
+  ratios, and cents.
+- `public/data/scale-formulas.json` — 12 scale/mode entries with degree formulas,
+  semitone maps, step patterns, parent scale, and mode index.
+- `public/data/chord-formulas.json` — 10 chord formulas with third-stacks, quality, and
+  diatonic function, plus a `notes` block explaining stacking/extension/alteration logic.
+- `public/data/guitar-fretboard-map.json` — every string/fret coordinate 0–24 with note
+  name, scientific pitch, MIDI number, and exact Hz, indexed both `byString` and
+  `coordinateIndex`.
+- `scripts/build-pages.ts` copies `music-theory-reference/04-data/*.json` into
+  `public/data/`, keeping the app copy in sync with the reference source.
+
+---
+
+## 13. Presentation and platform capabilities
+
+**User-facing**
+
+- Dark, glass-card visual theme with a single global stylesheet.
+- Fully static — works as a plain static site with no server or database.
+- Responsive layout and hover states across every tool.
+
+**Technical**
+
+- Vite + React 19 + TypeScript (strict, with `noUncheckedIndexedAccess`).
+- Single theme file `src/style.css`, imported both from `index.html` and `src/main.tsx`.
+- Dev server on port 5173, preview on 4173, both bound to `0.0.0.0`.
+- `bun build` produces a static `dist/`.
+
+---
+
+## Known gaps and rough edges
+
+Documented so the docs stay honest about the current state:
+
+- **Tests cover only the theory helpers.** `src/utils/musicTheory.test.ts` (24 tests) runs
+  with Bun's built-in runner (`bun test`), but no component or audio behavior is covered.
+  There is no `test` script in `package.json`, so `bun test` must be run directly.
+- **Pitch detection is implemented twice.** `detectPitch` exists in
+  `src/utils/musicTheory.ts` and again (as both `detectPitch` and `autoCorrelate`) inside
+  `src/components/GuitarTuner.tsx`.
+- **Several helper aliases overlap.** `noteNameAt`, `getNoteByCheckedIndex`, and
+  `noteNameFromIndex` do the same thing, as do `stringInfoAt`, `getGuitarStringInfo`, and
+  `resolveGuitarString`; `getFindIndex` only masks its argument.
+- **A default-card comment is stale.** `ChordWorkbench` labels
+  `COMPREHENSIVE_CHORDS[12]` as "B Minor", but index 12 in `chordsData.ts` is D Major.
+- **`public/metronome.js` is a stub.** It contains documentation comments only; the real
+  metronome lives in `src/components/RhythmMetronome.tsx`.
+- **`tsconfig.json` includes `vite.config.ts`** while the actual file is
+  `vite.config.js`.
+- **`public/data/*.json` and `scripts/build-pages.ts` are listed in `.gitignore`** yet
+  are tracked in git, so ignore rules do not currently exclude them.

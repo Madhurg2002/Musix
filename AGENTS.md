@@ -50,17 +50,31 @@ For a type check after changes, run:
 
 ```bash
 bunx tsc -b --noEmit
+bun test
 ```
 
 If you changed dependencies, run `bun install` first.
 
+There is no `test` script; run the unit suite directly with `bun test` (Bun's built-in
+runner). It covers the helpers in `src/utils/musicTheory.ts`. Component, audio, and tuner
+behavior are not covered yet, so verify those in the preview.
+
 ## Docs
 
+- Docs index: `docs/README.md`
+- Capabilities (every feature + known gaps): `docs/CAPABILITIES.md`
+- Architecture: `docs/ARCHITECTURE.md`
+- Component reference: `docs/COMPONENTS.md`
+- Data model: `docs/DATA-MODEL.md`
+- Development guide: `docs/DEVELOPMENT.md`
+- Theory reference map: `docs/MUSIC-THEORY.md`
 - Short readme: `README.md`
 - Longer docs: `README-docs.md`
 - Source theory notes: `music-theory-reference/`
 - Bundled public data: `public/data/`
 - Data copy helper: `scripts/build-pages.ts`
+
+When you add or rename a feature, update the matching doc so `docs/` stays accurate.
 
 ## Good defaults
 

@@ -69,14 +69,30 @@ src/
 scripts/
   build-pages.ts          # Data copy helper for the app (plain Node ESM)
 music-theory-reference/
-  01-pitch/
-  02-intervals/
-  03-scales/
-  04-data/
+  01-foundations/           # Pitch, intervals, scales, chords, rhythm
+  02-harmony-and-analysis/  # Circle of fifths, diatonic harmony, voice leading, roman numerals
+  03-instrument-mappings/   # Guitar fretboard, CAGED, 3NPS, tunings, triads
+  04-data/                  # Structured source for the bundled JSON in public/data/
+  templates/                # Authoring template for new instrument mappings
+docs/                       # Full documentation set
+docs/CAPABILITIES.md        # Everything the app can do
 README-docs.md            # This file
 README.md                 # Short readme
 AGENTS.md                 # Agent workflow notes
 ```
+
+## Full documentation set
+
+Start at [`docs/README.md`](docs/README.md). It indexes:
+
+- [`docs/CAPABILITIES.md`](docs/CAPABILITIES.md) — feature-by-feature capabilities and
+  known gaps.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — runtime model, state, routing, audio
+  and data flow.
+- [`docs/COMPONENTS.md`](docs/COMPONENTS.md) — per-module reference.
+- [`docs/DATA-MODEL.md`](docs/DATA-MODEL.md) — types and data schemas.
+- [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — setup, scripts, conventions, traps.
+- [`docs/MUSIC-THEORY.md`](docs/MUSIC-THEORY.md) — theory reference map.
 
 ## Reference data and docs
 

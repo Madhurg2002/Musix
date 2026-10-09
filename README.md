@@ -37,17 +37,16 @@ bun build
 
 Outputs `dist/`.
 
-## What changed in this session
+## Documentation
 
-- Reorganized the app shell and nav so each tab is clearly reachable.
-- Aligned the guitar fretboard, chord workbench, and piano/scale pages around a shared root
-  and active-chord concept.
-- Made sound selection explicit per tab with a header instrument control.
-- Tightened the visual identity and spacing across the main learning pages.
-- Added clearer fallback handling so the UI does not crash when data is missing or a user
-  action is interrupted mid-flight.
-- Prepared the repo for agent workflows by describing the setup, build, and content flow in
-  README and agent-facing docs.
+The full documentation set lives in [`docs/`](docs/README.md):
+
+- [Capabilities](docs/CAPABILITIES.md) — every feature the app can do, plus known gaps.
+- [Architecture](docs/ARCHITECTURE.md) — runtime model, state, routing, audio and data flow.
+- [Components](docs/COMPONENTS.md) — per-file reference for components and modules.
+- [Data model](docs/DATA-MODEL.md) — shared types, TS data tables, and bundled JSON schemas.
+- [Development](docs/DEVELOPMENT.md) — setup, scripts, verification, conventions, traps.
+- [Music theory map](docs/MUSIC-THEORY.md) — the reference library and the theory in code.
 
 ## Repo map
 
@@ -82,11 +81,13 @@ src/
 scripts/
   build-pages.ts      # Data copy helper for the app (plain Node ESM)
 music-theory-reference/
-  01-pitch/          # Source notes for pitch & frequency docs
-  02-intervals/
-  03-scales/
-  04-data/           # Structured source for the bundled JSON in public/data/
-README-docs.md        # Longer-form documentation for the same content
+  01-foundations/           # Pitch, intervals, scale formulas, chords, rhythm
+  02-harmony-and-analysis/  # Circle of fifths, diatonic harmony, voice leading, roman numerals
+  03-instrument-mappings/   # Guitar fretboard, CAGED, 3NPS, tunings, triads
+  04-data/                  # Structured source for the bundled JSON in public/data/
+  templates/                # Authoring template for new instrument mappings
+docs/                       # Full documentation set (see docs/README.md)
+README-docs.md              # Longer-form documentation for the same content
 ```
 
 ## Data flow
@@ -114,14 +115,16 @@ use these paths first when reading or changing code:
 
 When touching data files, keep the shape used by each component stable. When touching the UI,
 preserve the global CSS imports and the existing theme tokens in `src/style.css`; broken or
-unstyled previews usually mean the root layout, global stylesheet import, or Tailwind-like
-class structure was accidentally changed.
+unstyled previews usually mean the root layout, the global stylesheet import, or a layout
+class in `src/App.tsx` was accidentally changed.
 
-For tests of changes, prefer:
+To check a change, prefer:
 
 - `bun install` if dependencies changed
-- `bun run build` or `bun dev` to confirm the app still boots
-- Visual check of each tab after layout or theme changes
+- `bunx tsc -b --noEmit` for the strict type check
+- `bun test` for the theory helper unit tests
+- `bun dev` to confirm the app still boots, plus a visual check of each tab after layout or
+  theme changes
 
 ## Dev notes
 
