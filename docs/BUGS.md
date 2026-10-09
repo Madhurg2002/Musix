@@ -16,6 +16,7 @@ not yet fixed.
 | F5 | `transposeNoteSafeAny` ignored `NOTE_ALIASES`, so `'Db'` returned `C` instead of transposing. | `musicTheory.ts` | Wrong transposition | **fixed** (earlier) |
 | F6 | `ChordWorkbench` labels the third default card `// B Minor`, but index 12 of `COMPREHENSIVE_CHORDS` is **D Major**. | `ChordWorkbench.tsx` | Wrong comment | **open** |
 | F7 | `public/metronome.js` is a comment-only stub with no implementation and no `<script>` tag loading it. The real metronome is the React component. | `public/metronome.js` | Dead asset shipped to production | **open** |
+| F8 | The BPM slider's fill referenced `var(--v, 50)`, but `--v` was never set, so the filled track sat at a fixed 27.8% instead of tracking the thumb. | `style.css`, `RhythmMetronome.tsx` | Slider fill never moved | **fixed** |
 
 ## Dead code and unfinished logic
 

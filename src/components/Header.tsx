@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { THEMES, applyTheme, readTheme, type ThemeId } from '../utils/theme';
 
 interface HeaderProps {
   activeTab: string;
@@ -62,6 +63,14 @@ export const Header: React.FC<HeaderProps> = ({
     (id !== 'piano' || selectedVisualizer === 'piano') &&
     (id !== 'fretboard' || selectedVisualizer === 'guitar');
 
+  const [theme, setTheme] = useState<ThemeId>(() => readTheme());
+
+  const handleThemeChange = (value: string) => {
+    const next = value as ThemeId;
+    setTheme(next);
+    applyTheme(next);
+  };
+
   return (
     <nav className="nav-rail" aria-label="Musix sections">
       <div className="nav-rail__brand header-brand">
@@ -103,6 +112,21 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="nav-rail__footer">
+        <label className="rail-field">
+          <span className="rail-field__label">Theme</span>
+          <select
+            className="select-input rail-theme-select"
+            value={theme}
+            onChange={(event) => handleThemeChange(event.target.value)}
+          >
+            {THEMES.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <div className="header-visualizer-control" role="group" aria-label="Choose visualizer">
           <span className="header-visualizer-label">Visualizer</span>
           <div className="header-visualizer-options">

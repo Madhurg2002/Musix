@@ -2,8 +2,9 @@
 
 Status legend: `[x]` done and committed · `[ ]` planned · `[~]` in progress
 
-**Progress:** Phase 1 (design language) and Phase 2 (shell) are implemented, verified,
-and pushed. Phases 3–4 and the follow-up list below are open.
+**Progress:** Phase 1 (design language), Phase 2 (shell), the user-selectable theme system,
+and the repository bug audit (`docs/BUGS.md`) are implemented, verified, and pushed.
+Phases 3–4 and the follow-up list below are open.
 
 ## The reimagining in one line
 

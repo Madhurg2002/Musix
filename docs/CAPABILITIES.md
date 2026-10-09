@@ -308,9 +308,10 @@ capability that makes it work.
 
 **User-facing**
 
-- One warm **"Analog Studio"** theme: espresso canvas, cream text, a single brass accent
-  with copper/terracotta support and sage for "in tune", glass-card surfaces, and global
-  focus rings.
+- **Four selectable themes** — Analog Studio (default, warm), Nocturne (cool dark),
+  Sheet Paper (light), and Arcade (the original neon) — chosen from the navigation rail and
+  remembered across reloads, with glass-card surfaces, global focus rings, and warm
+  scrollbars.
 - Fully static — works as a plain static site with no server or database.
 - Responsive layout and hover states across every tool.
 
@@ -318,8 +319,9 @@ capability that makes it work.
 
 - Vite + React 19 + TypeScript (strict, with `noUncheckedIndexedAccess`).
 - Single theme file `src/style.css`, imported both from `index.html` and `src/main.tsx`.
-- Design tokens live in `:root` (surfaces, one brass accent, radii, elevation, motion), so
-  the palette is changed in one place.
+- Design tokens live in `:root` as channel triplets (`--accent-rgb`, `--overlay-rgb`, …),
+  so each `html[data-theme=…]` block only restates the palette and every translucent tint
+  follows it. `src/utils/theme.ts` applies the theme and persists the choice.
 - Dev server on port 5173, preview on 4173, both bound to `0.0.0.0`.
 - `bun build` produces a static `dist/`.
 

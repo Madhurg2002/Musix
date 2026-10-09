@@ -309,6 +309,8 @@ export const RhythmMetronome: React.FC = () => {
               min="40" max="220" step="1"
               value={bpm}
               className="bpm-slider"
+              // CSS custom properties are not part of React's CSSProperties type.
+              style={{ '--v': bpm } as unknown as React.CSSProperties}
               onChange={(e) => setBpm(Number(e.target.value))}
               id="bpm-slider"
             />

@@ -71,8 +71,9 @@ The left navigation rail.
   so only one of that pair is listed.
 - Each item is a `rail-item` with a label and a one-line hint, `aria-current="page"` on
   the active entry, and a brass left rule while active.
-- The footer holds the Piano/Guitar visualizer toggle as a `role="group"` of two
-  `aria-pressed` buttons.
+- The footer holds the theme `<select>` (from `THEMES`) and the Piano/Guitar visualizer
+  toggle as a `role="group"` of two `aria-pressed` buttons. Changing the theme writes
+  `data-theme` on `<html>` and persists it through `applyTheme`.
 - Below 900px the rail lays out horizontally and becomes a scrollable top strip.
 
 ---
@@ -269,6 +270,20 @@ renders the note grids, distance badge, name/short code, quality tag, and descri
 
 Stateless. Renders three static guide cards: reading guitar cards, half/whole steps, and
 building chords.
+
+---
+
+## `src/utils/theme.ts`
+
+The selectable-theme registry.
+
+- `THEMES` — the four options (`studio`, `nocturne`, `paper`, `arcade`) with display labels.
+- `ThemeId` — union of the ids.
+- `readTheme()` — the stored theme, or `studio` when storage is empty or blocked.
+- `applyTheme(id)` — sets `data-theme` on `<html>` and persists the choice.
+
+`main.tsx` calls `applyTheme(readTheme())` before the first render so the page never
+flashes the default palette.
 
 ---
 
