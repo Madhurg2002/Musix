@@ -14,7 +14,9 @@ interface ExpectMatchers<T> {
   toBeNull(): void;
   toBeCloseTo(expected: number, precision?: number): void;
   toBeLessThan(expected: number): void;
+  toBeLessThanOrEqual(expected: number): void;
   toBeGreaterThan(expected: number): void;
+  toBeGreaterThanOrEqual(expected: number): void;
   toHaveProperty(property: string): void;
   toHaveLength(expected: number): void;
   /** Array membership, or substring for strings. */

@@ -236,10 +236,15 @@ export const COMPREHENSIVE_CHORDS: ChordShape[] = [
 ];
 
 
-export function findOrCreateChord(root: NoteName, type: string): ChordShape {
-  const existing = COMPREHENSIVE_CHORDS.find(
-    (c) => c.root === root && c.type.toLowerCase() === type.toLowerCase()
+/** Look up a stored shape by root and type, or `undefined` when the table has none. */
+export function findChord(root: NoteName, type: string): ChordShape | undefined {
+  return COMPREHENSIVE_CHORDS.find(
+    (chord) => chord.root === root && chord.type.toLowerCase() === type.toLowerCase()
   );
+}
+
+export function findOrCreateChord(root: NoteName, type: string): ChordShape {
+  const existing = findChord(root, type);
   if (existing) return existing;
 
   // Fallback dynamic note derivation

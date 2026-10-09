@@ -4,49 +4,16 @@ import { findOrCreateChord, asSafeChord } from '../data/chordsData';
 import {
   ALL_NOTES,
   GUITAR_STRINGS,
-  transposeNote,
   noteColorFor,
   getFretMidi,
   midiToFrequency,
 } from '../utils/musicTheory';
+import {
+  fretWindow,
+  getChordPosition,
+  transposeChordShape,
+} from '../utils/chordVoicing';
 import { soundEngine } from '../utils/audio';
-
-function getChordPosition(chord: ChordShape, position: number): { frets: number[]; fingers: (number | string | undefined)[] } {
-  const safeChord = asSafeChord(chord);
-  if (position === 0) {
-    return {
-      frets: [...safeChord.frets],
-      fingers: safeChord.frets.map((_, index) => safeChord.fingers?.[index]),
-    };
-  }
-
-  const chordNotes = safeChord.notes.map((note) => ALL_NOTES.indexOf(note)).filter((note) => note >= 0);
-  const chordNoteSet = new Set(chordNotes);
-  const minimumFret = Math.max(0, position - 2);
-  const maximumFret = Math.min(20, position + 2);
-  const frets = GUITAR_STRINGS.map((_, stringIndex) => {
-    const preferredNote = chordNotes[stringIndex % chordNotes.length];
-    let bestFret = -1;
-    let bestScore = Number.POSITIVE_INFINITY;
-
-    for (let fret = minimumFret; fret <= maximumFret; fret += 1) {
-      const note = getFretMidi(stringIndex, fret) % 12;
-      if (!chordNoteSet.has(note)) continue;
-
-      const score = Math.abs(fret - position) + (note === preferredNote ? 0 : 0.25);
-      if (score < bestScore) {
-        bestFret = fret;
-        bestScore = score;
-      }
-    }
-
-    return bestFret;
-  });
-  const pressedFrets = [...new Set(frets.filter((fret) => fret > 0))].sort((left, right) => left - right);
-  const fingers = frets.map((fret) => fret <= 0 ? 0 : Math.min(pressedFrets.indexOf(fret) + 1, 4));
-
-  return { frets, fingers };
-}
 
 const CardFretboard: React.FC<{
   chord: ChordShape;
@@ -56,14 +23,7 @@ const CardFretboard: React.FC<{
 }> = ({ chord, cardId, position, onPositionChange }) => {
   const safeChord = asSafeChord(chord);
   const { frets, fingers } = getChordPosition(chord, position);
-  const pressedFrets = frets.filter((fret) => fret > 0);
-  const lowestFret = pressedFrets.length > 0 ? Math.min(...pressedFrets) : 1;
-  const highestFret = Math.max(0, ...pressedFrets);
-  const firstFret = highestFret > 5
-    ? highestFret - lowestFret > 4 ? lowestFret : highestFret - 4
-    : 1;
-  const fretCount = Math.max(5, highestFret - firstFret + 1);
-  const fretNumbers = Array.from({ length: fretCount }, (_, index) => firstFret + index);
+  const { firstFret, fretCount, fretNumbers } = fretWindow(frets);
 
   return (
     <div className="card-fretboard">
@@ -210,23 +170,18 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
     ));
   };
 
-  // Transpose a card
+  // Transpose a card. The shape has to move with the name — transposing only the root and
+  // notes left the original frets on screen and played the wrong voicing.
   const handleTranspose = (id: string, delta: number) => {
-    setCards(
-      cards.map((item) => {
+    setCards((currentCards) =>
+      currentCards.map((item) => {
         if (item.id !== id) return item;
-        const newRoot = transposeNote(item.chord.root, delta);
-        const newNotes = item.chord.notes.map((n: NoteName) => transposeNote(n, delta));
-        return {
-          ...item,
-          transposeOffset: item.transposeOffset + delta,
-          chord: {
-            ...item.chord,
-            root: newRoot,
-            name: `${newRoot} ${item.chord.type}`,
-            notes: newNotes,
-          },
-        };
+        const { chord, transposeOffset } = transposeChordShape(
+          item.chord,
+          delta,
+          item.transposeOffset
+        );
+        return { ...item, chord, transposeOffset, fretPosition: 0 };
       })
     );
   };
