@@ -162,14 +162,14 @@ still follows tabs, responsive at ≤720px.
 
   Done so far: setup (`5decd5d` — layer order declared so `utilities` beats `components`,
   whole sheet wrapped in `@layer components`, tints exposed as `--color-*`), footer
-  (`9e45dc2`), top bar (`cc5ef5a`), and the screen hero + key chips in `App.tsx`.
-  Each screen's rules are deleted from `src/style.css` when its markup moves, and the guard
-  test marker is swapped to a rule that still exists.
+  (`9e45dc2`), top bar (`cc5ef5a`), the screen hero + key chips (`4e2f6f2`), and the
+  navigation rail — so the whole shell is utilities now. Each area's rules are deleted from
+  `src/style.css` when its markup moves, and the guard test marker is swapped to a rule that
+  still exists.
 
-  Remaining, in order: the navigation rail (last piece of the shell), then Chord Studio,
-  Song Follower, Fretboard, Scales, Intervals, Tuner, Metronome, Piano, Guide, Contact —
-  and finally the leftovers utilities do not reach (SVG internals, fretboard grid,
-  keyframes, print), which stay as CSS.
+  Remaining, in order: Chord Studio, Song Follower, Fretboard, Scales, Intervals, Tuner,
+  Metronome, Piano, Guide, Contact — and finally the leftovers utilities do not reach (SVG
+  internals, fretboard grid, keyframes, print), which stay as CSS.
 
 ### Phase 3 — Screen-level craft
 
