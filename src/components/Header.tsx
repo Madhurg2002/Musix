@@ -31,7 +31,14 @@ const INSTRUMENT_LABELS: Record<InstrumentType | 'auto', string> = {
   'synth': '🎛️ Synth Pad',
 };
 
-export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, userOverride, setUserOverride }) => {
+export const Header: React.FC<HeaderProps> = ({
+  activeTab,
+  setActiveTab,
+  userOverride,
+  setUserOverride,
+  pianoOpen,
+  setPianoOpen,
+}) => {
   const tabs = [
     { id: 'tuner', label: '🎯 Instrument Tuner' },
     { id: 'fretboard', label: '🎸 Guitar Fretboard' },

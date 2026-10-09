@@ -158,7 +158,7 @@ export function App() {
         )}
 
         {/* Tab 3: Piano Keyboard */}
-{!pianoOpen && activeTab === 'piano' && (
+  {pianoOpen && activeTab === 'piano' && (
           <section className="tab-section">
             <PianoKeyboard
               activeNotes={activeChordForFretboard ? activeChordForFretboard.notes : activeScaleNotes}
