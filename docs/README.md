@@ -16,6 +16,7 @@ and how to work on it.
 | [MUSIC-THEORY.md](./MUSIC-THEORY.md) | The theory reference library and the theory the code implements |
 | [BUGS.md](./BUGS.md) | The bug audit: every fault found, its impact, and whether it is fixed |
 | [PLAN.md](./PLAN.md) | The reimagining plan, what has landed, and the follow-up backlog |
+| [ADDING-AN-INSTRUMENT.md](./ADDING-AN-INSTRUMENT.md) | How to add a new playable instrument, end to end |
 
 Related docs outside this folder:
 
