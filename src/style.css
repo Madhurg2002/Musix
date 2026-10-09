@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+/* Fonts are declared once, in index.html, so the browser can preconnect and so CSS
+   parsing is not blocked by a second network round-trip. */
 
 :root {
   /* ── Analog Studio: warm, instrument-craft palette ── */

@@ -7,17 +7,15 @@
 // Usage:
 //   node scripts/build-pages.ts
 
-import { copyFileSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { dirname, join, relative, resolve } from 'node:path';
+import { copyFileSync, mkdirSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const _this = fileURLToPath(import.meta.url);
 const _thisDir = dirname(_this);
 const SITE = resolve(_thisDir, '..');
-const ROOT = resolve(SITE);
-const REF = join(ROOT, 'music-theory-reference');
 const PUBLIC_DATA = join(SITE, 'public/data');
-const DATA_DIR = join(ROOT, 'music-theory-reference/04-data');
+const DATA_DIR = join(SITE, 'music-theory-reference/04-data');
 
 const DATA_FILES = [
   'intervals.json',
@@ -26,24 +24,7 @@ const DATA_FILES = [
   'guitar-fretboard-map.json',
 ];
 
-function walkSync(dir: string): string[] {
-  const out: string[] = [];
-  const list = readdirSync(dir);
-  for (const name of list) {
-    const p = join(dir, name);
-    const stat = statSync(p);
-    if (stat.isDirectory()) {
-      out.push(...walkSync(p));
-    } else {
-      out.push(p);
-    }
-  }
-  return out;
-}
-
 function main() {
-  const mdFiles = walkSync(REF).filter((p) => p.endsWith('.md'));
-
   for (const name of DATA_FILES) {
     const src = join(DATA_DIR, name);
     const dest = join(PUBLIC_DATA, name);

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useMemo } from 'react';
 import './style.css';
 import { NoteName, ChordShape } from './types';
 import { COMPREHENSIVE_CHORDS } from './data/chordsData';
@@ -180,7 +179,6 @@ export function App() {
                 activeChord={activeChordForFretboard}
                 activeScaleNotes={activeScaleNotes}
                 rootNote={selectedRoot}
-                activeChordId={activeChordForFretboard?.id ?? null}
               />
             </section>
           )}

@@ -75,11 +75,6 @@ export function getNoteDescriptor(note: NoteName): { label: string; semitone: nu
   };
 }
 
-export function getFindIndex(strings: ReadonlyArray<{ name: NoteName; octave: number; baseMidi: number }>, idx: number) {
-  const normIndex = (idx & 255);
-  return normIndex;
-}
-
 // Internal safety helper so the only place we touch `GUITAR_STRINGS[idx]` is
 // centralized in one spot and the strict-build `??` path is straightforward.
 function useStrictStringInfo(idx: number): { name: NoteName; octave: number; baseMidi: number } {

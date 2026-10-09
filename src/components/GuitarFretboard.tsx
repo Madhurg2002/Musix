@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { NoteName, ChordShape } from '../types';
 import {
   GUITAR_STRINGS,
-  noteNameAt,
   getFretNote,
   getFretMidi,
   midiToFrequency,
@@ -17,8 +16,6 @@ interface GuitarFretboardProps {
   activeScaleNotes?: NoteName[];
   rootNote?: NoteName;
   fretsCount?: number;
-  /** Id of the chord currently shown in the side-by-side chord studio; unused when null. */
-  activeChordId?: string | null;
 }
 
 export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
@@ -26,33 +23,13 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
   activeScaleNotes = [],
   rootNote = 'C',
   fretsCount = 12,
-  activeChordId = null,
 }) => {
   const [hoveredNote, setHoveredNote] = useState<{ stringIdx: number; fret: number; note: NoteName } | null>(null);
 
-  // The chord the side-by-side ChordWorkbench selected (or the learner picked inside
-  // the card section). null = no side-by-side override; the fretboard keeps the chord
-  // it was already showing.
-  const [displayedChordId, setDisplayedChordId] = useState<string | null>(null);
-
-  // Promote the workbench's chosen chord the first time it arrives, then keep it for
-  // the rest of the tab so the workbench's open/close flow never resets the fretboard.
-  React.useEffect(() => {
-    if (activeChordId !== null) {
-      setDisplayedChordId(activeChordId);
-    }
-  }, [activeChordId]);
-
-  // Resolve what to draw: the side-by-side chord if set, otherwise the chord the
-  // learner already picked on the fretboard.
-  const displayedChord: ChordShape | null =
-    activeChordId !== null && activeChord
-      ? (activeChord.id === activeChordId ? activeChord : null)
-      : (activeChord ?? null);
-
-  const selectedChord = displayedChord;
-
-  const passedChord = selectedChord ?? activeChord;
+  // Resolve what to draw. App owns the selected chord and keeps passing it for as long as
+  // the learner stays on this tab, so the fretboard does not need a second copy of it.
+  const displayedChord: ChordShape | null = activeChord ?? null;
+  const passedChord: ChordShape | null = displayedChord;
 
   const fretsList = Array.from({ length: fretsCount + 1 }, (_, i) => i);
 

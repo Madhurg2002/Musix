@@ -24,7 +24,6 @@ export const RhythmMetronome: React.FC = () => {
   const [currentBeat, setCurrentBeat] = useState<number>(1);
   const [beatsPerMeasure, setBeatsPerMeasure] = useState<number>(4);
   const [pendulumAngle, setPendulumAngle] = useState<number>(-30);
-  const [pendulumDir, setPendulumDir] = useState<1 | -1>(1);
   const [flashBeat, setFlashBeat] = useState<boolean>(false);
   const [accent, setAccent] = useState<boolean>(false); // true = downbeat flash
 
@@ -52,7 +51,7 @@ export const RhythmMetronome: React.FC = () => {
     }
   }, [bpm]);
 
-  const triggerBeat = useCallback((beat: number, isDownbeat: boolean) => {
+  const triggerBeat = useCallback((isDownbeat: boolean) => {
     soundEngine.playClick(isDownbeat);
     setFlashBeat(true);
     setAccent(isDownbeat);
@@ -75,20 +74,19 @@ export const RhythmMetronome: React.FC = () => {
       let beat = 1;
 
       // Fire immediately on start
-      triggerBeat(beat, beat === 1);
+      triggerBeat(beat === 1);
       setCurrentBeat(beat);
 
       const intervalMs = (60 / bpm) * 1000;
       timerRef.current = window.setInterval(() => {
         beat = (beat % beatsPerMeasure) + 1;
         setCurrentBeat(beat);
-        triggerBeat(beat, beat === 1);
+        triggerBeat(beat === 1);
       }, intervalMs);
     } else {
       if (timerRef.current) clearInterval(timerRef.current);
       if (pendulumAnimRef.current) cancelAnimationFrame(pendulumAnimRef.current);
       setPendulumAngle(-30);
-      setPendulumDir(1);
       setCurrentBeat(1);
     }
 
@@ -127,9 +125,6 @@ export const RhythmMetronome: React.FC = () => {
   // Weight position on pendulum rod: higher BPM = weight closer to pivot
   // Range: 40bpm → weight at 85% down, 220bpm → weight at 20% down
   const weightPos: number = 85 - ((bpm - 40) / 180) * 65; // 20-85%
-
-  // Safety clamp so the SVG math never receives a fractional/negative index.
-  const safeBpmIndex = Math.max(0, Math.min(220, bpm));
 
   return (
     <div className="metronome-page glass-card">

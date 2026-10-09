@@ -1,12 +1,17 @@
-# Environment variables
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Environment variables (the example file is intentionally tracked)
 .env
 .env.local
 .env.*.local
 !.env.example
-
-# Build outputs & dependencies
-node_modules/
-dist/
 
 # Logs
 npm-debug.log*
@@ -14,16 +19,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# OS / Editor files
+# OS / editor files
 .DS_Store
 .vscode/
 .idea/
 
-# Data copy generated for the client app
-public/data/*.json
-
-# Legacy Astro / vendored files
-scripts/build-pages.ts
-src/content/config.ts
-src/main.js
-src/styles/global.css
+# Freebuff workspace runtime
+.vly-run/

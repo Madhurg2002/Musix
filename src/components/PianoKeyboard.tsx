@@ -1,6 +1,6 @@
 import React from 'react';
 import { NoteName } from '../types';
-import { ALL_NOTES, NOTE_COLORS, midiToFrequency, noteColorFor } from '../utils/musicTheory';
+import { ALL_NOTES, midiToFrequency, noteColorFor } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 
 interface PianoKeyboardProps {

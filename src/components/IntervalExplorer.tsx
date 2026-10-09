@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NoteName } from '../types';
 import { COMPREHENSIVE_INTERVALS } from '../data/scalesData';
-import { ALL_NOTES, NOTE_COLORS, midiToFrequency, noteColorFor } from '../utils/musicTheory';
+import { ALL_NOTES, NOTE_COLORS, midiToFrequency } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 
 export const IntervalExplorer: React.FC = () => {

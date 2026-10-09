@@ -217,24 +217,6 @@ export const GuitarTuner: React.FC = () => {
 
   const preset = TUNING_PRESETS[selectedPresetIndex] ?? TUNING_PRESETS[0]!;
   const currentTuningStrings = preset.strings;
-  const selectedStringInfo = (() => {
-    if (selectedStringIndex == null) return undefined;
-    return currentTuningStrings[selectedStringIndex] ?? undefined;
-  })();
-
-  const selectedGuitarStringInfo = (() => {
-    if (selectedStringInfo) return selectedStringInfo;
-    const found = currentTuningStrings.find((s) => s.index === selectedStringIndex);
-    if (found) return found;
-    return currentTuningStrings[0] ?? undefined;
-  })();
-
-  const handlePegClick = (str: StringInfo) => {
-    setSelectedStringIndex(str.index);
-    setActivePegIndex(str.index);
-    soundEngine.playNote(str.frequency ?? 440, 2.5, 'acoustic-guitar');
-  };
-
   const handlePegClickExt = (str: StringInfo | null | undefined) => {
     if (!str) return;
     setSelectedStringIndex(str.index);
@@ -299,8 +281,6 @@ export const GuitarTuner: React.FC = () => {
     // Guard the pitch-analysis branch so the strict-build path stays readable.
     const hasUsablePitch = pitch !== -1 && 60 < pitch && pitch < 1000;
     if (hasUsablePitch) {
-      const currentPitch = pitch;
-
       setDetectedPitch(pitch);
 
       // Find closest MIDI note
@@ -339,9 +319,6 @@ export const GuitarTuner: React.FC = () => {
 
     animFrameRef.current = requestAnimationFrame(updatePitch);
   };
-
-  const activePreset = preset;
-  const presetStrings = activePreset?.strings ?? [];
 
   useEffect(() => {
     return () => {

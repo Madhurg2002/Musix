@@ -13,7 +13,6 @@ import {
   midiToFrequency,
   noteNameAt,
   NOTE_ALIASES,
-  NOTE_COLORS,
   noteColorFor,
   transposeNote,
   transposeNoteSafe,
