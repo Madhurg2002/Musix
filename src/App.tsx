@@ -22,17 +22,11 @@ import {
   writePreference,
 } from './utils/preferences';
 import { soundEngine, type InstrumentType } from './utils/audio';
+import { INSTRUMENT_IDS } from './data/instruments';
+import { ChipRow, type ChipOption } from './components/ChipRow';
 
 const isVisualizer = isOneOf('piano', 'guitar');
-const isInstrumentChoice = isOneOf<InstrumentType | 'auto'>(
-  'auto',
-  'acoustic-guitar',
-  'electric-guitar',
-  'piano',
-  'bass',
-  'ukulele',
-  'synth'
-);
+const isInstrumentChoice = isOneOf<InstrumentType | 'auto'>('auto', ...INSTRUMENT_IDS);
 
 /** Shown while a route's code chunk loads. */
 function ScreenLoading({ title }: { title: string }) {
@@ -43,6 +37,14 @@ function ScreenLoading({ title }: { title: string }) {
     </div>
   );
 }
+
+/** The six practice keys offered in the hero, shared with the chip row below. */
+const HERO_KEYS: readonly NoteName[] = ['C', 'G', 'D', 'A', 'E', 'F'];
+const HERO_KEY_OPTIONS: readonly ChipOption<NoteName>[] = HERO_KEYS.map((key) => ({
+  value: key,
+  label: key,
+  tip: `Practise in the key of ${key} — every tool follows it`,
+}));
 
 export function App() {
   const [activeTab, setActiveTabState] = useState<string>(() =>
@@ -72,6 +74,9 @@ export function App() {
   const [cookiePanelOpen, setCookiePanelOpen] = useState<boolean>(false);
 
   const route = routeFor(activeTab);
+  // What this screen sounds like right now: the top bar's lock, or the route's default.
+  const effectiveInstrument: InstrumentType =
+    userOverride === 'auto' ? route.instrument : userOverride;
 
   // Mirror the shell choices back to storage.
   useEffect(() => writePreference(PREFERENCE_KEYS.root, selectedRoot), [selectedRoot]);
@@ -135,10 +140,18 @@ export function App() {
       setVisualizer,
       selectChordForFretboard,
       openTuner: () => setActiveTab('tuner'),
+      instrument: effectiveInstrument,
     }),
     // Handlers below are stable enough for this shell; re-creating the context per render is
     // cheap and keeps the dependency list honest.
-    [selectedRoot, activeChordForFretboard, activeScaleNotes, selectedVisualizer, activeTab],
+    [
+      selectedRoot,
+      activeChordForFretboard,
+      activeScaleNotes,
+      selectedVisualizer,
+      activeTab,
+      userOverride,
+    ],
   );
 
   return (
@@ -187,28 +200,12 @@ export function App() {
               >
                 Start with the basics
               </button>
-              <div className="flex items-center gap-2.5">
-                <span className="text-[10px] font-bold uppercase tracking-[1.5px] text-ink-muted">
-                  Key
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {(['C', 'G', 'D', 'A', 'E', 'F'] as NoteName[]).map((key) => (
-                    <button
-                      key={key}
-                      className={`cursor-pointer rounded-xl border px-3.5 py-1.5 text-[13px] font-semibold transition-all duration-200 ${
-                        selectedRoot === key
-                          ? 'border-accent bg-accent text-[#1a1208]'
-                          : 'border-hairline bg-chip text-ink'
-                      }`}
-                      aria-pressed={selectedRoot === key}
-                      data-tip={`Practise in the key of ${key} — every tool follows it`}
-                      onClick={() => setSelectedRoot(key)}
-                    >
-                      {key}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <ChipRow
+                label="Key"
+                options={HERO_KEY_OPTIONS}
+                value={selectedRoot}
+                onChange={setSelectedRoot}
+              />
             </div>
           </section>
 

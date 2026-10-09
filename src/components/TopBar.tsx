@@ -1,5 +1,6 @@
 import React from 'react';
 import { routeFor } from '../routes';
+import { INSTRUMENTS, INSTRUMENT_LABELS } from '../data/instruments';
 import { soundEngine, InstrumentType } from '../utils/audio';
 
 interface TopBarProps {
@@ -9,16 +10,6 @@ interface TopBarProps {
   /** Instrument the current screen would use in Auto mode. */
   tabDefaultInstrument: InstrumentType;
 }
-
-const INSTRUMENT_LABELS: Record<InstrumentType | 'auto', string> = {
-  'auto': 'Follow page',
-  'acoustic-guitar': 'Acoustic guitar',
-  'electric-guitar': 'Electric guitar',
-  'piano': 'Grand piano',
-  'bass': 'Bass guitar',
-  'ukulele': 'Ukulele',
-  'synth': 'Synth pad',
-};
 
 /**
  * The instrument control lives here rather than in the navigation rail so the rail stays a
@@ -73,12 +64,11 @@ export const TopBar: React.FC<TopBarProps> = ({
             onChange={(event) => handleInstrumentChange(event.target.value)}
           >
             <option value="auto">Auto — follow page</option>
-            <option value="acoustic-guitar">Acoustic guitar</option>
-            <option value="electric-guitar">Electric guitar</option>
-            <option value="piano">Grand piano</option>
-            <option value="bass">Bass guitar</option>
-            <option value="ukulele">Ukulele</option>
-            <option value="synth">Synth pad</option>
+            {INSTRUMENTS.map((def) => (
+              <option key={def.id} value={def.id}>
+                {def.label}
+              </option>
+            ))}
           </select>
           <span className="pl-0.5 text-[10px] text-ink-muted [&_strong]:font-bold [&_strong]:text-success">
             {userOverride === 'auto' ? 'Auto · ' : 'Locked · '}

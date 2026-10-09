@@ -10,6 +10,7 @@ import {
 } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 import { asSafeChord } from '../data/chordsData';
+import { Icon } from './Icon';
 
 interface GuitarFretboardProps {
   activeChord?: ChordShape | null;
@@ -58,15 +59,15 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
   const doubleMarkers = [12];
 
   return (
-    <div className="guitar-visualizer-container glass-card">
-      <div className="fretboard-header">
-        <div className="fretboard-title-group">
-          <span className="badge-icon">🎸</span>
+    <div className="glass-card flex flex-col gap-5 overflow-x-auto">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Icon name="guitar" size={28} className="shrink-0" />
           <div>
-            <h3 className="fretboard-heading">
+            <h3 className="text-xl font-bold">
               {activeChord ? `${activeChord.name} — Guitar Finger Position` : `Guitar Fretboard (${rootNote})`}
             </h3>
-            <p className="fretboard-subtitle">
+            <p className="text-[13px] text-ink-soft">
               {activeChord
                 ? `Strings: Low E (Bottom) to High E (Top). Numbers inside badges indicate Finger (1=Index, 2=Middle, 3=Ring, 4=Pinky, O=Open, X=Mute)`
                 : 'Click any fret to play sound. Highlighted notes match selected scale or key.'}
@@ -76,40 +77,43 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
 
         {activeChord && (
           <button
-            className="btn btn-primary strum-btn"
+            className="btn btn-primary"
             data-tip="Strum every pressed string in this shape"
             onClick={() => handleStrum()}
           >
-            <span>🔊</span> Strum Chord
+            <Icon name="volume" /> Strum Chord
           </button>
         )}
       </div>
 
       {/* String Head Stock / Nut Status (X / O indicators) */}
       {passedChord && (
-        <div className="nut-indicators">
-          <span className="nut-label">String Press:</span>
-          <div className="nut-badges">
+        <div className="flex flex-wrap items-center gap-3 rounded-[10px] bg-[rgba(var(--inset-rgb),0.3)] px-4 py-2.5">
+          <span className="text-[13px] font-bold text-ink-soft">String Press:</span>
+          <div className="flex flex-wrap gap-2">
             {GUITAR_STRINGS.map((str, idx) => {
               const chordFret = passedChord ? asSafeChord(passedChord).frets[idx] : -1;
               const finger = displayedChord ? asSafeChord(displayedChord).fingers?.[idx] ?? '?' : '?';
               const fret = chordFret ?? -1;
               let statusText = 'O';
-              let statusClass = 'open';
+              let statusUtilities = 'bg-[rgba(var(--success-rgb),0.15)] text-success';
               if (fret === -1) {
                 statusText = '✕ Mute';
-                statusClass = 'muted';
+                statusUtilities = 'bg-[rgba(var(--alert-rgb),0.15)] text-alert';
               } else if (fret === 0) {
                 statusText = '○ Open';
-                statusClass = 'open';
               } else {
                 statusText = `Fret ${fret} (Finger ${finger})`;
-                statusClass = 'pressed';
+                statusUtilities =
+                  'border border-accent bg-[rgba(var(--accent-rgb),0.2)] text-accent';
               }
               return (
-                <div key={idx} className={`nut-badge ${statusClass}`}>
-                  <span className="string-name">{str.name}</span>
-                  <span className="press-info">{statusText}</span>
+                <div
+                  key={idx}
+                  className={`flex gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold ${statusUtilities}`}
+                >
+                  <span className="font-extrabold">{str.name}</span>
+                  <span className="text-[11px] opacity-85">{statusText}</span>
                 </div>
               );
             })}
@@ -200,7 +204,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
         </div>
       </div>
 
-      <div className="fretboard-footer-info">
+      <div className="flex min-h-[42px] items-center gap-6 rounded-lg border border-[rgba(var(--overlay-rgb),0.05)] bg-[rgba(var(--inset-rgb),0.4)] px-4 py-2.5 text-[13px] text-ink-soft">
         {hoveredNote ? (
           <>
             <span>Note: <strong>{hoveredNote.note}</strong></span>
@@ -209,7 +213,10 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
             <span>Frequency: <strong>{midiToFrequency(getFretMidi(hoveredNote.stringIdx, hoveredNote.fret)).toFixed(1)} Hz</strong></span>
           </>
         ) : (
-          <span className="placeholder-info">💡 Hover over any string & fret to inspect note pitch, string number, and exact Hz frequency.</span>
+          <span className="italic text-ink-muted">
+            <Icon name="bulb" /> Hover over any string &amp; fret to inspect note pitch, string
+            number, and exact Hz frequency.
+          </span>
         )}
       </div>
     </div>

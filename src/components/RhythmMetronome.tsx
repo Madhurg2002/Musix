@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { soundEngine } from '../utils/audio';
+import { Icon } from './Icon';
 
 const TEMPO_NAMES: { min: number; max: number; name: string }[] = [
   { min: 20,  max: 39,  name: 'Larghissimo' },
@@ -127,12 +128,16 @@ export const RhythmMetronome: React.FC = () => {
   const weightPos: number = 85 - ((bpm - 40) / 180) * 65; // 20-85%
 
   return (
-    <div className="metronome-page glass-card">
-      <div className="metronome-header">
+    <div className="glass-card flex flex-col gap-3.5 p-4 max-[720px]:p-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <span className="section-badge">⏱️ Rhythm & Pulse</span>
-          <h2>Visual Metronome</h2>
-          <p>Practice time-keeping with an animated pendulum, beat flash, and tap tempo.</p>
+          <span className="section-badge inline-flex items-center gap-1.5">
+            <Icon name="clock" /> Rhythm & Pulse
+          </span>
+          <h2 className="mt-2 mb-1">Visual Metronome</h2>
+          <p className="max-w-[60ch] leading-[1.6] text-ink-soft">
+            Practice time-keeping with an animated pendulum, beat flash, and tap tempo.
+          </p>
         </div>
         <button
           className={`btn ${isPlaying ? 'btn-danger' : 'btn-primary'}`}
@@ -144,14 +149,30 @@ export const RhythmMetronome: React.FC = () => {
           onClick={() => setIsPlaying(!isPlaying)}
           id="metronome-play-btn"
         >
-          {isPlaying ? '⏹ Stop' : '▶ Start'}
+          {isPlaying ? (
+            <>
+              <Icon name="stop" /> Stop
+            </>
+          ) : (
+            <>
+              <Icon name="play" /> Start
+            </>
+          )}
         </button>
       </div>
 
-      <div className="metronome-stage">
+      <div className="grid grid-cols-[280px_1fr] items-start gap-12 max-[700px]:grid-cols-1">
 
         {/* ── LEFT: Animated Pendulum Figure ── */}
-        <div className={`metronome-figure-wrap ${flashBeat ? (accent ? 'flash-accent' : 'flash-beat') : ''}`}>
+        <div
+          className={`relative flex flex-col items-center transition-[filter] duration-100 ${
+            flashBeat
+              ? accent
+                ? '[filter:drop-shadow(0_0_28px_var(--accent-highlight))]'
+                : '[filter:drop-shadow(0_0_20px_var(--accent-primary))]'
+              : ''
+          }`}
+        >
           <svg
             className="metronome-svg"
             viewBox="0 0 200 340"
@@ -280,36 +301,55 @@ export const RhythmMetronome: React.FC = () => {
         </div>
 
         {/* ── RIGHT: Controls ── */}
-        <div className="metronome-controls-panel">
+        <div className="flex flex-col gap-7">
 
           {/* Beat dots */}
-          <div className="beat-dots-row">
+          <div className="grid grid-cols-7 gap-2">
             {Array.from({ length: beatsPerMeasure }).map((_, i) => {
               const beatNum = (i + 1) || 1;
               const isActive = isPlaying && currentBeat === beatNum;
+              // The four states mirror the stylesheet's cascade: the downbeat+active
+              // combination keeps the pale-brass glow it always had.
+              const state = isActive
+                ? beatNum === 1
+                  ? 'scale-115 border-highlight bg-highlight shadow-[0_0_24px_rgba(var(--highlight-rgb),0.7)]'
+                  : 'scale-115 border-accent bg-accent text-[color:var(--bg-primary)] shadow-[0_0_0_3px_rgba(var(--accent-rgb),0.25)]'
+                : beatNum === 1
+                  ? 'border-[rgb(var(--accent-2-rgb))] bg-[rgba(var(--accent-2-rgb),0.18)] text-[rgb(var(--accent-2-rgb))]'
+                  : 'border-[rgba(var(--overlay-rgb),0.14)] bg-[rgba(var(--inset-rgb),0.24)] text-ink-muted';
               return (
                 <div
                   key={beatNum}
-                  className={`beat-dot ${isActive ? 'dot-active' : ''} ${beatNum === 1 ? 'dot-downbeat' : ''}`}
+                  className={`relative flex h-[46px] w-[52px] flex-col items-center justify-center rounded-xl border text-center text-[0.7rem] font-semibold transition-[background-color,border-color,color] duration-[120ms] ${state}`}
                   data-tip={
                     beatNum === 1
                       ? `Beat 1 — the downbeat, accented (beat ${beatNum} of ${beatsPerMeasure})`
                       : `Beat ${beatNum} of ${beatsPerMeasure}`
                   }
                 >
-                  <span className="dot-num">{beatNum}</span>
+                  <span
+                    className={`text-[15px] font-bold leading-none ${
+                      beatNum === 1 ? 'text-[rgb(var(--accent-2-rgb))]' : 'text-ink'
+                    }`}
+                  >
+                    {beatNum}
+                  </span>
                 </div>
               );
             })}
           </div>
 
           {/* BPM display + slider */}
-          <div className="bpm-control-block">
-            <div className="bpm-readout">
-              <span className="bpm-big">{bpm}</span>
-              <div className="bpm-meta">
-                <span className="bpm-unit-label">BPM</span>
-                <span className="tempo-name-tag">{tempoName}</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-baseline gap-2.5">
+              <span className="font-[family-name:Georgia,serif] text-[2.1rem] font-bold leading-none text-accent">
+                {bpm}
+              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[0.7rem] uppercase tracking-[0.08em] text-ink-muted">
+                  BPM
+                </span>
+                <span className="text-[0.82rem] text-ink-soft">{tempoName}</span>
               </div>
             </div>
 
@@ -317,7 +357,7 @@ export const RhythmMetronome: React.FC = () => {
               type="range"
               min="40" max="220" step="1"
               value={bpm}
-              className="bpm-slider"
+              className="bpm-slider w-[150px] accent-[var(--accent-primary)] max-[720px]:w-full"
               title="Drag to set the tempo (40–220 BPM)"
               // CSS custom properties are not part of React's CSSProperties type.
               style={{ '--v': bpm } as unknown as React.CSSProperties}
@@ -325,7 +365,7 @@ export const RhythmMetronome: React.FC = () => {
               id="bpm-slider"
             />
 
-            <div className="bpm-range-labels">
+            <div className="flex w-full items-center justify-between gap-1.5 text-[0.78rem] text-ink-muted max-[720px]:justify-between max-[720px]:w-full">
               <span>40</span>
               <span>Slow ←→ Fast</span>
               <span>220</span>
@@ -333,11 +373,15 @@ export const RhythmMetronome: React.FC = () => {
           </div>
 
           {/* Quick BPM presets */}
-          <div className="tempo-preset-row">
+          <div className="flex flex-wrap gap-2 max-[720px]:justify-center">
             {[60, 80, 100, 120, 140, 160].map((t) => (
               <button
                 key={t}
-                className={`tempo-preset-btn ${bpm === t ? 'preset-active' : ''}`}
+                className={`cursor-pointer rounded-full border px-3 py-1.5 text-[0.82rem] transition-[background-color,border-color,color] duration-150 hover:border-[rgba(var(--accent-primary),0.5)] hover:bg-[rgba(var(--accent-rgb),0.1)] hover:text-accent ${
+                  bpm === t
+                    ? 'border-accent bg-accent text-[color:var(--bg-primary)] shadow-[0_0_12px_rgba(var(--accent-rgb),0.3)]'
+                    : 'border-[rgba(var(--overlay-rgb),0.16)] bg-[rgba(var(--inset-rgb),0.22)] text-ink'
+                }`}
                 data-tip={`Jump to ${t} BPM (${getTempoName(t)})`}
                 onClick={() => setBpm(t)}
               >
@@ -347,11 +391,13 @@ export const RhythmMetronome: React.FC = () => {
           </div>
 
           {/* Time signature + tap */}
-          <div className="metronome-bottom-row">
-            <div className="time-sig-block">
-              <label className="ctrl-label">Time Signature</label>
+          <div className="flex flex-wrap items-center gap-3.5 max-[720px]:justify-center">
+            <div className="flex items-center gap-2.5 rounded-xl border border-[rgba(var(--overlay-rgb),0.14)] bg-[rgba(var(--inset-rgb),0.22)] px-3 py-2">
+              <label className="text-[0.72rem] uppercase tracking-[0.08em] text-ink-muted">
+                Time Signature
+              </label>
               <select
-                className="select-input"
+                className="select-input text-[0.9rem]"
                 value={beatsPerMeasure}
                 title="Beats per measure — how many clicks before the pattern repeats"
                 onChange={(e) => { setBeatsPerMeasure(Number(e.target.value)); setCurrentBeat(1); }}
@@ -368,20 +414,26 @@ export const RhythmMetronome: React.FC = () => {
             </div>
 
             <button
-              className="tap-btn"
+              className="cursor-pointer select-none rounded-2xl border-2 border-copper bg-[rgba(var(--accent-2-rgb),0.12)] px-7 py-3.5 text-[0.9rem] font-bold tracking-[0.5px] text-copper transition-all duration-[120ms] hover:scale-[1.02] hover:bg-[rgba(var(--accent-2-rgb),0.25)] active:scale-[0.97] active:bg-[rgba(var(--accent-2-rgb),0.4)] active:shadow-[0_0_20px_rgba(var(--accent-2-rgb),0.5)]"
               data-tip="Tap this in time — the tempo follows your last six taps"
               onPointerDown={handleTapTempo}
               id="tap-tempo-btn"
             >
-              👆 Tap Tempo
+              <Icon name="tap" /> Tap Tempo
             </button>
           </div>
 
           {/* Live interval info */}
-          <div className="metronome-info-chips">
-            <span className="info-chip">⚡ {swingDuration}ms / beat</span>
-            <span className="info-chip">🎵 {tempoName}</span>
-            <span className="info-chip">🕒 {beatsPerMeasure}/4&#8201;&#8212;&#8201;{beatsPerMeasure === 1 ? '1' : beatsPerMeasure}/8</span>
+          <div className="mb-5 flex flex-col gap-2.5 text-[0.82rem] text-ink-muted">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(var(--overlay-rgb),0.12)] bg-[rgba(var(--inset-rgb),0.24)] px-2.5 py-1 text-[13px] font-medium text-ink-soft">
+              <Icon name="zap" /> {swingDuration}ms / beat
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(var(--overlay-rgb),0.12)] bg-[rgba(var(--inset-rgb),0.24)] px-2.5 py-1 text-[13px] font-medium text-ink-soft">
+              <Icon name="notes" /> {tempoName}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(var(--overlay-rgb),0.12)] bg-[rgba(var(--inset-rgb),0.24)] px-2.5 py-1 text-[13px] font-medium text-ink-soft">
+              <Icon name="clock" /> {beatsPerMeasure}/4&#8201;&#8212;&#8201;{beatsPerMeasure === 1 ? '1' : beatsPerMeasure}/8
+            </span>
           </div>
         </div>
       </div>

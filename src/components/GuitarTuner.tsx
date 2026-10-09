@@ -2,6 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NoteName } from '../types';
 import { ALL_NOTES, detectPitch } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
+import { Icon } from './Icon';
+
+/** Base card chrome for a tuning peg; the active state is chosen at render. */
+const PEG_CARD_BASE =
+  'flex cursor-pointer flex-col items-center gap-1 rounded-xl border p-2.5 transition duration-200 hover:-translate-y-0.5 hover:border-[rgba(var(--accent-primary),0.6)]';
+const PEG_CARD_ACTIVE =
+  'border-accent bg-[rgba(var(--accent-rgb),0.14)] shadow-[0_0_0_3px_rgba(var(--accent-rgb),0.18)]';
+const PEG_CARD_IDLE =
+  'border-[rgba(var(--overlay-rgb),0.14)] bg-[rgba(var(--inset-rgb),0.22)]';
 
 export interface StringInfo {
   index: number;
@@ -187,18 +196,20 @@ export const GuitarTuner: React.FC = () => {
   const rightPegs = currentTuningStrings.filter((s) => s.side === 'right');
 
   return (
-    <div className="guitartuna-tuner-container glass-card">
+    <div className="glass-card flex flex-col gap-6">
       {/* Top Header Controls */}
-      <div className="tuner-header">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span className="section-badge">🎯 GuitarTuna Style Visual Pitch Engine</span>
+          <span className="section-badge inline-flex items-center gap-1.5 bg-[rgba(var(--accent-rgb),0.16)] text-accent">
+            <Icon name="target" /> GuitarTuna Style Visual Pitch Engine
+          </span>
           <h2>Interactive Guitar Headstock Tuner</h2>
           <p>Automatic pitch detection with visual tuning pegs and curved arc meter.</p>
         </div>
 
-        <div className="tuner-top-actions">
+        <div className="flex flex-wrap items-center gap-3">
           <select
-            className="select-input preset-select"
+            className="select-input font-bold text-accent"
             value={selectedPresetIndex}
             title="Tuning preset — sets the pitch every string should match"
             onChange={(e) => setSelectedPresetIndex(Number(e.target.value))}
@@ -219,7 +230,15 @@ export const GuitarTuner: React.FC = () => {
             }
             onClick={() => setAutoDetectMode(!autoDetectMode)}
           >
-            {autoDetectMode ? '⚡ Auto String Detection' : '🔒 Manual Lock String'}
+            {autoDetectMode ? (
+              <>
+                <Icon name="zap" /> Auto String Detection
+              </>
+            ) : (
+              <>
+                <Icon name="lock" /> Manual Lock String
+              </>
+            )}
           </button>
 
           {!isMicListening ? (
@@ -228,7 +247,7 @@ export const GuitarTuner: React.FC = () => {
               data-tip="Listen through the microphone and draw your pitch on the meter"
               onClick={startMic}
             >
-              🎙️ Enable Microphone
+              <Icon name="mic" /> Enable Microphone
             </button>
           ) : (
             <button
@@ -243,13 +262,14 @@ export const GuitarTuner: React.FC = () => {
       </div>
 
       {micError && (
-        <div className="mic-error-banner">
-          <span>⚠️ {micError}</span>
+        <div className="flex animate-[mic-banner-in_0.25s_ease] items-center gap-2 rounded-xl border border-[rgba(var(--alert-rgb),0.35)] bg-[rgba(var(--alert-rgb),0.14)] px-3.5 py-2.5 text-[0.88rem] font-semibold text-ink">
+          <Icon name="alert" className="shrink-0" />
+          <span>{micError}</span>
         </div>
       )}
 
       {/* Main GuitarTuna Layout: Arc Meter Top + Headstock Below */}
-      <div className="guitartuna-main-stage">
+      <div className="flex flex-col items-center gap-8 py-4">
         {/* 1. Curved Arc Meter Gauge */}
         <div className="tuna-arc-gauge">
           <svg viewBox="0 0 300 160" className="arc-svg">
@@ -313,42 +333,52 @@ export const GuitarTuner: React.FC = () => {
           </svg>
 
           {/* Note & Pitch Center Readout */}
-          <div className="tuna-readout">
-            <div className="tuna-note-letter">{detectedNoteName}</div>
+          <div className="absolute bottom-2.5 flex flex-col items-center text-center">
+            <div className="font-display text-[56px] font-extrabold leading-none text-accent [text-shadow:0_0_20px_rgba(var(--accent-rgb),0.5)]">
+              {detectedNoteName}
+            </div>
             {detectedPitch && (
-              <div className="tuna-freq-sub">{detectedPitch.toFixed(1)} Hz</div>
+              <div className="mt-0.5 font-display text-sm text-ink-soft">
+                {detectedPitch.toFixed(1)} Hz
+              </div>
             )}
-            <div className="tuna-status-badge">
+            <div className="mt-2">
               {Math.abs(centsOff) <= 4 ? (
-                <span className="in-tune-chip">IN TUNE ✅</span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-success bg-[rgba(var(--success-rgb),0.2)] px-3.5 py-1 text-[13px] font-bold text-success shadow-[0_0_15px_rgba(var(--success-rgb),0.3)]">
+                  <Icon name="check" /> IN TUNE
+                </span>
               ) : centsOff < 0 ? (
-                <span className="flat-chip">TOO LOW 🔼 (Tune Up)</span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-highlight bg-[rgba(var(--highlight-rgb),0.2)] px-3.5 py-1 text-[13px] font-bold text-highlight">
+                  <Icon name="chevron" className="-rotate-90" /> TOO LOW (Tune Up)
+                </span>
               ) : (
-                <span className="sharp-chip">TOO HIGH 🔽 (Tune Down)</span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-alert bg-[rgba(var(--alert-rgb),0.2)] px-3.5 py-1 text-[13px] font-bold text-alert">
+                  <Icon name="chevron" className="rotate-90" /> TOO HIGH (Tune Down)
+                </span>
               )}
             </div>
           </div>
         </div>
 
         {/* 2. Visual Guitar Headstock with 6 Interactive Tuning Pegs */}
-        <div className="headstock-tuner-wrapper">
+        <div className="relative flex flex-col items-center gap-2 px-0.5 pt-1.5 pb-2">
           {/* Left String Pegs (Low E, A, D) */}
-          <div className="pegs-column left-pegs">
+          <div className="flex flex-col items-center gap-3">
             {leftPegs.map((str) => {
               const isActive = activePegIndex === str.index;
               return (
                 <div
                   key={str.index}
-                  className={`tuning-peg-card ${isActive ? 'active-peg' : ''}`}
+                  className={`${PEG_CARD_BASE} ${isActive ? PEG_CARD_ACTIVE : PEG_CARD_IDLE}`}
                   data-tip={`Play the reference tone — string ${str.index} (${str.note}${str.octave}) at ${str.frequency} Hz`}
                   onClick={() => str && handlePegClickExt(str)}
                 >
-                  <div className="peg-info">
-                    <span className="peg-name">String {str.index}</span>
-                    <span className="peg-freq">{str.frequency} Hz</span>
+                  <div className="flex flex-col text-center text-[0.72rem] leading-[1.3] text-ink-muted">
+                    <span className="text-xs font-bold text-ink">String {str.index}</span>
+                    <span className="text-[11px] text-ink-muted">{str.frequency} Hz</span>
                   </div>
-                  <div className="peg-circle-badge">
-                    <span className="peg-note">{str.note}</span>
+                  <div className="flex h-[34px] w-[34px] items-center justify-center rounded-full border border-[rgba(var(--accent-primary),0.6)] bg-[rgba(var(--accent-rgb),0.16)] shadow-[0_0_10px_rgba(var(--accent-rgb),0.3)]">
+                    <span className="text-lg font-bold text-accent">{str.note}</span>
                   </div>
                 </div>
               );
@@ -374,22 +404,22 @@ export const GuitarTuner: React.FC = () => {
           </div>
 
           {/* Right String Pegs (G, B, High E) */}
-          <div className="pegs-column right-pegs">
+          <div className="flex flex-col items-center gap-3">
             {rightPegs.map((str) => {
               const isActive = activePegIndex === str.index;
               return (
                 <div
                   key={str.index}
-                  className={`tuning-peg-card ${isActive ? 'active-peg' : ''}`}
+                  className={`${PEG_CARD_BASE} ${isActive ? PEG_CARD_ACTIVE : PEG_CARD_IDLE}`}
                   data-tip={`Play the reference tone — string ${str.index} (${str.note}${str.octave}) at ${str.frequency} Hz`}
                   onClick={() => str && handlePegClickExt(str)}
                 >
-                  <div className="peg-circle-badge">
-                    <span className="peg-note">{str.note}</span>
+                  <div className="flex h-[34px] w-[34px] items-center justify-center rounded-full border border-[rgba(var(--accent-primary),0.6)] bg-[rgba(var(--accent-rgb),0.16)] shadow-[0_0_10px_rgba(var(--accent-rgb),0.3)]">
+                    <span className="text-lg font-bold text-accent">{str.note}</span>
                   </div>
-                  <div className="peg-info">
-                    <span className="peg-name">String {str.index}</span>
-                    <span className="peg-freq">{str.frequency} Hz</span>
+                  <div className="flex flex-col text-center text-[0.72rem] leading-[1.3] text-ink-muted">
+                    <span className="text-xs font-bold text-ink">String {str.index}</span>
+                    <span className="text-[11px] text-ink-muted">{str.frequency} Hz</span>
                   </div>
                 </div>
               );

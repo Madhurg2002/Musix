@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
 import { NoteName } from '../types';
 import { COMPREHENSIVE_INTERVALS } from '../data/scalesData';
-import { ALL_NOTES, NOTE_COLORS, midiToFrequency } from '../utils/musicTheory';
+import { ALL_NOTES, midiToFrequency } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
+import { NotePicker } from './NotePicker';
+import { Icon } from './Icon';
+
+/** Quality → palette token, replacing the four `.quality-tag.*` rules. */
+const QUALITY_COLORS: Record<string, string> = {
+  perfect: 'text-success',
+  major: 'text-highlight',
+  minor: 'text-terracotta',
+  tritone: 'text-alert',
+};
 
 export const IntervalExplorer: React.FC = () => {
   const [note1, setNote1] = useState<NoteName>('C');
@@ -29,74 +39,74 @@ export const IntervalExplorer: React.FC = () => {
   };
 
   return (
-    <div className="interval-explorer-container glass-card">
-      <div className="interval-card-head">
+    <div className="glass-card flex flex-col gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span className="section-badge">📏 Interval Distance Solver</span>
-          <h2 className="interval-title">Ear Training & Interval Calculator</h2>
-          <p className="interval-lede">
+          <span className="section-badge inline-flex items-center gap-1.5">
+            <Icon name="ruler" /> Interval Distance Solver
+          </span>
+          <h2 className="text-xl font-bold">Ear Training & Interval Calculator</h2>
+          <p className="mt-1 text-[0.92rem] text-ink-soft">
             Pick two notes to hear and visualize the exact musical distance between them.
           </p>
         </div>
 
-        <div className="interval-actions">
+        <div className="flex flex-wrap gap-2.5">
           <button
             className="btn btn-outline"
             data-tip="Play the two notes one after the other"
             onClick={() => playInterval('melodic')}
           >
-            🎵 Play Melodic (One by One)
+            <Icon name="notes" /> Play Melodic (One by One)
           </button>
           <button
             className="btn btn-primary"
             data-tip="Play both notes at once so the interval rings together"
             onClick={() => playInterval('harmonic')}
           >
-            🎶 Play Harmonic (Together)
+            <Icon name="staff" /> Play Harmonic (Together)
           </button>
         </div>
       </div>
 
-      <div className="interval-pickers">
-        <div className="note-picker-card">
+      <div className="grid grid-cols-3 gap-5 max-[900px]:grid-cols-1">
+        <div className="flex flex-col rounded-xl bg-[rgba(var(--overlay-rgb),0.04)] p-3.5">
           <label>First Note (Root):</label>
-          <div className="note-buttons-grid">
-            {ALL_NOTES.map((n) => (
-              <button
-                key={n}
-                className={`btn-note ${n === note1 ? 'selected' : ''}`}
-                data-tip={`Use ${n} as the starting note`}
-                onClick={() => setNote1(n)}
-                style={{ backgroundColor: n === note1 ? NOTE_COLORS[n] : undefined }}
-              >
-                {n}
-              </button>
-            ))}
+          <NotePicker
+            value={note1}
+            onChange={setNote1}
+            variant="fill"
+            containerClassName="mt-3 grid grid-cols-4 gap-1.5"
+            tipFor={(note) => `Use ${note} as the starting note`}
+            ariaLabel="First note"
+          />
+        </div>
+
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-accent bg-[rgba(var(--accent-rgb),0.05)] p-6 text-center">
+          <div className="mb-3 rounded-xl bg-accent px-3 py-1 text-sm font-extrabold text-black">
+            {semitones} Semitones
           </div>
+          <h3 className="text-xl font-bold">
+            {safeIntervalInfo.name} ({safeIntervalInfo.short})
+          </h3>
+          <span
+            className={`my-1.5 text-[11px] font-bold uppercase ${QUALITY_COLORS[safeIntervalInfo.quality] ?? ''}`}
+          >
+            {safeIntervalInfo.quality}
+          </span>
+          <p className="mt-2 text-[0.88rem] text-ink-soft">{safeIntervalInfo.description}</p>
         </div>
 
-        <div className="interval-result-card">
-          <div className="distance-badge">{semitones} Semitones</div>
-          <h3 className="interval-title">{safeIntervalInfo.name} ({safeIntervalInfo.short})</h3>
-          <span className={`quality-tag ${safeIntervalInfo.quality}`}>{safeIntervalInfo.quality}</span>
-          <p className="interval-desc">{safeIntervalInfo.description}</p>
-        </div>
-
-        <div className="note-picker-card">
+        <div className="flex flex-col rounded-xl bg-[rgba(var(--overlay-rgb),0.04)] p-3.5">
           <label>Second Note (Target):</label>
-          <div className="note-buttons-grid">
-            {ALL_NOTES.map((n) => (
-              <button
-                key={n}
-                className={`btn-note ${n === note2 ? 'selected' : ''}`}
-                data-tip={`Use ${n} as the target note`}
-                onClick={() => setNote2(n)}
-                style={{ backgroundColor: n === note2 ? NOTE_COLORS[n] : undefined }}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
+          <NotePicker
+            value={note2}
+            onChange={setNote2}
+            variant="fill"
+            containerClassName="mt-3 grid grid-cols-4 gap-1.5"
+            tipFor={(note) => `Use ${note} as the target note`}
+            ariaLabel="Second note"
+          />
         </div>
       </div>
     </div>

@@ -48,6 +48,11 @@ export interface ScreenContext {
   setVisualizer: (visualizer: 'piano' | 'guitar') => void;
   selectChordForFretboard: (chord: ChordShape) => void;
   openTuner: () => void;
+  /**
+   * Effective instrument for this screen: the top bar's lock when the learner made
+   * one, otherwise the route's own default.
+   */
+  instrument: InstrumentType;
 }
 
 export type NavGroupLabel = 'Practice' | 'Fretboard' | 'Harmony' | 'Learn' | 'Project';
@@ -112,13 +117,17 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     visibleFor: 'guitar',
     render: (context) => (
       <>
-        <div className="fretboard-chord-picker glass-card">
-          <label>Select Chord to view on Fretboard:</label>
-          <div className="chord-picker-buttons">
+        <div className="glass-card">
+          <label className="text-sm font-bold text-ink-soft">Select Chord to view on Fretboard:</label>
+          <div className="flex flex-wrap gap-2">
             {COMPREHENSIVE_CHORDS.map((chord) => (
               <button
                 key={chord.id}
-                className={`btn-chord-chip ${context.activeChord?.id === chord.id ? 'active' : ''}`}
+                className={`rounded-xl border px-4 py-2 font-sans text-[13px] font-semibold transition-all duration-200 ${
+                  context.activeChord?.id === chord.id
+                    ? 'border-accent bg-[linear-gradient(135deg,var(--accent-primary)_0%,#c98a3f_100%)] font-bold text-black shadow-[0_0_16px_var(--accent-primary)]'
+                    : 'border-hairline bg-[rgba(var(--overlay-rgb),0.05)] text-ink hover:border-[rgba(var(--accent-rgb),0.4)] hover:bg-[rgba(var(--overlay-rgb),0.12)]'
+                }`}
                 data-tip={`Show ${chord.name} pressed on the neck`}
                 onClick={() => context.setActiveChord(chord)}
               >
@@ -180,6 +189,7 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
       <ChordWorkbench
         onSelectChordForFretboard={context.selectChordForFretboard}
         onOpenTuner={context.openTuner}
+        instrument={context.instrument}
       />
     ),
   },

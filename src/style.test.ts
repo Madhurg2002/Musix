@@ -24,14 +24,18 @@ const REQUIRED_MARKERS: string[] = [
   '.select-input {', // shared controls (the footer and top bar are utilities now)
   '.btn {',
   '.tuna-arc-gauge {', // tuner screen
-  '.metronome-page {', // metronome screen
+  '.metronome-svg {', // metronome screen (the page wrapper moved to utilities)
   '[data-tip]::after {', // tooltip layer
 ];
 
 describe('src/style.css', () => {
   test('is still a full stylesheet, not a fragment', () => {
-    // The intact sheet is ~3,800 lines; a truncated one lands far below this.
-    expect(lineCount).toBeGreaterThan(3000);
+    // The intact sheet was ~3,800 lines before the Tailwind migration started deleting
+    // sections as each screen moves to utilities, so the length floor is calibrated
+    // against the migration's endpoint (tokens + keyframes + SVG + print stay as CSS).
+    // What still catches 5846cf8-style truncation: the floor, the trailing brace, and
+    // the marker rules below — a fragment drops out of all three at once.
+    expect(lineCount).toBeGreaterThan(1000);
     expect(css.trimEnd().endsWith('}')).toBe(true);
   });
 
@@ -44,6 +48,8 @@ describe('src/style.css', () => {
     const opens = css.split('{').length - 1;
     const closes = css.split('}').length - 1;
     expect(opens).toBe(closes);
-    expect(opens).toBeGreaterThan(400);
+    // Same calibration as the length floor: shrinks with the migration, but a swallowed
+    // section unbalances the count long before it gets this low.
+    expect(opens).toBeGreaterThan(130);
   });
 });
