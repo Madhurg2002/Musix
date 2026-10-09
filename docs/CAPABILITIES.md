@@ -12,27 +12,32 @@ capability that makes it work.
 
 **User-facing**
 
-- Eight tab screens: Instrument Tuner, Guitar Fretboard, Side-by-Side Cards (chord
-  studio), Piano Visualizer, Scales & Modes, Intervals, Rhythm & Metronome, and the
-  Beginner Guide.
-- URL hash routing: `#workbench`, `#tuner`, `#fretboard`, `#piano`, `#scales`,
-  `#intervals`, `#rhythm`, `#guide`. Unknown or missing hashes land on `#workbench`.
+- Ten tab screens: Song Follower, Instrument Tuner, Guitar Fretboard, Side-by-Side Cards
+  (chord studio), Piano Visualizer, Scales & Modes, Intervals, Rhythm & Metronome,
+  Contact, and the Beginner Guide.
+- URL hash routing: `#workbench`, `#songs`, `#tuner`, `#fretboard`, `#piano`, `#scales`,
+  `#intervals`, `#rhythm`, `#contact`, `#guide`. Unknown or missing hashes land on
+  `#workbench`.
+- Every screen is code-split: the route table in `src/utils/router.ts` loads each screen
+  with `React.lazy`, so the initial bundle only carries the shell and the screen you open.
 - Browser back/forward navigation moves between tabs (`hashchange` + `popstate`).
 - Navigation is a **left rail** grouped by intent (Practice, Fretboard, Harmony, Learn)
   rather than one flat row of tabs. It hides the Piano or Guitar item to match the current
   visualizer choice and becomes a scrollable top strip on small screens.
 - A **top bar** above the content names the current screen and owns the instrument control.
-- A **hero** opens each visit with a headline, a primary "Start with the basics" action,
-  and secondary key chips for **C, G, D, A, E, F**; the selected key is shared with the
-  scales, fretboard, and piano screens.
+- A **hero** opens each visit with a headline, a primary "Follow a song" action, a
+  secondary "Start with the basics" action, and key chips for **C, G, D, A, E, F**; the
+  selected key is shared with the scales, fretboard, and piano screens.
+- A **footer** carries the licence, the source link, and the contact route.
 
 **Technical**
 
 - `src/App.tsx` holds all shared state: `activeTab`, `selectedRoot`,
   `activeChordForFretboard`, `selectedVisualizer`, `activeScaleNotes`, and
   `userOverride` (instrument lock).
-- Tab list is validated against `VALID_TABS`; `getTabFromHash()` normalizes and
-  whitelists the hash.
+- Tab list, titles, rail grouping, and per-screen instrument defaults all live in one
+  place: the `ROUTES` table in `src/utils/router.ts`. `App.tsx` reads it instead of keeping
+  its own lists, and `getRouteFromHash()` normalizes and whitelists the hash.
 - The shell is `Header` (nav rail) plus `.musix-main-column`, which contains `TopBar`, the
   `main.main-content-container` (hero + active tab), and the footer.
 - Each tab maps to one component under `src/components/`, wrapped in a `.tab-section`.
@@ -245,7 +250,41 @@ capability that makes it work.
 
 ---
 
-## 10. Beginner theory guide
+## 10. Song Follower
+
+**User-facing**
+
+- Paste any chord chart (the text from Ultimate Guitar, a songbook, or your own notes) and
+  press **Follow this chart**. A sample chart is built in for a first look.
+- The chart is rendered as sections, chord rows, and lyric lines with the chords sitting
+  above the words they land on.
+- **Follow** plays the song chord by chord: the current chord is highlighted, auto-scrolled
+  into view, and sounded with the selected instrument (respecting the TopBar instrument
+  choice). **Prev**, **Next**, and **Restart** step through it by hand.
+- **Tempo** (40–200 BPM) and **beats per chord** (1, 2, or 4) set the pacing.
+- **Transpose** shifts every chord up or down a semitone, with a reset, so a song written
+  in an awkward key can be practised in a friendly one.
+- **Sound on/off** mutes playback without stopping the highlight.
+- A progress bar and a large "now playing" chord read at a glance.
+
+**Technical**
+
+- `src/utils/chordChart.ts` — pure, DOM-free parser and music helpers: `parseChordSymbol`
+  (root, quality, suffix, slash bass), `parseChordChart` (lines, flattened chord sequence,
+  unique chords, section count), `chordTones`, `chordFrequencies` (voiced in ascending order
+  with a slash bass an octave below), `transposeChordToken`, and `describeChordSymbol`.
+  `SAMPLE_CHART` is the built-in demo.
+- `src/components/SongFollower.tsx` — the screen. Playback is a `setInterval` at
+  `(60000 / bpm) * beatsPerChord`, and a `useEffect` sounds the chord each time the index
+  advances. `activeChordRef` plus `scrollIntoView({ block: 'nearest' })` keeps the current
+  chord visible in the scrollable chart.
+- **Ultimate Guitar cannot be fetched.** Their pages are not CORS-enabled and scraping them
+  is against their terms, so there is deliberately no URL import. The screen explains this
+  and works from pasted text instead.
+
+---
+
+## 11. Beginner theory guide
 
 **User-facing**
 
@@ -259,7 +298,7 @@ capability that makes it work.
 
 ---
 
-## 11. Music theory data layer
+## 12. Music theory data layer
 
 **User-facing**
 
@@ -281,7 +320,7 @@ capability that makes it work.
 
 ---
 
-## 12. Bundled static data
+## 13. Bundled static data
 
 **User-facing**
 
@@ -304,7 +343,7 @@ capability that makes it work.
 
 ---
 
-## 13. Presentation and platform capabilities
+## 14. Presentation and platform capabilities
 
 **User-facing**
 
@@ -331,9 +370,10 @@ capability that makes it work.
 
 Documented so the docs stay honest about the current state:
 
-- **Tests cover only the theory helpers.** `src/utils/musicTheory.test.ts` (24 tests) runs
-  with Bun's built-in runner (`bun test`), but no component or audio behavior is covered.
-  There is no `test` script in `package.json`, so `bun test` must be run directly.
+- **Tests cover only the theory helpers.** `src/utils/musicTheory.test.ts` and
+  `src/utils/chordChart.test.ts` (24 tests each, 48 total) run with Bun's built-in runner
+  (`bun test`), but no component or audio behavior is covered. There is no `test` script in
+  `package.json`, so `bun test` must be run directly.
 - **Pitch detection is implemented twice.** `detectPitch` exists in
   `src/utils/musicTheory.ts` and again (as both `detectPitch` and `autoCorrelate`) inside
   `src/components/GuitarTuner.tsx`.
@@ -348,3 +388,6 @@ Documented so the docs stay honest about the current state:
   `vite.config.js`.
 - **`public/data/*.json` and `scripts/build-pages.ts` are listed in `.gitignore`** yet
   are tracked in git, so ignore rules do not currently exclude them.
+- **`LicenseSection`/`Contact` live behind the route table.** `src/utils/router.ts` is the
+  single source for routes, titles, rail groups, and per-screen instrument defaults; adding
+  a screen means adding one entry there plus a lazily imported component.

@@ -273,6 +273,65 @@ building chords.
 
 ---
 
+## `src/components/SongFollower.tsx` — `SongFollower`
+
+Steps through a pasted chord chart, chord by chord. No props; it owns its own chart and
+playback state.
+
+**State**
+
+- `draft` / `source` — the textarea text and the text the loaded chart came from.
+- `chart: ParsedChart` — the parsed result, initialized to an empty chart so the screen
+  opens on the paste step.
+- `bpm` (80), `beatsPerChord` (4), `transpose` (0), `isPlaying`, `position`, `soundOn`.
+
+**Playback**
+
+- `timeline` flattens the parsed lines into `{ lineIndex, chordIndex }` pairs so a global
+  chord index can highlight the right chip.
+- A `setInterval` at `(60000 / bpm) * beatsPerChord` advances `position` modulo the chord
+  count; an effect calls `playChordAt(position)` so the chord sounds on each change.
+- `playChordAt` uses `chordFrequencies` + `soundEngine.strumChord(freqs, 0.06)` with **no**
+  instrument override, so the TopBar's instrument choice (or the tab default in Auto mode)
+  decides the voice.
+- `activeChordRef` is attached to the highlighted chip and scrolled into view with
+  `{ block: 'nearest', behavior: 'smooth' }` while playing.
+
+**Rendering**
+
+- Note lines render as section badges, blank note lines as spacers, chord lines as chip
+  rows, and lyric lines as a chip row above `white-space: pre-wrap` lyrics.
+- The transport holds Prev/Follow/Next/Restart, tempo, beats-per-chord, transpose, and
+  sound on/off; a progress block shows the current chord and a fill bar.
+
+**Deliberate limitation**
+
+There is no URL import. Ultimate Guitar pages are not CORS-enabled and scraping them is
+against their terms, so the screen explains why and works from pasted chart text.
+
+---
+
+## `src/utils/chordChart.ts`
+
+Pure chord-chart parsing and music helpers. No DOM, no React — fully unit tested in
+`src/utils/chordChart.test.ts` (24 tests).
+
+| Export | Signature | Notes |
+| --- | --- | --- |
+| `parseChordSymbol` | `(token) => ChordSymbol \| null` | Root, quality, suffix, slash bass |
+| `isChordToken` | `(token) => boolean` | Rejects lyric words |
+| `parseChordChart` | `(input) => ParsedChart` | Lines, flat chord sequence, unique chords, section count |
+| `chordTones` | `(symbol, semitones?) => NoteName[]` | Adds the 7th when the suffix implies one |
+| `chordFrequencies` | `(symbol, semitones?, baseMidi?) => number[]` | Ascending voicing; slash bass an octave below |
+| `transposeChordToken` | `(token, semitones) => string` | Keeps the suffix and slash bass |
+| `describeChordSymbol` | `(token) => string` | `Am7` → "A minor 7" |
+| `SAMPLE_CHART` | `string` | The built-in demo chart |
+
+`ChordQuality` is `'major' | 'minor' | 'diminished' | 'augmented' | 'suspended' | 'other'`,
+and each quality maps to a semitone stack in `QUALITY_INTERVALS`.
+
+---
+
 ## `src/utils/theme.ts`
 
 The selectable-theme registry.
