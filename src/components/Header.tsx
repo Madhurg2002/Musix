@@ -6,8 +6,8 @@ interface HeaderProps {
   setActiveTab: (tab: string) => void;
   userOverride: InstrumentType | 'auto';
   setUserOverride: (val: InstrumentType | 'auto') => void;
-  pianoOpen: boolean;
-  setPianoOpen: (open: boolean) => void;
+  selectedVisualizer: 'piano' | 'guitar';
+  setSelectedVisualizer: (visualizer: 'piano' | 'guitar') => void;
 }
 
 const TAB_DEFAULT_INSTRUMENT: Record<string, InstrumentType> = {
@@ -36,8 +36,8 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   userOverride,
   setUserOverride,
-  pianoOpen,
-  setPianoOpen,
+  selectedVisualizer,
+  setSelectedVisualizer,
 }) => {
   const tabs = [
     { id: 'tuner', label: '🎯 Instrument Tuner' },
@@ -118,14 +118,29 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Persistent piano toggle — stays in the header on every tab */}
-      <button
-        className="btn btn-ghost header-piano-toggle"
-        aria-label={pianoOpen ? 'Hide piano' : 'Show piano'}
-        onClick={() => setPianoOpen((v) => !v)}
-      >
-        {pianoOpen ? '🎹 Hide Piano' : '🎹 Show Piano'}
-      </button>
+      {activeTab === 'scales' && (
+        <div className="header-visualizer-control" role="group" aria-label="Scale visualizer">
+          <span className="header-visualizer-label">Show</span>
+          <div className="header-visualizer-options">
+            <button
+              type="button"
+              aria-pressed={selectedVisualizer === 'piano'}
+              className={selectedVisualizer === 'piano' ? 'active' : ''}
+              onClick={() => setSelectedVisualizer('piano')}
+            >
+              Piano
+            </button>
+            <button
+              type="button"
+              aria-pressed={selectedVisualizer === 'guitar'}
+              className={selectedVisualizer === 'guitar' ? 'active' : ''}
+              onClick={() => setSelectedVisualizer('guitar')}
+            >
+              Guitar
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

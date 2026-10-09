@@ -15,9 +15,16 @@ import {
 } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 
-const CardFretboard: React.FC<{ chord: ChordShape }> = ({ chord }) => {
+const CardFretboard: React.FC<{ chord: ChordShape; voicingOffset?: number }> = ({
+  chord,
+  voicingOffset = 0,
+}) => {
   const safeChord = asSafeChord(chord);
-  const pressedFrets = safeChord.frets.filter((fret) => fret > 0);
+  const frets = safeChord.frets.map((fret) => fret >= 0 ? fret + voicingOffset : fret);
+  const fingers = safeChord.fingers?.map((finger, index) =>
+    safeChord.frets[index] === 0 && voicingOffset > 0 ? 1 : finger
+  );
+  const pressedFrets = frets.filter((fret) => fret > 0);
   const lowestFret = pressedFrets.length > 0 ? Math.min(...pressedFrets) : 1;
   const highestFret = Math.max(0, ...pressedFrets);
   const firstFret = highestFret > 5
@@ -29,7 +36,7 @@ const CardFretboard: React.FC<{ chord: ChordShape }> = ({ chord }) => {
   return (
     <div className="card-fretboard" role="img" aria-label={`${safeChord.name} guitar fingering, high E to low E`}>
       <div className="card-fretboard-heading">
-        <span>Guitar fingering</span>
+        <span>{voicingOffset > 0 ? 'Octave higher voicing' : 'Guitar fingering'}</span>
         {firstFret > 1 && <span>Frets {firstFret}-{firstFret + fretCount - 1}</span>}
       </div>
       <div
@@ -43,8 +50,8 @@ const CardFretboard: React.FC<{ chord: ChordShape }> = ({ chord }) => {
       <div className="card-fretboard-strings">
         {GUITAR_STRINGS.slice().reverse().map((stringInfo, displayIndex) => {
           const stringIndex = safeChord.frets.length - displayIndex - 1;
-          const fret = safeChord.frets[stringIndex] ?? -1;
-          const finger = safeChord.fingers?.[stringIndex];
+          const fret = frets[stringIndex] ?? -1;
+          const finger = fingers?.[stringIndex];
 
           return (
             <div
@@ -85,7 +92,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
 
   const [selectedRootToAdd, setSelectedRootToAdd] = useState<NoteName>('G');
   const [selectedTypeToAdd, setSelectedTypeToAdd] = useState<string>('Major');
-  const [sheetSelectedChordId, setSheetSelectedChordId] = useState<string | null>(COMPREHENSIVE_CHORDS[0]?.id ?? null);
+  const [selectedVoicing, setSelectedVoicing] = useState<'standard' | 'octave'>('standard');
 
   // Add new card
   const handleAddCard = () => {
@@ -94,6 +101,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
       id: `card-${Date.now()}`,
       chord: newChord,
       transposeOffset: 0,
+      voicingOffset: selectedVoicing === 'octave' ? 12 : 0,
     };
     setCards([...cards, newCard]);
   };
@@ -133,7 +141,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
     frets.forEach((fret: number, sIdx: number) => {
       if (fret >= 0) {
         const midi = getFretMidi(sIdx, fret);
-        freqs.push(midiToFrequency(midi + card.transposeOffset));
+        freqs.push(midiToFrequency(midi + card.transposeOffset + (card.voicingOffset ?? 0)));
       }
     });
 
@@ -141,7 +149,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
     if (freqs.length === 0) {
       notes.forEach((n: NoteName, i: number) => {
         const idx = ALL_NOTES.indexOf(n);
-        freqs.push(midiToFrequency(60 + idx + i * 3));
+        freqs.push(midiToFrequency(60 + idx + i * 3 + card.transposeOffset + (card.voicingOffset ?? 0)));
       });
     }
     soundEngine.strumChord(freqs, 0.07, 'acoustic-guitar');
@@ -194,6 +202,16 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
               <option value="Major 7th">Major 7th</option>
             </select>
 
+            <select
+              className="select-input"
+              aria-label="Guitar voicing"
+              value={selectedVoicing}
+              onChange={(e) => setSelectedVoicing(e.target.value as 'standard' | 'octave')}
+            >
+              <option value="standard">Original position</option>
+              <option value="octave">Octave higher</option>
+            </select>
+
             <button className="btn btn-accent" onClick={handleAddCard}>
               + Add Card
             </button>
@@ -213,22 +231,6 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
 
       {/* Side by Side Grid */}
       <div className="cards-grid">
-        {onSelectChordForFretboard && (
-          <div className="pick-chord-bar glass-card">
-            <label>Pick chord for the fretboard</label>
-            <div className="chord-picker-buttons">
-              {COMPREHENSIVE_CHORDS.map((chord) => (
-                <button
-                  key={chord.id}
-                  className={`btn-chord-chip ${sheetSelectedChordId === chord.id ? 'active' : ''}`}
-                  onClick={() => setSheetSelectedChordId(chord.id)}
-                >
-                  {chord.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
         {cards.map((item, index) => {
           const { chord, isMuted } = item;
           return (
@@ -275,7 +277,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                   ))}
                 </div>
 
-                <CardFretboard chord={chord} />
+                <CardFretboard chord={chord} voicingOffset={item.voicingOffset} />
 
                 {/* Transpose & Action Footer */}
                 <div className="chord-card-actions">
@@ -298,21 +300,14 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                   </div>
 
                   <div className="card-play-btns">
-                    {onOpenTuner && (
-                      <button className="btn btn-outline btn-sm" onClick={onOpenTuner} title="Open Instrument Tuner">
-                        🎯 Tuner
-                      </button>
-                    )}
                     {onSelectChordForFretboard && (
                       <button
                         className="btn btn-outline btn-sm"
                         onClick={() => onSelectChordForFretboard(chord)}
+                        title={`Open ${chord.name} on the full fretboard`}
                       >
-                        🎸 Fretboard
+                        🎸 Open Fretboard
                       </button>
-                    )}
-                    {sheetSelectedChordId === chord.id && (
-                      <span className="sheet-note">picked for the fretboard</span>
                     )}
                     <button className="btn btn-primary btn-sm" onClick={() => handlePlayChord(item)}>
                       ▶ Play Audio

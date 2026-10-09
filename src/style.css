@@ -2083,23 +2083,79 @@ body {
   color: #fff;
 }
 
-/* Persistent piano toggle in the header */
-.header-piano-toggle {
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.14) 0%, rgba(157, 78, 221, 0.14) 100%);
-  border: 1px solid rgba(0, 240, 255, 0.3);
-  color: var(--text-primary);
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+@media (max-width: 700px) {
+  .main-header {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 12px 16px;
+    gap: 10px;
+  }
+
+  .header-brand,
+  .header-nav,
+  .header-sound-selector,
+  .header-visualizer-control {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .hero-quick-keys {
+    flex: 1 1 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .key-badges-row {
+    flex-wrap: wrap;
+  }
+
+  .scale-select {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+.header-visualizer-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
 }
 
-.header-piano-toggle:hover {
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.24) 0%, rgba(157, 78, 221, 0.24) 100%);
-  border-color: var(--accent-cyan);
-  color: #fff;
+.header-visualizer-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.header-visualizer-options {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.32);
+}
+
+.header-visualizer-options button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.header-visualizer-options button:hover {
+  color: var(--text-primary);
+}
+
+.header-visualizer-options button.active {
+  background: var(--accent-cyan);
+  color: #071114;
 }
 
 .chord-workbench-picker__list {

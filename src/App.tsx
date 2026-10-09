@@ -37,7 +37,7 @@ export function App() {
   const [activeTab, setActiveTabState] = useState<string>(() => getTabFromHash());
   const [selectedRoot, setSelectedRoot] = useState<NoteName>('C');
   const [activeChordForFretboard, setActiveChordForFretboard] = useState<ChordShape | null>(COMPREHENSIVE_CHORDS[0] ?? null);
-  const [pianoOpen, setPianoOpen] = useState<boolean>(true);
+  const [selectedVisualizer, setSelectedVisualizer] = useState<'piano' | 'guitar'>('piano');
   const [activeScaleNotes, setActiveScaleNotes] = useState<NoteName[]>(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
   // 'auto' = follow tab defaults; anything else = user explicitly chose an instrument
   const [userOverride, setUserOverride] = useState<InstrumentType | 'auto'>('auto');
@@ -82,8 +82,8 @@ export function App() {
         setActiveTab={setActiveTab}
         userOverride={userOverride}
         setUserOverride={setUserOverride}
-        pianoOpen={pianoOpen}
-        setPianoOpen={setPianoOpen}
+        selectedVisualizer={selectedVisualizer}
+        setSelectedVisualizer={setSelectedVisualizer}
       />
 
       <main className="main-content-container">
@@ -159,7 +159,7 @@ export function App() {
         )}
 
         {/* Tab 3: Piano Keyboard */}
-  {pianoOpen && activeTab === 'piano' && (
+  {activeTab === 'piano' && (
           <section className="tab-section">
             <PianoKeyboard
               activeNotes={activeChordForFretboard ? activeChordForFretboard.notes : activeScaleNotes}
@@ -177,13 +177,14 @@ export function App() {
               onScaleNotesChange={setActiveScaleNotes}
             />
             <div className="dual-visualizers-grid">
-              {pianoOpen && (
+              {selectedVisualizer === 'piano' ? (
                 <PianoKeyboard activeNotes={activeScaleNotes} rootNote={selectedRoot} />
+              ) : (
+                <GuitarFretboard
+                  activeScaleNotes={activeScaleNotes}
+                  rootNote={selectedRoot}
+                />
               )}
-              <GuitarFretboard
-                activeScaleNotes={activeScaleNotes}
-                rootNote={selectedRoot}
-              />
             </div>
           </section>
         )}
