@@ -2,10 +2,40 @@
 
 Status legend: `[x]` done and committed · `[ ]` planned · `[~]` in progress
 
+## Documentation sync policy
+
+Do **not** rewrite every doc on every change. The rule from here on:
+
+- `docs/PLAN.md` (this file) is the only doc updated on every run.
+- The rest are refreshed in batches, and the batch is recorded below.
+- Anything a reader of the other docs would get *wrong* is listed under "Deferred doc
+  edits" so it can be swept up in the next batch rather than forgotten.
+
+| Batch | Commits | Docs refreshed |
+| --- | --- | --- |
+| 1 | `6073dfb` | `CAPABILITIES.md`, `COMPONENTS.md` (Song Follower) |
+| 2 | `f919b4f`, `84ca95f` | `ARCHITECTURE.md`, `COMPONENTS.md`, `DEVELOPMENT.md`, `BUGS.md`, `README.md`, `README-docs.md`, docs index |
+| 3 | `938fd47`, `c5ce232`, `07483ff` | **this file only** |
+
+### Deferred doc edits (sweep up in the next batch)
+
+`docs/CAPABILITIES.md`, `docs/COMPONENTS.md`, and `docs/DEVELOPMENT.md` do not yet mention:
+
+- `bun run typecheck` / `bun run test` scripts and the pinned `typescript` devDependency.
+- The CI workflow at `.github/workflows/ci.yml`.
+- `src/utils/preferences.ts` and the fact that the key, instrument, visualizer, scale, and
+  song now persist.
+- `public/metronome.js` being gone, the helper aliases being collapsed into `noteNameAt` /
+  `stringInfoAt`, and `detectPitch` now living only in `musicTheory.ts`.
+- `src/utils/preferences.test.ts` (test counts are now 82 across 5 files).
+
+`docs/BUGS.md` has the statuses updated in the same sweep.
+
 **Progress:** Phase 1 (design language), Phase 2 (shell), the user-selectable theme system,
 the repository bug audit (`docs/BUGS.md`), the mobile audio fixes, the Song Follower, the
-route table with lazy loading, and the licence/contact work are all implemented, verified,
-and pushed. Phases 3–4 and the follow-up list below are still open.
+route table with lazy loading, the licence/contact work, the CI gate, the dead-code cleanup
+(Phase 4), and preference persistence are all implemented, verified, and pushed.
+Phase 3 (screen-level craft) and the remaining follow-ups are still open.
 
 ## The reimagining in one line
 
@@ -117,15 +147,20 @@ still follows tabs, responsive at ≤720px.
 
 **Verify:** each screen checked in the preview, then committed on its own.
 
-### Phase 4 — Consistency, accessibility, and hardening
+### Phase 4 — Consistency, accessibility, and hardening — partly done
 
-- [ ] Full pass for `:focus-visible`, keyboard reachability, and `aria-*` on toggles.
+- [~] Full pass for `:focus-visible`, keyboard reachability, and `aria-*` on toggles.
+      (Focus rings and `aria-pressed` on the toggles are in; the emoji sweep below is not.)
 - [ ] Remove emoji-as-iconography in favour of a small, consistent inline icon set.
-- [ ] Delete or reconcile dead code flagged in `docs/CAPABILITIES.md` (duplicate pitch
-      detectors, overlapping helper aliases, stub `public/metronome.js`).
-- [ ] Extend `bun test` coverage beyond `musicTheory.ts`.
+- [x] Delete or reconcile dead code: the three duplicate pitch detectors collapsed into one
+      exported `detectPitch`, the overlapping helper aliases collapsed into `noteNameAt` /
+      `stringInfoAt`, and the comment-only `public/metronome.js` stub deleted.
+- [x] Extend `bun test` coverage: 82 tests across 5 files (theory, chart parser, router,
+      route table, preferences), including synthetic-sine coverage for the pitch detector.
+- [x] Add a `test` script and a CI gate (`.github/workflows/ci.yml`) so both checks run on
+      every push and pull request.
 
-**Verify:** `bun test` green, `bunx tsc -b --noEmit` green, preview pass on all tabs.
+**Verify:** `bun test` green, `bun run typecheck` green, preview boots on every screen.
 
 ## Commit strategy
 
@@ -155,35 +190,39 @@ uncommitted to keep the history about source changes.
 Ordered by value; none block the phases above.
 
 - [ ] **Test the chord voicing logic.** `getChordPosition` (fret-window generation, finger
-      numbering) and `handleTranspose` are untested.
-- [ ] **Add a `test` script** to `package.json` so `bun test` is reachable via `bun run test`
-      and CI can call it uniformly.
-- [ ] **Add CI** running `bunx tsc -b --noEmit` and `bun test` on every push and pull request.
-- [ ] **De-duplicate pitch detection.** Three near-identical autocorrelation implementations
-      exist (`musicTheory.ts` and two in `GuitarTuner.tsx`); keep one.
-- [ ] **Collapse helper aliases.** `noteNameAt` / `getNoteByCheckedIndex` / `noteNameFromIndex`
-      and `stringInfoAt` / `getGuitarStringInfo` / `resolveGuitarString` are duplicates.
-- [ ] **Fix the stale card comment** in `ChordWorkbench` that labels `COMPREHENSIVE_CHORDS[12]`
-      as "B Minor" when it is D Major.
-- [ ] **Persist learner state.** Remember the active key, instrument, scale, and chord cards
-      across reloads (localStorage) so practice resumes where it left off.
+      numbering) and `handleTranspose` are untested — T3 in `docs/BUGS.md` would have been
+      caught by such a test, and remains open.
+- [x] **Add a `test` script** — `bun run test` and `bun run typecheck`, with `typescript`
+      pinned as a devDependency (it was previously downloaded on demand by `bunx`).
+- [x] **Add CI** running the type check and the tests on every push and pull request.
+- [x] **De-duplicate pitch detection** — one exported `detectPitch` in `musicTheory.ts`, the
+      tuner imports it, and the synthetic-sine tests cover it.
+- [x] **Collapse helper aliases** — `noteNameAt` and `stringInfoAt` are the only survivors.
+- [x] **Fix the stale card comment** — the studio now resolves its starting cards by name
+      (`findOrCreateChord('B', 'Minor')`) instead of by array index, so the copy and the data
+      cannot drift again.
+- [x] **Persist learner state.** `src/utils/preferences.ts` remembers the key, instrument,
+      visualizer, scale, and the Song Follower's chart, tempo, beats-per-chord, transpose,
+      and sound setting. Remaining: the chord-studio cards themselves.
 - [ ] **Finish de-emoji-ing the screens.** The rail and top bar are text-only now, but the
       remaining tools still use emoji in headings and buttons.
 - [ ] **Close the CSS/component class drift.** Around 30 classes used by components (e.g.
       `interval-header`, `dual-visualizers-grid`, `chord-card-body`, `strum-btn`) have no
       stylesheet rule at all, so those wrappers render unstyled.
-- [ ] **Resolve `public/metronome.js`.** It is a comment-only stub; either implement it or
-      remove it and the reference.
-- [ ] **Reconcile `.gitignore`.** Done — the tracked-but-ignored paths were reconciled and
-      the stale `tsconfig.tsbuildinfo` was purged.
-- [ ] **Align `tsconfig.json` include** with the real config filename (`vite.config.js`, not
-      `vite.config.ts`).
+- [x] **Resolve `public/metronome.js`** — deleted; the real metronome is the React
+      component.
+- [x] **Reconcile `.gitignore`** — the tracked-but-ignored paths were reconciled and the
+      stale `tsconfig.tsbuildinfo` was purged.
+- [x] **Align `tsconfig.json` include** with the real config filename.
+- [ ] **Decide on `package-lock.json`.** It is a stale npm lockfile sitting next to
+      `bun.lock`; the project installs with bun, so the npm lock is likely drift. Not
+      deleted yet because a decision on it belongs in a commit of its own.
 - [ ] **Accessibility audit.** Contrast check on the new palette, and keyboard flows for the
       chord card drag-and-drop (which currently has Alt+↑/↓ as the keyboard fallback).
 - [ ] **Progressions.** Turn the "Play Progression" feature into a real chord-progression
       builder with named presets (I–V–vi–IV, ii–V–I, 12-bar blues).
-- [ ] **Save and share a followed song.** The Song Follower keeps its chart only in memory;
-      persisting the pasted chart and transpose choice (localStorage) would resume practice.
+- [x] **Save a followed song.** The pasted chart and its practice settings persist; a
+      shareable link (encoding the chart in the URL) is still open.
 - [ ] **Render a PDF/page export of the follower.** Print stylesheet so a learner can take the
       graded chart away from the screen.
 - [ ] **Serve `LICENSE` from the built site.** The footer links to GitHub's copy; a `public/`
