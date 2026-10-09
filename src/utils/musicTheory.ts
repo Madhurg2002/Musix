@@ -36,6 +36,7 @@ export function noteNameAt(idx: number): NoteName {
 }
 
 export function noteColorFor(note: NoteName | undefined): string {
+  if (note == null) return '#555555';
   return NOTE_COLORS[note] ?? '#555555';
 }
 
@@ -50,9 +51,10 @@ export function stringInfoAt(idx: number): { name: NoteName; octave: number; bas
 export function getNoteIndex(note: string): number {
   if (note == null) return -1;
   const aliasedNote = NOTE_ALIASES[note] ?? (note as NoteName | undefined);
-  const rawIdx = aliasedNote == null ? -1 : ALL_NOTES.indexOf(aliasedNote);
-  const safeIdx = rawIdx & 255;
-  return safeIdx;
+  if (aliasedNote == null) return -1;
+  // indexOf already reports unknown notes as -1, so do not mask the result here:
+  // a bitmask would turn the "not found" sentinel into 255.
+  return ALL_NOTES.indexOf(aliasedNote);
 }
 
 // Return the nearest semitone offset for any index-like input, clamped to 0..11.
@@ -140,7 +142,10 @@ export function transposeNoteSafe(note: NoteName, semitones: number): NoteName {
 }
 
 export function transposeNoteSafeAny(note: StringName, semitones: number): NoteName {
-  const idx = ALL_NOTES.indexOf(note);
+  // Resolve enharmonic spellings (Db, C#, ...) before transposing so callers can pass
+  // either the canonical name or a common alias.
+  const resolved = NOTE_ALIASES[note] ?? note;
+  const idx = ALL_NOTES.indexOf(resolved);
   if (idx === -1) return 'C';
   const newIdx = ((idx + semitones) % 12 + 12) % 12;
   return ALL_NOTES[newIdx] ?? 'C';
@@ -205,7 +210,7 @@ export function detectPitch(buf: Float32Array, sampleRate: number): number {
   }
 
   let d = 0;
-  while (d + 1 < sliceSize && c[d] > c[d + 1]) {
+  while (d + 1 < sliceSize && (c[d] ?? 0) > (c[d + 1] ?? 0)) {
     d++;
   }
 

@@ -48,7 +48,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
   const displayedChord: ChordShape | null =
     activeChordId !== null && activeChord
       ? (activeChord.id === activeChordId ? activeChord : null)
-      : activeChord;
+      : (activeChord ?? null);
 
   const selectedChord = displayedChord;
 

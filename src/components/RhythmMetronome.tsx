@@ -106,7 +106,11 @@ export const RhythmMetronome: React.FC = () => {
     if (times.length > 1) {
       const intervals: number[] = [];
       for (let i = 1; i < times.length; i++) {
-        intervals.push(times[i] - times[i - 1]);
+        const current = times[i];
+        const previous = times[i - 1];
+        if (current != null && previous != null) {
+          intervals.push(current - previous);
+        }
       }
       const avgMs = intervals.reduce((a, b) => a + b, 0) / intervals.length;
       const calculated = Math.round(60000 / avgMs);

@@ -37,20 +37,21 @@ export function detectPitch(buf: Float32Array, sampleRate: number): number {
   const c = new Float32Array(sliceSize);
   for (let i = 0; i < sliceSize; i++) {
     for (let j = 0; j < sliceSize - i; j++) {
-      c[i] += (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
+      c[i] = (c[i] ?? 0) + (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
     }
   }
 
   let d = 0;
-  while (d + 1 < sliceSize && c[d] > c[d + 1]) {
+  while (d + 1 < sliceSize && (c[d] ?? 0) > (c[d + 1] ?? 0)) {
     d++;
   }
 
   let maxval = -1;
   let maxpos = -1;
   for (let i = d; i < sliceSize; i++) {
-    if (c[i] > maxval) {
-      maxval = c[i];
+    const cAtI = c[i] ?? 0;
+    if (cAtI > maxval) {
+      maxval = cAtI;
       maxpos = i;
     }
   }
@@ -168,7 +169,7 @@ function autoCorrelate(buf: Float32Array, sampleRate: number): number {
   }
 
   let d = 0;
-  while (d + 1 < sliceSize && c[d] > c[d + 1]) {
+  while (d + 1 < sliceSize && (c[d] ?? 0) > (c[d + 1] ?? 0)) {
     d++;
   }
 
