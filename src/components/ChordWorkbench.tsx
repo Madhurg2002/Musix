@@ -7,12 +7,57 @@ import {
 } from '../data/chordsData';
 import {
   ALL_NOTES,
+  GUITAR_STRINGS,
   transposeNote,
   noteColorFor,
   getFretMidi,
   midiToFrequency,
 } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
+
+const CardFretboard: React.FC<{ chord: ChordShape }> = ({ chord }) => {
+  const safeChord = asSafeChord(chord);
+  const pressedFrets = safeChord.frets.filter((fret) => fret > 0);
+  const highestFret = Math.max(0, ...pressedFrets);
+  const firstFret = highestFret > 5 ? highestFret - 4 : 1;
+  const fretNumbers = Array.from({ length: 5 }, (_, index) => firstFret + index);
+
+  return (
+    <div className="card-fretboard" role="img" aria-label={`${safeChord.name} guitar fingering, high E to low E`}>
+      <div className="card-fretboard-heading">
+        <span>Guitar fingering</span>
+        {firstFret > 1 && <span>Frets {firstFret}-{firstFret + 4}</span>}
+      </div>
+      <div className="card-fretboard-numbers" aria-hidden="true">
+        <span />
+        {fretNumbers.map((fret) => <span key={fret}>{fret}</span>)}
+      </div>
+      <div className="card-fretboard-strings">
+        {GUITAR_STRINGS.slice().reverse().map((stringInfo, displayIndex) => {
+          const stringIndex = safeChord.frets.length - displayIndex - 1;
+          const fret = safeChord.frets[stringIndex] ?? -1;
+          const finger = safeChord.fingers?.[stringIndex];
+
+          return (
+            <div className="card-fretboard-string-row" key={`${stringInfo.name}-${displayIndex}`}>
+              <span className="card-string-name">
+                {stringInfo.name}
+                <small>{fret === -1 ? '×' : fret === 0 ? '○' : ''}</small>
+              </span>
+              {fretNumbers.map((fretNumber) => (
+                <span className="card-fret-cell" key={fretNumber}>
+                  {fret === fretNumber && (
+                    <span className="card-fret-marker">{finger && finger !== 0 ? finger : ''}</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 interface ChordWorkbenchProps {
   onSelectChordForFretboard?: (chord: ChordShape) => void;
@@ -218,31 +263,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({ onSelectChordFor
                   ))}
                 </div>
 
-                {/* Guitar String Press Box Diagram */}
-                <div className="guitar-mini-box">
-                  <div className="mini-box-title">Guitar Press Pattern (Low E ➔ High E)</div>
-                  <div className="string-press-grid">
-                    {asSafeChord(chord).frets.map((fret: number, stringIdx: number) => {
-                      const finger = asSafeChord(chord).fingers?.[stringIdx];
-                      let label = 'O';
-                      let cssClass = 'open';
-                      if (fret === -1) {
-                        label = '✕';
-                        cssClass = 'muted';
-                      } else if (fret > 0) {
-                        label = `${fret} (F:${finger ?? '?'})`;
-                        cssClass = 'pressed';
-                      }
-
-                      return (
-                        <div key={stringIdx} className={`string-press-cell ${cssClass}`}>
-                          <span className="str-name">S{6 - stringIdx}</span>
-                          <span className="str-press">{label}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                <CardFretboard chord={chord} />
 
                 {/* Transpose & Action Footer */}
                 <div className="chord-card-actions">

@@ -530,61 +530,94 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-/* Guitar Mini Box Diagram */
-.guitar-mini-box {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 12px;
+/* Compact chord fingering diagram */
+.card-fretboard {
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  background: linear-gradient(100deg, #211c18, #131416);
 }
 
-.mini-box-title {
-  font-size: 11px;
+.card-fretboard-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
   color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  margin-bottom: 8px;
-  letter-spacing: 0.5px;
 }
 
-.string-press-grid {
+.card-fretboard-numbers,
+.card-fretboard-string-row {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 6px;
+  grid-template-columns: 24px repeat(5, minmax(0, 1fr));
+}
+
+.card-fretboard-numbers {
+  padding-bottom: 3px;
+  color: var(--text-muted);
+  font-size: 10px;
   text-align: center;
 }
 
-.string-press-cell {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 6px;
-  padding: 6px 2px;
+.card-fretboard-string-row {
+  position: relative;
+  height: 25px;
+  align-items: stretch;
+}
+
+.card-fretboard-string-row::after {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 24px;
+  height: 1px;
+  background: #a99b87;
+  content: '';
+}
+
+.card-string-name {
+  z-index: 1;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 4px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.card-string-name small {
+  color: var(--accent-gold);
   font-size: 11px;
 }
 
-.string-press-cell.pressed {
-  background: rgba(0, 240, 255, 0.2);
-  border: 1px solid var(--accent-cyan);
-  color: var(--accent-cyan);
-
+.card-fret-cell {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  border-right: 1px solid rgba(220, 220, 220, 0.3);
 }
 
-.string-press-cell.open {
-  color: var(--accent-green);
+.card-fret-cell:last-child {
+  border-right-width: 2px;
 }
 
-.string-press-cell.muted {
-  color: #ff4d4d;
-}
-
-.str-name {
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.str-press {
-  font-weight: 600;
+.card-fret-marker {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.35);
+  color: #071114;
+  font-size: 10px;
+  font-weight: 800;
 }
 
 .chord-card-actions {
