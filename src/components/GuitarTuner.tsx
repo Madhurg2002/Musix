@@ -1,80 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NoteName } from '../types';
-import { ALL_NOTES } from '../utils/musicTheory';
+import { ALL_NOTES, detectPitch } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
-
-// Autocorrelation pitch detector (browser-side). Returns -1 when no pitch is usable.
-export function detectPitch(buf: Float32Array, sampleRate: number): number {
-  let SIZE = buf.length;
-  let rms = 0;
-
-  for (let i = 0; i < SIZE; i++) {
-    const val = buf[i] ?? 0;
-    rms += val * val;
-  }
-  rms = Math.sqrt(rms / SIZE);
-  if (rms < 0.012) return -1;
-
-  let r1 = 0;
-  let r2 = SIZE - 1;
-  const thres = 0.2;
-  for (let i = 0; i < SIZE / 2; i++) {
-    if (Math.abs(buf[i] ?? 0) < thres) {
-      r1 = i;
-      break;
-    }
-  }
-  for (let i = 1; i < SIZE / 2; i++) {
-    if (Math.abs(buf[SIZE - i] ?? 0) < thres) {
-      r2 = SIZE - i;
-      break;
-    }
-  }
-
-  const sliceBuf = buf.slice(r1, r2);
-  const sliceSize = sliceBuf.length;
-
-  const c = new Float32Array(sliceSize);
-  for (let i = 0; i < sliceSize; i++) {
-    for (let j = 0; j < sliceSize - i; j++) {
-      c[i] = (c[i] ?? 0) + (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
-    }
-  }
-
-  let d = 0;
-  while (d + 1 < sliceSize && (c[d] ?? 0) > (c[d + 1] ?? 0)) {
-    d++;
-  }
-
-  let maxval = -1;
-  let maxpos = -1;
-  for (let i = d; i < sliceSize; i++) {
-    const cAtI = c[i] ?? 0;
-    if (cAtI > maxval) {
-      maxval = cAtI;
-      maxpos = i;
-    }
-  }
-
-  let T0 = maxpos;
-  if (T0 == null || T0 < 1 || T0 >= sliceSize) return -1;
-
-  const x1 = c[T0 - 1] ?? 0;
-  const x2 = c[T0] ?? 0;
-  const x3 = c[T0 + 1] ?? 0;
-  const a = (x1 + x3 - 2 * x2) / 2;
-  const b = (x3 - x1) / 2;
-
-  if (a) {
-    T0 = T0 - b / (2 * a);
-  }
-
-  return sampleRate / T0;
-}
-
-export { detectPitch as detectPitchVanilla };
-
-export { detectPitch as detectPitchLite };
 
 export interface StringInfo {
   index: number;
@@ -125,79 +52,6 @@ export const TUNING_PRESETS: TuningPreset[] = [
     ],
   },
 ];
-
-// Autocorrelation Pitch Detection algorithm
-function autoCorrelate(buf: Float32Array, sampleRate: number): number {
-  let SIZE = buf.length;
-  let rms = 0;
-
-  for (let i = 0; i < SIZE; i++) {
-    const val = buf[i] ?? 0;
-    rms += val * val;
-  }
-  rms = Math.sqrt(rms / SIZE);
-  if (rms < 0.012) return -1;
-
-  let r1 = 0;
-  let r2 = SIZE - 1;
-  const thres = 0.2;
-  for (let i = 0; i < SIZE / 2; i++) {
-    if (Math.abs(buf[i] ?? 0) < thres) {
-      r1 = i;
-      break;
-    }
-  }
-  for (let i = 1; i < SIZE / 2; i++) {
-    if (Math.abs(buf[SIZE - i] ?? 0) < thres) {
-      r2 = SIZE - i;
-      break;
-    }
-  }
-
-  const sliceBuf = buf.slice(r1, r2);
-  const sliceSize = sliceBuf.length;
-
-  const c: Float32Array = new Float32Array(sliceSize);
-  for (let i = 0; i < sliceSize; i++) {
-    let sum = 0;
-    let j = 0;
-    const limit = sliceSize - i;
-    for (j = 0; j < limit; j++) {
-      sum += (sliceBuf[j] ?? 0) * (sliceBuf[j + i] ?? 0);
-    }
-    c[i] = sum;
-  }
-
-  let d = 0;
-  while (d + 1 < sliceSize && (c[d] ?? 0) > (c[d + 1] ?? 0)) {
-    d++;
-  }
-
-  let maxval = -1;
-  let maxpos = -1;
-  for (let i = d; i < sliceSize; i++) {
-    const cAtI = c[i] ?? 0;
-    if (cAtI > maxval) {
-      maxval = cAtI;
-      maxpos = i;
-    }
-  }
-
-  let T0 = maxpos;
-  if (T0 == null || T0 < 1) return -1;
-
-  const x1 = c[T0 - 1] ?? 0;
-  const x2 = c[T0] ?? 0;
-  const x3 = c[T0 + 1] ?? 0;
-  const a = (x1 + x3 - 2 * x2) / 2;
-  const b = (x3 - x1) / 2;
-
-  if (a) {
-    T0 = T0 - b / (2 * a);
-  }
-
-  return sampleRate / T0;
-}
 
 export const GuitarTuner: React.FC = () => {
   const [selectedPresetIndex, setSelectedPresetIndex] = useState<number>(0);
@@ -276,7 +130,7 @@ export const GuitarTuner: React.FC = () => {
     const buf = new Float32Array(analyser.fftSize);
     analyser.getFloatTimeDomainData(buf);
 
-    const pitch = autoCorrelate(buf, ctx.sampleRate ?? 44100);
+    const pitch = detectPitch(buf, ctx.sampleRate ?? 44100);
 
     // Guard the pitch-analysis branch so the strict-build path stays readable.
     const hasUsablePitch = pitch !== -1 && 60 < pitch && pitch < 1000;

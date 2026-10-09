@@ -3,11 +3,9 @@ import {
   getNoteIndex,
   getSemitoneIndexLike,
   getNoteDescriptor,
-  resolveGuitarString,
   getFretNote,
   getFretMidi,
-  getGuitarStringInfo,
-  getNoteByCheckedIndex,
+  detectPitch,
   ALL_NOTES,
   GUITAR_STRINGS,
   midiToFrequency,
@@ -86,8 +84,8 @@ describe('musicTheory helpers', () => {
   });
 
   describe('guitar fret resolution', () => {
-    test('getGuitarStringInfo matches GUITAR_STRINGS shape', () => {
-      const info = getGuitarStringInfo(0);
+    test('stringInfoAt matches the GUITAR_STRINGS shape', () => {
+      const info = stringInfoAt(0);
       expect(info).toEqual({
         name: 'E',
         octave: 2,
@@ -117,20 +115,55 @@ describe('musicTheory helpers', () => {
   });
 
   describe('strict build safe wrappers', () => {
-    test('getNoteByCheckedIndex never returns undefined', () => {
-      expect(getNoteByCheckedIndex(0)).toBe('C');
-      expect(getNoteByCheckedIndex(12)).toBe('C');
-      expect(getNoteByCheckedIndex(1)).toBe('C♯');
+    test('noteNameAt never returns undefined', () => {
+      expect(noteNameAt(0)).toBe('C');
+      expect(noteNameAt(12)).toBe('C');
+      expect(noteNameAt(1)).toBe('C♯');
     });
 
-    test('resolveGuitarString returns guitar-string-shaped info', () => {
-      const info = resolveGuitarString(2);
+    test('noteNameAt wraps out-of-range indexes into the octave', () => {
+      expect(noteNameAt(13)).toBe('C♯');
+      expect(noteNameAt(-1)).toBe('B');
+      expect(noteNameAt(NaN)).toBe('C');
+    });
+
+    test('stringInfoAt returns guitar-string-shaped info', () => {
+      const info = stringInfoAt(2);
       expect(info).toHaveProperty('name');
       expect(info).toHaveProperty('octave');
       expect(info).toHaveProperty('baseMidi');
       expect(typeof info.name).toBe('string');
       expect(typeof info.octave).toBe('number');
       expect(typeof info.baseMidi).toBe('number');
+    });
+  });
+
+  describe('pitch detection', () => {
+    const sineWave = (frequency: number, sampleRate: number, length: number): Float32Array => {
+      const buffer = new Float32Array(length);
+      for (let i = 0; i < length; i += 1) {
+        buffer[i] = 0.5 * Math.sin((2 * Math.PI * frequency * i) / sampleRate);
+      }
+      return buffer;
+    };
+
+    test('detects a 440 Hz sine wave within a few Hz', () => {
+      const detected = detectPitch(sineWave(440, 44100, 2048), 44100);
+      expect(Math.abs(detected - 440)).toBeLessThan(5);
+    });
+
+    test('detects the low E string range', () => {
+      // E2 is 82.41 Hz, the lowest note the tuner has to recognize.
+      const detected = detectPitch(sineWave(82.41, 44100, 4096), 44100);
+      expect(Math.abs(detected - 82.41)).toBeLessThan(2);
+    });
+
+    test('reports -1 for silence instead of guessing', () => {
+      expect(detectPitch(new Float32Array(2048), 44100)).toBe(-1);
+    });
+
+    test('reports -1 for an unusable sample rate', () => {
+      expect(detectPitch(sineWave(440, 44100, 2048), 0)).toBe(-1);
     });
   });
 

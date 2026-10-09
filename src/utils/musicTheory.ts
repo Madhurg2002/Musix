@@ -14,7 +14,7 @@ export const NOTE_ALIASES: Readonly<Record<string, NoteName>> = {
 };
 
 // Standard Guitar Tuning (Low E to High E): E2, A2, D3, G3, B3, E4
-export const GUITAR_STRINGS: ReadonlyArray<{ name: NoteName; octave: number; baseMidi: number }> = [
+export const GUITAR_STRINGS: ReadonlyArray<GuitarStringInfo> = [
   { name: 'E', octave: 2, baseMidi: 40 }, // String 6 (Low E)
   { name: 'A', octave: 2, baseMidi: 45 }, // String 5
   { name: 'D', octave: 3, baseMidi: 50 }, // String 4
@@ -28,11 +28,20 @@ export function midiToFrequency(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
 }
 
-// Safe lookups for strict noUncheckedIndexedAccess builds
+/* ---------------------------------------------------------------------------------------
+ * Safe lookups for strict noUncheckedIndexedAccess builds.
+ *
+ * There is one helper per shape rather than a family of aliases: `noteNameAt` for pitch
+ * classes and `stringInfoAt` for guitar strings. The old `getNoteByCheckedIndex`,
+ * `noteNameFromIndex`, `getGuitarStringInfo`, and `resolveGuitarString` were byte-for-byte
+ * duplicates of these two and were removed so call sites have one obvious choice.
+ * ------------------------------------------------------------------------------------- */
+
+/** Pitch class at a (possibly out-of-range) index, wrapped into the octave. */
 export function noteNameAt(idx: number): NoteName {
-  const idxNorm = idx & 255;
-  const entry = ALL_NOTES[idxNorm];
-  return entry ?? 'C';
+  if (!Number.isFinite(idx)) return 'C';
+  const normalized = ((Math.trunc(idx) % 12) + 12) % 12;
+  return ALL_NOTES[normalized] ?? 'C';
 }
 
 export function noteColorFor(note: NoteName | undefined): string {
@@ -40,13 +49,14 @@ export function noteColorFor(note: NoteName | undefined): string {
   return NOTE_COLORS[note] ?? '#555555';
 }
 
-export function stringInfoAt(idx: number): { name: NoteName; octave: number; baseMidi: number } {
+/** Tuning of a guitar string. Anything out of range clamps to the lowest string. */
+export function stringInfoAt(idx: number): GuitarStringInfo {
   if (!Number.isFinite(idx)) return GUITAR_STRINGS[0]!;
-  const idxNorm = idx & 255;
-  const entry = GUITAR_STRINGS[idxNorm];
-  const fallback = entry ?? GUITAR_STRINGS[0]!;
-  return fallback as { name: NoteName; octave: number; baseMidi: number };
+  return GUITAR_STRINGS[Math.trunc(idx)] ?? GUITAR_STRINGS[0]!;
 }
+
+/** Tuning entry for one of the six strings. */
+export type GuitarStringInfo = { name: NoteName; octave: number; baseMidi: number };
 
 export function getNoteIndex(note: string): number {
   if (note == null) return -1;
@@ -73,36 +83,6 @@ export function getNoteDescriptor(note: NoteName): { label: string; semitone: nu
     semitone: safeSemitone,
     color: NOTE_COLORS[note] ?? '#000000',
   };
-}
-
-// Internal safety helper so the only place we touch `GUITAR_STRINGS[idx]` is
-// centralized in one spot and the strict-build `??` path is straightforward.
-function useStrictStringInfo(idx: number): { name: NoteName; octave: number; baseMidi: number } {
-  const idxNorm = idx & 255;
-  const result = GUITAR_STRINGS[idxNorm] ?? GUITAR_STRINGS[0]!;
-  return result as { name: NoteName; octave: number; baseMidi: number };
-}
-
-// Convenience guard for Tuner-style fallback lookups.
-export function resolveGuitarString(idx: number): { name: NoteName; octave: number; baseMidi: number } {
-  const idxNorm = idx & 255;
-  const resolved = GUITAR_STRINGS[idxNorm] ?? GUITAR_STRINGS[0]!;
-  return resolved as { name: NoteName; octave: number; baseMidi: number };
-}
-
-// Tiny helper that lets strict builds consume an ALL_NOTES index without
-// inserting a typecast at each call site.
-export function getNoteByCheckedIndex(idx: number): NoteName {
-  return ALL_NOTES[idx & 255] ?? 'C';
-}
-
-// Tiny safety wrapper for strict builds that may pass a loose string index.
-export function getGuitarStringInfo(idx: number): { name: NoteName; octave: number; baseMidi: number } {
-  return useStrictStringInfo(idx);
-}
-
-export function noteNameFromIndex(idx: number): NoteName {
-  return ALL_NOTES[idx & 255] ?? 'C';
 }
 
 // Color badges for notes so users easily distinguish pitch classes visually
@@ -148,7 +128,7 @@ export function transposeNoteSafeAny(note: StringName, semitones: number): NoteN
 
 // Get Note Name for a specific string and fret on guitar
 export function getFretNote(stringIndex: number, fret: number): NoteName {
-  const stringInfo = useStrictStringInfo(stringIndex);
+  const stringInfo = stringInfoAt(stringIndex);
   const openNoteName = stringInfo.name;
   const openNoteIdx = ALL_NOTES.indexOf(openNoteName);
   const safeIdx = ((openNoteIdx + fret) % 12 + 12) % 12;
@@ -156,13 +136,18 @@ export function getFretNote(stringIndex: number, fret: number): NoteName {
 }
 
 export function getFretMidi(stringIndex: number, fret: number): number {
-  const stringInfo = useStrictStringInfo(stringIndex);
+  const stringInfo = stringInfoAt(stringIndex);
   const baseMidi = stringInfo.baseMidi;
   if (!Number.isFinite(baseMidi)) return 60 + fret;
   return baseMidi + fret;
 }
 
-// Autocorrelation pitch detector (browser-side). Returns -1 when no pitch is usable.
+/**
+ * Autocorrelation pitch detector (browser-side). Returns -1 when no pitch is usable.
+ *
+ * This is the **single** detector in the app: the tuner imports it instead of keeping its
+ * own copy, so the microphone path and any future consumer cannot drift apart.
+ */
 export function detectPitch(buf: Float32Array, sampleRate: number): number {
   const SIZE = buf.length;
   let rms = 0;
@@ -219,7 +204,7 @@ export function detectPitch(buf: Float32Array, sampleRate: number): number {
     }
   }
 
-  const T0 = maxpos;
+  let T0 = maxpos;
   if (T0 == null || T0 < 1 || T0 >= sliceSize) return -1;
 
   const x1 = c[T0 - 1] ?? 0;
@@ -229,16 +214,8 @@ export function detectPitch(buf: Float32Array, sampleRate: number): number {
   const b = (x3 - x1) / 2;
 
   if (a) {
-    const refined = T0 - b / (2 * a);
-    if (!Number.isFinite(refined) || refined <= 0) return -1;
-    return sampleRate / refined;
+    T0 = T0 - b / (2 * a);
   }
 
-  if (!Number.isFinite(T0) || T0 <= 0) return -1;
   return sampleRate / T0;
 }
-
-// Re-export the pitch detector in stable alternate names so other modules can import
-// the same detector through different names if they prefer.
-export const detectPitchVanilla = detectPitch;
-export const detectPitchLite = detectPitch;

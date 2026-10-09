@@ -6,7 +6,7 @@ import {
   getFretMidi,
   midiToFrequency,
   noteColorFor,
-  getGuitarStringInfo,
+  stringInfoAt,
 } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 import { asSafeChord } from '../data/chordsData';
@@ -200,7 +200,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
         {hoveredNote ? (
           <>
             <span>Note: <strong>{hoveredNote.note}</strong></span>
-            <span>String: <strong>{6 - hoveredNote.stringIdx} ({getGuitarStringInfo(hoveredNote.stringIdx).name})</strong></span>
+            <span>String: <strong>{6 - hoveredNote.stringIdx} ({stringInfoAt(hoveredNote.stringIdx).name})</strong></span>
             <span>Fret: <strong>{hoveredNote.fret}</strong></span>
             <span>Frequency: <strong>{midiToFrequency(getFretMidi(hoveredNote.stringIdx, hoveredNote.fret)).toFixed(1)} Hz</strong></span>
           </>
