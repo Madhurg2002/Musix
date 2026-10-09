@@ -26,6 +26,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
   activeScaleNotes = [],
   rootNote = 'C',
   fretsCount = 12,
+  activeChordId = null,
 }) => {
   const [hoveredNote, setHoveredNote] = useState<{ stringIdx: number; fret: number; note: NoteName } | null>(null);
 
