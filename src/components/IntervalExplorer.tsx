@@ -30,11 +30,13 @@ export const IntervalExplorer: React.FC = () => {
 
   return (
     <div className="interval-explorer-container glass-card">
-      <div className="interval-header">
+      <div className="interval-card-head">
         <div>
           <span className="section-badge">📏 Interval Distance Solver</span>
-          <h2>Ear Training & Interval Calculator</h2>
-          <p>Pick two notes to hear and visualize the exact musical distance between them.</p>
+          <h2 className="interval-title">Ear Training & Interval Calculator</h2>
+          <p className="interval-lede">
+            Pick two notes to hear and visualize the exact musical distance between them.
+          </p>
         </div>
 
         <div className="interval-actions">
