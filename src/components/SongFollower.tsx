@@ -8,9 +8,22 @@ import {
   transposeChordToken,
   type ParsedChart,
 } from '../utils/chordChart';
+import {
+  PREFERENCE_KEYS,
+  isBoolean,
+  isIntegerInRange,
+  isOneOfValue,
+  isText,
+  readPreference,
+  writePreference,
+} from '../utils/preferences';
 
 const BEATS_PER_CHORD_OPTIONS = [1, 2, 4] as const;
 const EMPTY_CHART: ParsedChart = { lines: [], chords: [], unique: [], sections: 0 };
+
+const isBeatsPerChord = isOneOfValue(BEATS_PER_CHORD_OPTIONS);
+const isBpm = isIntegerInRange(40, 200);
+const isTranspose = isIntegerInRange(-11, 11);
 
 /**
  * Follow a song from a pasted chord chart.
@@ -21,16 +34,40 @@ const EMPTY_CHART: ParsedChart = { lines: [], chords: [], unique: [], sections: 
  * with the selected instrument, and can transpose the whole song into a friendlier key.
  */
 export const SongFollower: React.FC = () => {
-  const [draft, setDraft] = useState<string>('');
-  const [chart, setChart] = useState<ParsedChart>(EMPTY_CHART);
-  const [source, setSource] = useState<string>('');
+  // A chart pasted in a previous session comes back already loaded, so practising a song is
+  // not a re-paste every time the page reloads.
+  const savedChart = useMemo(
+    () => readPreference(PREFERENCE_KEYS.songChart, '', isText),
+    []
+  );
 
-  const [bpm, setBpm] = useState<number>(80);
-  const [beatsPerChord, setBeatsPerChord] = useState<number>(4);
-  const [transpose, setTranspose] = useState<number>(0);
+  const [draft, setDraft] = useState<string>(savedChart);
+  const [chart, setChart] = useState<ParsedChart>(() =>
+    savedChart ? parseChordChart(savedChart) : EMPTY_CHART
+  );
+  const [source, setSource] = useState<string>(savedChart);
+
+  const [bpm, setBpm] = useState<number>(() => readPreference(PREFERENCE_KEYS.songBpm, 80, isBpm));
+  const [beatsPerChord, setBeatsPerChord] = useState<number>(() =>
+    readPreference(PREFERENCE_KEYS.songBeatsPerChord, 4, isBeatsPerChord)
+  );
+  const [transpose, setTranspose] = useState<number>(() =>
+    readPreference(PREFERENCE_KEYS.songTranspose, 0, isTranspose)
+  );
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [position, setPosition] = useState<number>(0);
-  const [soundOn, setSoundOn] = useState<boolean>(true);
+  const [soundOn, setSoundOn] = useState<boolean>(() =>
+    readPreference(PREFERENCE_KEYS.songSoundOn, true, isBoolean)
+  );
+
+  // Mirror the practice settings back to storage.
+  useEffect(() => writePreference(PREFERENCE_KEYS.songBpm, bpm), [bpm]);
+  useEffect(
+    () => writePreference(PREFERENCE_KEYS.songBeatsPerChord, beatsPerChord),
+    [beatsPerChord]
+  );
+  useEffect(() => writePreference(PREFERENCE_KEYS.songTranspose, transpose), [transpose]);
+  useEffect(() => writePreference(PREFERENCE_KEYS.songSoundOn, soundOn), [soundOn]);
 
   const activeChordRef = useRef<HTMLElement | null>(null);
 
@@ -53,6 +90,9 @@ export const SongFollower: React.FC = () => {
     setSource(text);
     setPosition(0);
     setIsPlaying(false);
+    if (parsed.chords.length > 0) {
+      writePreference(PREFERENCE_KEYS.songChart, text);
+    }
   }, []);
 
   const playChordAt = useCallback(

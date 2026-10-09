@@ -21,6 +21,10 @@ interface ExpectMatchers<T> {
   toContain(
     expected: T extends readonly (infer Item)[] ? Item : T extends string ? string : never
   ): void;
+  /** Asserts the function throws, e.g. `expect(() => risky()).toThrow()`. */
+  toThrow(message?: string | RegExp): void;
+  /** Negated form, e.g. `expect(() => safe()).not.toThrow()`. */
+  readonly not: ExpectMatchers<T>;
 }
 
 declare function expect<T>(actual: T): ExpectMatchers<T>;

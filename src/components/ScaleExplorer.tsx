@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NoteName } from '../types';
 import { COMPREHENSIVE_SCALES } from '../data/scalesData';
 import { ALL_NOTES, transposeNote, NOTE_COLORS, midiToFrequency } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
+import { PREFERENCE_KEYS, isOneOf, readPreference, writePreference } from '../utils/preferences';
+
+// Validating against the real scale ids means a saved scale that no longer exists (or a
+// hand-edited value) falls back to Major instead of rendering an empty selector.
+const SCALE_IDS = COMPREHENSIVE_SCALES.map((scale) => scale.id);
+const isScaleId = isOneOf(...SCALE_IDS);
 
 interface ScaleExplorerProps {
   selectedRoot: NoteName;
@@ -15,7 +21,11 @@ export const ScaleExplorer: React.FC<ScaleExplorerProps> = ({
   onRootChange,
   onScaleNotesChange,
 }) => {
-  const [selectedScaleId, setSelectedScaleId] = useState<string>('major');
+  const [selectedScaleId, setSelectedScaleId] = useState<string>(() =>
+    readPreference(PREFERENCE_KEYS.scaleId, SCALE_IDS[0] ?? 'major', isScaleId)
+  );
+
+  useEffect(() => writePreference(PREFERENCE_KEYS.scaleId, selectedScaleId), [selectedScaleId]);
 
   const currentScaleDef = COMPREHENSIVE_SCALES.find((s) => s.id === selectedScaleId) ?? COMPREHENSIVE_SCALES[0]!;
 

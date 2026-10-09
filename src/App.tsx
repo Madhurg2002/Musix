@@ -13,7 +13,25 @@ import {
   type ScreenContext,
 } from './routes';
 import { readHashRoute, subscribeToRoute, writeHashRoute } from './utils/router';
+import {
+  PREFERENCE_KEYS,
+  isOneOf,
+  isNoteName,
+  readPreference,
+  writePreference,
+} from './utils/preferences';
 import { soundEngine, type InstrumentType } from './utils/audio';
+
+const isVisualizer = isOneOf('piano', 'guitar');
+const isInstrumentChoice = isOneOf<InstrumentType | 'auto'>(
+  'auto',
+  'acoustic-guitar',
+  'electric-guitar',
+  'piano',
+  'bass',
+  'ukulele',
+  'synth'
+);
 
 /** Shown while a route's code chunk loads. */
 function ScreenLoading({ title }: { title: string }) {
@@ -29,20 +47,39 @@ export function App() {
   const [activeTab, setActiveTabState] = useState<string>(() =>
     readHashRoute(ROUTE_IDS, DEFAULT_ROUTE_ID)
   );
-  const [selectedRoot, setSelectedRoot] = useState<NoteName>('C');
+  // Saved preferences seed the shell so practice resumes where the learner left off.
+  const [selectedRoot, setSelectedRoot] = useState<NoteName>(() =>
+    readPreference(PREFERENCE_KEYS.root, 'C' as NoteName, isNoteName)
+  );
   const [activeChordForFretboard, setActiveChordForFretboard] = useState<ChordShape | null>(
     COMPREHENSIVE_CHORDS[0] ?? null
   );
   const [selectedVisualizer, setSelectedVisualizer] = useState<'piano' | 'guitar'>(
-    () => visualizerForRoute(readHashRoute(ROUTE_IDS, DEFAULT_ROUTE_ID)) ?? 'piano'
+    () =>
+      // The route's own choice wins on a deep link; the saved preference covers the rest.
+      visualizerForRoute(readHashRoute(ROUTE_IDS, DEFAULT_ROUTE_ID)) ??
+      readPreference(PREFERENCE_KEYS.visualizer, 'piano' as const, isVisualizer)
   );
   const [activeScaleNotes, setActiveScaleNotes] = useState<NoteName[]>([
     'C', 'D', 'E', 'F', 'G', 'A', 'B',
   ]);
   // 'auto' = follow the route's default instrument; anything else = the user chose one.
-  const [userOverride, setUserOverride] = useState<InstrumentType | 'auto'>('auto');
+  const [userOverride, setUserOverride] = useState<InstrumentType | 'auto'>(() =>
+    readPreference(PREFERENCE_KEYS.instrument, 'auto' as const, isInstrumentChoice)
+  );
 
   const route = routeFor(activeTab);
+
+  // Mirror the shell choices back to storage.
+  useEffect(() => writePreference(PREFERENCE_KEYS.root, selectedRoot), [selectedRoot]);
+  useEffect(() => writePreference(PREFERENCE_KEYS.visualizer, selectedVisualizer), [selectedVisualizer]);
+  useEffect(() => writePreference(PREFERENCE_KEYS.instrument, userOverride), [userOverride]);
+
+  // A saved instrument lock has to reach the engine on the very first render, before any
+  // screen tries to play a note.
+  useEffect(() => {
+    soundEngine.setInstrument(userOverride === 'auto' ? 'auto' : userOverride);
+  }, []);
 
   // Keep the engine in 'auto' unless the user locked an instrument, so each tool's own
   // override decides the voice. Pinning a concrete instrument here would win over those
