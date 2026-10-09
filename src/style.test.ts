@@ -21,8 +21,8 @@ const REQUIRED_MARKERS: string[] = [
   'html[data-theme="arcade"]',
   '@layer components {', // the sheet stays in the components layer so utilities win
   '.nav-rail {', // app shell
-  '.topbar {',
-  '.btn {', // shared controls
+  '.select-input {', // shared controls (the footer and top bar are utilities now)
+  '.btn {',
   '.tuna-arc-gauge {', // tuner screen
   '.metronome-page {', // metronome screen
   '[data-tip]::after {', // tooltip layer

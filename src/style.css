@@ -389,55 +389,7 @@ body {
   box-shadow: 0 0 16px var(--accent-primary);
 }
 
-/* Header Sound Selector */
-.header-sound-selector {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(var(--overlay-rgb), 0.04);
-  padding: 6px 12px;
-  border-radius: 14px;
-  border: 1px solid var(--card-border);
-}
-
-.sound-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.sound-select {
-  background: rgba(var(--bg-primary-rgb), 0.9);
-  border: 1px solid var(--card-border);
-  color: var(--accent-primary);
-  padding: 6px 10px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  outline: none;
-}
-
-.sound-selector-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.sound-active-chip {
-  font-size: 11px;
-  color: var(--text-muted);
-  padding-left: 2px;
-}
-
-.sound-active-chip.small {
-  font-size: 10px;
-}
-
-.sound-active-chip strong {
-  color: var(--accent-success);
-  font-weight: 700;
-}
+/* Header sound selector — styled with Tailwind utilities in src/components/TopBar.tsx. */
 
 /* Buttons System */
 .btn {
@@ -2233,7 +2185,6 @@ body {
 
   .header-brand,
   .header-nav,
-  .header-sound-selector,
   .header-visualizer-control {
     flex: 1 1 100%;
     justify-content: center;
@@ -2492,42 +2443,7 @@ body {
   flex-direction: column;
 }
 
-/* ── Top bar ── */
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  padding: 12px 28px;
-  background: rgba(var(--bg-primary-rgb), 0.85);
-  border-bottom: 1px solid var(--card-border);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-
-.topbar__heading {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.topbar__eyebrow {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.topbar__title {
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-}
+/* ── Top bar ── styled with Tailwind utilities in src/components/TopBar.tsx ── */
 
 /* ── Screen hero ── */
 .screen-hero {
@@ -2694,12 +2610,6 @@ body {
   .main-content-container {
     padding: 22px 16px;
     gap: 22px;
-  }
-
-  /* The rail already owns the top edge on small screens. */
-  .topbar {
-    position: static;
-    padding: 10px 16px;
   }
 }
 
