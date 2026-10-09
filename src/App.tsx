@@ -177,7 +177,9 @@ export function App() {
               onScaleNotesChange={setActiveScaleNotes}
             />
             <div className="dual-visualizers-grid">
-              <PianoKeyboard activeNotes={activeScaleNotes} rootNote={selectedRoot} />
+              {pianoOpen && (
+                <PianoKeyboard activeNotes={activeScaleNotes} rootNote={selectedRoot} />
+              )}
               <GuitarFretboard
                 activeScaleNotes={activeScaleNotes}
                 rootNote={selectedRoot}
