@@ -552,7 +552,6 @@ body {
 .card-fretboard-numbers,
 .card-fretboard-string-row {
   display: grid;
-  grid-template-columns: 24px repeat(5, minmax(0, 1fr));
 }
 
 .card-fretboard-numbers {

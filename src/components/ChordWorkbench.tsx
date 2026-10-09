@@ -18,17 +18,25 @@ import { soundEngine } from '../utils/audio';
 const CardFretboard: React.FC<{ chord: ChordShape }> = ({ chord }) => {
   const safeChord = asSafeChord(chord);
   const pressedFrets = safeChord.frets.filter((fret) => fret > 0);
+  const lowestFret = pressedFrets.length > 0 ? Math.min(...pressedFrets) : 1;
   const highestFret = Math.max(0, ...pressedFrets);
-  const firstFret = highestFret > 5 ? highestFret - 4 : 1;
-  const fretNumbers = Array.from({ length: 5 }, (_, index) => firstFret + index);
+  const firstFret = highestFret > 5
+    ? highestFret - lowestFret > 4 ? lowestFret : highestFret - 4
+    : 1;
+  const fretCount = Math.max(5, highestFret - firstFret + 1);
+  const fretNumbers = Array.from({ length: fretCount }, (_, index) => firstFret + index);
 
   return (
     <div className="card-fretboard" role="img" aria-label={`${safeChord.name} guitar fingering, high E to low E`}>
       <div className="card-fretboard-heading">
         <span>Guitar fingering</span>
-        {firstFret > 1 && <span>Frets {firstFret}-{firstFret + 4}</span>}
+        {firstFret > 1 && <span>Frets {firstFret}-{firstFret + fretCount - 1}</span>}
       </div>
-      <div className="card-fretboard-numbers" aria-hidden="true">
+      <div
+        className="card-fretboard-numbers"
+        aria-hidden="true"
+        style={{ gridTemplateColumns: `24px repeat(${fretCount}, minmax(0, 1fr))` }}
+      >
         <span />
         {fretNumbers.map((fret) => <span key={fret}>{fret}</span>)}
       </div>
@@ -39,7 +47,11 @@ const CardFretboard: React.FC<{ chord: ChordShape }> = ({ chord }) => {
           const finger = safeChord.fingers?.[stringIndex];
 
           return (
-            <div className="card-fretboard-string-row" key={`${stringInfo.name}-${displayIndex}`}>
+            <div
+              className="card-fretboard-string-row"
+              key={`${stringInfo.name}-${displayIndex}`}
+              style={{ gridTemplateColumns: `24px repeat(${fretCount}, minmax(0, 1fr))` }}
+            >
               <span className="card-string-name">
                 {stringInfo.name}
                 <small>{fret === -1 ? '×' : fret === 0 ? '○' : ''}</small>
