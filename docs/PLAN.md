@@ -15,7 +15,7 @@ Do **not** rewrite every doc on every change. The rule from here on:
 | --- | --- | --- |
 | 1 | `6073dfb` | `CAPABILITIES.md`, `COMPONENTS.md` (Song Follower) |
 | 2 | `f919b4f`, `84ca95f` | `ARCHITECTURE.md`, `COMPONENTS.md`, `DEVELOPMENT.md`, `BUGS.md`, `README.md`, `README-docs.md`, docs index |
-| 3 | `938fd47`, `c5ce232`, `07483ff` | **this file only** |
+| 3 | `938fd47`, `c5ce232`, `07483ff`, `975ae19` | **this file only** |
 
 ### Deferred doc edits (sweep up in the next batch)
 
@@ -27,7 +27,10 @@ Do **not** rewrite every doc on every change. The rule from here on:
   song now persist.
 - `public/metronome.js` being gone, the helper aliases being collapsed into `noteNameAt` /
   `stringInfoAt`, and `detectPitch` now living only in `musicTheory.ts`.
-- `src/utils/preferences.test.ts` (test counts are now 82 across 5 files).
+- `src/utils/preferences.test.ts` and `src/utils/chordVoicing.test.ts` (test counts are now
+  100 across 6 files).
+- `src/utils/chordVoicing.ts` — the chord studio's voicing maths moved out of the component,
+  and `findChord` was added to `chordsData.ts`.
 
 `docs/BUGS.md` has the statuses updated in the same sweep.
 
@@ -189,9 +192,10 @@ uncommitted to keep the history about source changes.
 
 Ordered by value; none block the phases above.
 
-- [ ] **Test the chord voicing logic.** `getChordPosition` (fret-window generation, finger
-      numbering) and `handleTranspose` are untested — T3 in `docs/BUGS.md` would have been
-      caught by such a test, and remains open.
+- [x] **Test the chord voicing logic** — `chordVoicing.ts` holds `getChordPosition`,
+      `fretWindow`, and `transposeChordShape` with 18 tests. Writing those tests surfaced and
+      fixed T3 (a transposed card drew and played its original shape), which is exactly the
+      failure the plan predicted the tests would catch.
 - [x] **Add a `test` script** — `bun run test` and `bun run typecheck`, with `typescript`
       pinned as a devDependency (it was previously downloaded on demand by `bunx`).
 - [x] **Add CI** running the type check and the tests on every push and pull request.
