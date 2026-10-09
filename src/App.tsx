@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import './style.css';
 import { NoteName, ChordShape } from './types';
 import { COMPREHENSIVE_CHORDS } from './data/chordsData';
