@@ -7,7 +7,7 @@
 //
 // Everything here is pure so it can be unit tested without a DOM.
 
-import { ALL_NOTES, NOTE_ALIASES, midiToFrequency, transposeNote } from './musicTheory';
+import { ALL_NOTES, NOTE_ALIASES, getNoteIndex, midiToFrequency, transposeNote } from './musicTheory';
 import type { NoteName } from '../types';
 
 export type ChordQuality = 'major' | 'minor' | 'diminished' | 'augmented' | 'suspended' | 'other';
@@ -167,6 +167,69 @@ export function transposeChordToken(token: string, semitones: number): string {
   const root = transposeNote(symbol.root, semitones);
   const bass = symbol.bass ? `/${transposeNote(symbol.bass, semitones)}` : '';
   return `${root}${symbol.suffix}${bass}`;
+}
+
+/**
+ * Pitch classes (0 = C … 11 = B) that a chart token sounds, transposed by `semitones`,
+ * or null when the token is not a chord. This is the mic follow-along's comparison
+ * basis: what the learner plays, reduced to pitch classes, is matched against these sets.
+ */
+export function chordPitchClasses(token: string, semitones = 0): number[] | null {
+  const symbol = parseChordSymbol(token);
+  if (!symbol) return null;
+  const classes = new Set<number>();
+  for (const note of chordTones(symbol, semitones)) {
+    const index = getNoteIndex(note);
+    if (index >= 0) classes.add(index);
+  }
+  return [...classes];
+}
+
+/**
+ * How well a set of heard pitch classes fits a chord's: every overlap counts once for,
+ * every class outside the chord counts against — a perfect fit scores +1 per heard note,
+ * 0 means no information either way, and negatives are clashes. The Song Follower's live coaching
+ * uses it both to flag a wrong chord and to work out where the learner actually is.
+ */
+export function chordFitScore(heard: readonly number[], tones: readonly number[]): number {
+  let score = 0;
+  for (const pitchClass of heard) {
+    score += tones.includes(pitchClass) ? 1 : -1;
+  }
+  return score;
+}
+
+/**
+ * The chart index that best explains what is being played: the highest fit score, with
+ * ties won by the earliest index at or after `from` (wrapping), because the follower
+ * moves forward through a song — so while the current position fits at all, it wins and
+ * the caller has nothing to snap to. Returns null when the chart has no position that
+ * the heard notes fit (score ≥ 1).
+ */
+export function findBestChartPosition(
+  heard: readonly number[],
+  tonesByIndex: readonly (readonly number[] | null)[],
+  from: number
+): number | null {
+  const count = tonesByIndex.length;
+  if (count === 0 || heard.length === 0) return null;
+
+  const start = ((Math.trunc(from) % count) + count) % count;
+  let bestScore = Number.NEGATIVE_INFINITY;
+  let bestIndex: number | null = null;
+
+  for (let offset = 0; offset < count; offset++) {
+    const index = (start + offset) % count;
+    const tones = tonesByIndex[index];
+    if (!tones || tones.length === 0) continue;
+    const score = chordFitScore(heard, tones);
+    if (score > bestScore) {
+      bestScore = score;
+      bestIndex = index;
+    }
+  }
+
+  return bestScore >= 1 ? bestIndex : null;
 }
 
 /** Frequency in Hz for each note of the chord, voiced in ascending order above the root. */

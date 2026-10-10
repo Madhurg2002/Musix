@@ -1,7 +1,10 @@
 import {
   chordFrequencies,
+  chordFitScore,
+  chordPitchClasses,
   chordTones,
   describeChordSymbol,
+  findBestChartPosition,
   isChordToken,
   parseChordChart,
   parseChordSymbol,
@@ -154,6 +157,56 @@ describe('chordChart', () => {
     test('describes quality and extension', () => {
       expect(describeChordSymbol('Am7')).toContain('minor');
       expect(describeChordSymbol('C')).toContain('major');
+    });
+  });
+
+  describe('mic follow-along matching', () => {
+    test('chordPitchClasses reduces a chord to its pitch classes, transposed', () => {
+      expect(chordPitchClasses('C')).toEqual([0, 4, 7]);
+      expect(chordPitchClasses('Am')).toEqual([9, 0, 4]);
+      expect(chordPitchClasses('C', 1)).toEqual([1, 5, 8]);
+// G B D with B in the bass — B is a duplicate pitch class, not a fourth tone.
+      expect(chordPitchClasses('G/B')).toEqual([7, 11, 2]);
+      expect(chordPitchClasses('break')).toBeNull();
+    });
+
+    test('chordFitScore counts overlaps for and clashes against', () => {
+      expect(chordFitScore([9, 0, 4], [9, 0, 4])).toBe(3);
+      expect(chordFitScore([9, 1], [9, 0, 4])).toBe(0);
+      expect(chordFitScore([1, 6], [9, 0, 4])).toBe(-2);
+      expect(chordFitScore([], [9, 0, 4])).toBe(0);
+    });
+
+    test('findBestChartPosition jumps forward to the chord that fits', () => {
+      const chart = [
+        [0, 4, 7], // C
+        [7, 11, 2], // G
+        [9, 0, 4], // Am
+      ];
+      // Heard A + C: Am fits perfectly, C and G do not — even though they come first.
+      expect(findBestChartPosition([9, 0], chart, 0)).toBe(2);
+    });
+
+    test('findBestChartPosition stays put while the current position fits', () => {
+      const chart = [
+        [0, 4, 7], // C
+        [9, 0, 4], // Am
+        [0, 4, 7], // C again
+      ];
+      // Ties are won by the earliest index at or after `from`, so a note that fits the
+      // chord under the playhead never drags the highlight elsewhere.
+      expect(findBestChartPosition([0], chart, 0)).toBe(0);
+      expect(findBestChartPosition([0], chart, 1)).toBe(1);
+      // ...while a note that does NOT fit the current chord moves forward to the next
+      // position that does explain it.
+      expect(findBestChartPosition([7], chart, 1)).toBe(2);
+    });
+
+    test('findBestChartPosition returns null when nothing on the chart fits', () => {
+      expect(findBestChartPosition([1], [[0, 4, 7]], 0)).toBeNull();
+      expect(findBestChartPosition([], [[0, 4, 7]], 0)).toBeNull();
+      expect(findBestChartPosition([0], [], 0)).toBeNull();
+      expect(findBestChartPosition([0], [null], 0)).toBeNull();
     });
   });
 });

@@ -3,11 +3,15 @@ import { soundEngine } from '../utils/audio';
 import {
   SAMPLE_CHART,
   chordFrequencies,
+  chordPitchClasses,
+  findBestChartPosition,
   parseChordChart,
   parseChordSymbol,
   transposeChordToken,
   type ParsedChart,
 } from '../utils/chordChart';
+import { noteNameAt } from '../utils/musicTheory';
+import { useLivePitch } from '../utils/useLivePitch';
 import {
   PREFERENCE_KEYS,
   isBoolean,
@@ -25,6 +29,11 @@ const EMPTY_CHART: ParsedChart = { lines: [], chords: [], unique: [], sections: 
 const isBeatsPerChord = isOneOfValue(BEATS_PER_CHORD_OPTIONS);
 const isBpm = isIntegerInRange(40, 200);
 const isTranspose = isIntegerInRange(-11, 11);
+
+/** How long a heard note stays in the follow-along's memory. */
+const HEARD_WINDOW_MS = 2000;
+/** How long a better-fitting chart position must hold before the highlight snaps to it. */
+const LOCATE_HOLD_MS = 1200;
 
 /**
  * Follow a song from a pasted chord chart.
@@ -138,13 +147,95 @@ export const SongFollower: React.FC = () => {
     if (isPlaying) playChordAt(position);
   }, [position, isPlaying, playChordAt]);
 
-  // Keep the highlighted chord on screen while the song plays.
+  // Keep the highlighted chord on screen whenever it moves: while the song plays, when
+  // stepping by hand, and when the mic locates the learner. The first run is skipped so
+  // opening a screen never drags the page down to the chart on its own.
+  const hasPositionedRef = useRef(false);
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!hasPositionedRef.current) {
+      hasPositionedRef.current = true;
+      return;
+    }
     activeChordRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, [position, isPlaying]);
 
   const displayToken = (token: string) => transposeChordToken(token, transpose);
+
+  // ---- Live follow-along (mic) -------------------------------------------------
+  // The learner plays what the chart shows; the mic names the pitch classes they are
+  // actually producing. The coaching strip checks them against the chord under the
+  // playhead, and while the follower is paused, agreement elsewhere in the chart moves
+  // the highlight to where they really are.
+  const live = useLivePitch();
+  const heardEntriesRef = useRef<{ pitchClass: number; at: number }[]>([]);
+  const [heardVersion, setHeardVersion] = useState(0);
+  const [foundAt, setFoundAt] = useState<{ index: number; t: number } | null>(null);
+
+  useEffect(() => {
+    if (!live.listening) {
+      heardEntriesRef.current = [];
+      setFoundAt(null);
+      return;
+    }
+    if (live.midi === null) return;
+
+    const pitchClass = ((live.midi % 12) + 12) % 12;
+    const now = Date.now();
+    const entries = heardEntriesRef.current;
+    const last = entries[entries.length - 1];
+    // Re-record a note that keeps sounding every 400ms so a held chord stays inside
+    // the window; a new note is always recorded immediately.
+    if (last && last.pitchClass === pitchClass && now - last.at < 400) return;
+    entries.push({ pitchClass, at: now });
+    while (entries.length > 0 && now - (entries[0]?.at ?? now) > HEARD_WINDOW_MS) {
+      entries.shift();
+    }
+    setHeardVersion((version) => version + 1);
+  }, [live.listening, live.midi, live.cents]);
+
+  const heardClasses = useMemo(() => {
+    if (!live.listening) return [];
+    const now = Date.now();
+    const unique = new Set<number>();
+    for (const entry of heardEntriesRef.current) {
+      if (now - entry.at <= HEARD_WINDOW_MS) unique.add(entry.pitchClass);
+    }
+    return [...unique];
+  }, [live.listening, heardVersion]);
+
+  const tonesByIndex = useMemo(
+    () => chart.chords.map((token) => chordPitchClasses(token, transpose)),
+    [chart.chords, transpose]
+  );
+
+  const locateIndex = useMemo(
+    () =>
+      live.listening && !isPlaying && heardClasses.length > 0
+        ? findBestChartPosition(heardClasses, tonesByIndex, position)
+        : null,
+    [live.listening, isPlaying, heardClasses, tonesByIndex, position]
+  );
+
+  // Snap only after the better position holds for a moment, so one passing note cannot
+  // throw the highlight around. The snap is silent — the learner just played it.
+  useEffect(() => {
+    if (locateIndex === null || locateIndex === position) return;
+    const timer = window.setTimeout(() => {
+      setPosition(locateIndex);
+      setFoundAt({ index: locateIndex, t: Date.now() });
+    }, LOCATE_HOLD_MS);
+    return () => window.clearTimeout(timer);
+  }, [locateIndex, position]);
+
+  const currentIndex = Math.min(position, Math.max(total - 1, 0));
+  const currentTones = currentToken ? tonesByIndex[currentIndex] ?? null : null;
+  const clashClasses =
+    heardClasses.length > 0 && currentTones
+      ? heardClasses.filter((pitchClass) => !currentTones.includes(pitchClass))
+      : [];
+  const heardNames = heardClasses.map((pitchClass) => noteNameAt(pitchClass)).join(' · ');
+  const snapIsFresh =
+    foundAt !== null && foundAt.index === position && Date.now() - foundAt.t < 4000;
 
   return (
     <div className="glass-card flex flex-col gap-[18px]">
@@ -328,6 +419,19 @@ export const SongFollower: React.FC = () => {
                 {soundOn ? '♪ Sound on' : '♪ Sound off'}
               </button>
               <button
+                className={`btn btn-sm ${live.listening ? 'btn-danger' : 'btn-outline'}`}
+                data-tip={
+                  live.listening
+                    ? 'Stop the microphone and the follow-along coaching'
+                    : 'Listen while you play: check every chord against the chart and find your place in it. Turn Sound off if the app’s own playback rings in your room.'
+                }
+                aria-pressed={live.listening}
+                onClick={() => (live.listening ? live.stop() : live.start())}
+              >
+                <Icon name={live.listening ? 'stop' : 'mic'} />
+                {live.listening ? 'Listening' : 'Play along'}
+              </button>
+              <button
                 className="btn btn-outline btn-sm"
                 data-tip="Print the chart so you can practise it away from the screen"
                 onClick={() => window.print()}
@@ -358,6 +462,60 @@ export const SongFollower: React.FC = () => {
               />
             </div>
           </div>
+
+          {/* Follow-along coaching: what the mic hears, checked against the chord under
+              the playhead, plus a nudge to where in the chart it actually fits. */}
+          {(live.listening || live.error) && (
+            <div
+              className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-[rgba(var(--accent-rgb),0.35)] bg-[rgba(var(--accent-rgb),0.08)] px-4 py-3 text-[13px] print:hidden"
+              role="status"
+              aria-live="polite"
+            >
+              {live.error ? (
+                <span className="flex items-center gap-2 text-alert">
+                  <Icon name="alert" /> {live.error}
+                </span>
+              ) : (
+                <>
+                  <span className="section-badge inline-flex items-center gap-1.5 bg-[rgba(var(--accent-rgb),0.16)] text-accent">
+                    <Icon name="mic" /> Playing along
+                  </span>
+                  {heardClasses.length === 0 ? (
+                    <span className="italic text-ink-muted">
+                      Play a chord — Musix checks it against the chart and finds your place.
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-ink-soft">
+                        You played: <strong className="text-ink">{heardNames}</strong>
+                      </span>
+                      {currentTones === null ? null : clashClasses.length === 0 ? (
+                        <span className="flex items-center gap-1.5 text-success">
+                          <Icon name="check" /> Those fit{' '}
+                          <strong>{currentToken ? displayToken(currentToken) : ''}</strong> —
+                          you are in the right place.
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1.5 text-alert">
+                          <Icon name="alert" /> Here the chart says{' '}
+                          <strong>{currentToken ? displayToken(currentToken) : ''}</strong>{' '}
+                          ({currentTones.map((pitchClass) => noteNameAt(pitchClass)).join(' · ')}) —
+                          you played{' '}
+                          {clashClasses.map((pitchClass) => noteNameAt(pitchClass)).join(' · ')},
+                          which {clashClasses.length === 1 ? 'is' : 'are'} not in it.
+                        </span>
+                      )}
+                      {snapIsFresh && foundAt && (
+                        <span className="text-accent">
+                          Found you at chord {foundAt.index + 1} of {total}.
+                        </span>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          )}
 
           <div className="print-sheet flex max-h-[min(58vh,560px)] flex-col gap-3 overflow-y-auto border-t border-t-[rgba(var(--overlay-rgb),0.1)] pt-[18px] max-sm:max-h-[62vh]">
             <div className="hidden pb-1 text-[12px] font-semibold text-ink-muted print:block">

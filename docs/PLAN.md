@@ -32,8 +32,8 @@ Do **not** rewrite every doc on every change. The rule from here on:
 - `src/utils/preferences.test.ts` and `src/utils/chordVoicing.test.ts` (test counts are now
   148 across 10 files).
 - The live note finder (`src/utils/useLivePitch.ts`, `fretPositionsForMidi`), the Song
-  Follower's print stylesheet and button, the final de-emoji pass, and the closed
-  class-drift item.
+  Follower's print stylesheet and button, its mic follow-along, the rail active-state fix,
+  the final de-emoji pass, and the closed class-drift item.
 - `src/utils/chordVoicing.ts` — the chord studio's voicing maths moved out of the component,
   and `findChord` was added to `chordsData.ts`.
 
@@ -256,6 +256,22 @@ Ordered by value; none block the phases above.
       octave and cents, and lights up every (string, fret) that sounds it via the tested
       `fretPositionsForMidi` — the inverse of `getFretMidi` — plus an open-string ring at
       the nut. One detector still serves both the tuner and this screen.
+- [x] **Fix the left rail's active states.** Tailwind compiles same-family utilities in
+      alphabetical order, so the rail's base classes (`border-l-transparent`,
+      `text-ink-soft`, `bg-transparent`, `font-semibold`) always beat the conditional
+      active-state ones — the highlight bar, brighter label, and visualizer toggle never
+      showed. Active and inactive now pick mutually exclusive class strings, and the
+      wordmark gradient is guarded with `@supports` so browsers without
+      `background-clip: text` get solid text instead of a gradient rectangle.
+- [x] **Song Follower follow-along.** A **Play along** toggle listens through the mic
+      (reusing `useLivePitch`): a coaching strip names the pitch classes just played and
+      checks them against the chord under the playhead — green when they fit, a direct
+      correction (`The chart says Am (A · C · E) — you played F♯, which is not in it`)
+      when they do not. While the follower is paused, the highlight snaps to the chart
+      position that actually fits, so the follower works out where the learner is. The
+      matching maths (`chordPitchClasses`, `chordFitScore`, `findBestChartPosition`) is
+      pure and tested in `chordChart.test.ts`; the heard window is 2 s and a new position
+      must hold 1.2 s before the snap.
 - [x] **Resolve `public/metronome.js`** — deleted; the real metronome is the React
       component.
 - [x] **Reconcile `.gitignore`** — the tracked-but-ignored paths were reconciled and the

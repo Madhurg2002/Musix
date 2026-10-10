@@ -276,6 +276,11 @@ capability that makes it work.
 - **Print chart** sends the chart to the printer: the print stylesheet drops the dark
   chrome for near-black ink on white, keeps every chord line whole across page breaks, and
   hides the app shell so only the chart lands on paper.
+- **Play along** listens through the microphone: a coaching strip names the notes you just
+  played and checks them against the chord under the playhead — green when they fit, and a
+  direct correction ("The chart says Am (A · C · E) — you played F♯, which is not in it")
+  when they do not. While the follower is paused, the highlight snaps to the chart
+  position your notes actually fit, so the follower works out where you are in the song.
 - A progress bar and a large "now playing" chord read at a glance.
 
 **Technical**
@@ -289,6 +294,12 @@ capability that makes it work.
   `(60000 / bpm) * beatsPerChord`, and a `useEffect` sounds the chord each time the index
   advances. `activeChordRef` plus `scrollIntoView({ block: 'nearest' })` keeps the current
   chord visible in the scrollable chart.
+- Follow-along matching is pure and tested: `chordPitchClasses` (a chord token reduced to
+  pitch classes, transposed), `chordFitScore` (overlaps for, clashes against), and
+  `findBestChartPosition` (best-fitting chart index, ties won forward from the current
+  position) in `src/utils/chordChart.test.ts`, fed by `src/utils/useLivePitch.ts`. Heard
+  notes live in a 2-second window, and a better position must hold 1.2 seconds before the
+  highlight snaps — silent, because the learner just played it.
 - **Ultimate Guitar cannot be fetched.** Their pages are not CORS-enabled and scraping them
   is against their terms, so there is deliberately no URL import. The screen explains this
   and works from pasted text instead.
