@@ -420,6 +420,46 @@ body {
   margin-top: -2px;
 }
 
+/* Live note finder: while the mic listens, every fret that sounds the detected note
+   pulses, and an open-string hit rings the string head at the nut. */
+.fret-cell--live::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--accent-highlight);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 6;
+  animation: live-hit-pulse 1.2s ease-in-out infinite;
+}
+
+.live-hit-badge {
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.7);
+}
+
+.string-head-label--live {
+  background: rgba(var(--accent-rgb), 0.16);
+  border-radius: 8px;
+  padding: 1px 6px;
+  animation: live-hit-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes live-hit-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.6);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0);
+    opacity: 0.7;
+  }
+}
+
 /* Piano Component */
 .piano-container {
   display: flex;
@@ -1228,6 +1268,43 @@ html[data-theme="arcade"] {
 
   .consent-bar__actions .btn {
     flex: 1 1 auto;
+  }
+}
+/* Print: paper carries only the Song Follower's chart, so a learner can take the graded
+   chart away from the screen (docs/PLAN.md, "print stylesheet"). The shell chrome hides
+   with Tailwind's `print:hidden`; this block re-themes the sheet for paper and lets it run
+   past the viewport-height scroll box. */
+@media print {
+  .print-sheet {
+    --text-primary: #111;
+    --text-secondary: #333;
+    --text-muted: #555;
+    --bg-primary: #111;
+    --overlay-rgb: 0, 0, 0;
+    --card-border: #bbb;
+
+    max-height: none !important;
+    overflow: visible !important;
+    height: auto !important;
+    border-top: 1px solid #bbb;
+    color: #111;
+  }
+
+  /* Each line of the chart stays whole — no chord chip orphaned from its lyrics. */
+  .print-sheet > * {
+    break-inside: avoid;
+  }
+
+  /* The card and page behind the sheet drop their dark chrome; ink stays near-black. */
+  .glass-card {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  body {
+    background: #fff !important;
   }
 }
 /* end @layer components — the closing brace is the last character of the file */

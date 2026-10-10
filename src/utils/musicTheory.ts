@@ -142,6 +142,36 @@ export function getFretMidi(stringIndex: number, fret: number): number {
   return baseMidi + fret;
 }
 
+/** One place a pitch can be played: a string index (0 = low E) and a fret. */
+export interface FretPosition {
+  stringIndex: number;
+  fret: number;
+}
+
+/**
+ * Every (string, fret) at or below `maxFret` that sounds `midi` — the inverse of
+ * `getFretMidi`. This is what turns a detected pitch into "you are playing fret N":
+ * one pitch has several homes on the neck (E4 = open high E, string 2 fret 5,
+ * string 3 fret 9), and a live detector cannot know which string was plucked, so
+ * callers highlight all of them at once.
+ *
+ * Results are ordered low string → high string, each entry's fret ascending.
+ */
+export function fretPositionsForMidi(
+  midi: number,
+  strings: readonly { baseMidi: number }[] = GUITAR_STRINGS,
+  maxFret = 12
+): FretPosition[] {
+  if (!Number.isFinite(midi)) return [];
+  const target = Math.round(midi);
+  const hits: FretPosition[] = [];
+  strings.forEach((string, stringIndex) => {
+    const fret = target - string.baseMidi;
+    if (fret >= 0 && fret <= maxFret) hits.push({ stringIndex, fret });
+  });
+  return hits;
+}
+
 /**
  * Autocorrelation pitch detector (browser-side). Returns -1 when no pitch is usable.
  *

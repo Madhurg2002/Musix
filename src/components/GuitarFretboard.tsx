@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { NoteName, ChordShape } from '../types';
 import {
   GUITAR_STRINGS,
+  fretPositionsForMidi,
   getFretNote,
   getFretMidi,
   midiToFrequency,
   noteColorFor,
+  noteNameAt,
   stringInfoAt,
 } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
+import { useLivePitch } from '../utils/useLivePitch';
 import { asSafeChord } from '../data/chordsData';
 import { Icon } from './Icon';
 
@@ -26,6 +29,16 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
   fretsCount = 12,
 }) => {
   const [hoveredNote, setHoveredNote] = useState<{ stringIdx: number; fret: number; note: NoteName } | null>(null);
+
+  // Live note finder: the mic names the note being played and every home it has on the
+  // neck lights up. One detector (`detectPitch` via useLivePitch) feeds both this screen
+  // and the tuner, so the two microphone paths cannot drift apart.
+  const live = useLivePitch();
+  const livePositions =
+    live.listening && live.midi !== null
+      ? fretPositionsForMidi(live.midi, GUITAR_STRINGS, fretsCount)
+      : [];
+  const liveHitKeys = new Set(livePositions.map((hit) => `${hit.stringIndex}:${hit.fret}`));
 
   // Resolve what to draw. App owns the selected chord and keeps passing it for as long as
   // the learner stays on this tab, so the fretboard does not need a second copy of it.
@@ -75,17 +88,78 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
           </div>
         </div>
 
-        {activeChord && (
+        <div className="flex flex-wrap items-center gap-2.5">
+          {activeChord && (
+            <button
+              className="btn btn-primary"
+              data-tip="Strum every pressed string in this shape"
+              onClick={() => handleStrum()}
+            >
+              <Icon name="volume" /> Strum Chord
+            </button>
+          )}
           <button
-            className="btn btn-primary"
-            data-tip="Strum every pressed string in this shape"
-            onClick={() => handleStrum()}
+            className={`btn btn-sm ${live.listening ? 'btn-danger' : 'btn-outline'}`}
+            data-tip={
+              live.listening
+                ? 'Stop the microphone and clear the live highlights'
+                : 'Listen through the mic: name the note you play and light up every fret it lives on'
+            }
+            aria-pressed={live.listening}
+            onClick={() => (live.listening ? live.stop() : live.start())}
           >
-            <Icon name="volume" /> Strum Chord
+            <Icon name={live.listening ? 'stop' : 'mic'} />
+            {live.listening ? 'Stop listening' : 'Find my note'}
           </button>
-        )}
+        </div>
       </div>
 
+      {/* Live note finder readout: what the mic hears right now, and where it lives. */}
+      {(live.listening || live.error) && (
+        <div
+          className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-[rgba(var(--accent-rgb),0.35)] bg-[rgba(var(--accent-rgb),0.08)] px-4 py-3"
+          role="status"
+          aria-live="polite"
+        >
+          {live.error ? (
+            <span className="flex items-center gap-2 text-[13px] text-alert">
+              <Icon name="alert" /> {live.error}
+            </span>
+          ) : (
+            <>
+              <span className="section-badge inline-flex items-center gap-1.5 bg-[rgba(var(--accent-rgb),0.16)] text-accent">
+                <Icon name="mic" /> Listening
+              </span>
+              {live.midi !== null ? (
+                <>
+                  <span className="font-[family-name:Georgia,serif] text-[1.7rem] font-bold leading-none text-accent">
+                    {noteNameAt(live.midi)}
+                    {Math.floor(live.midi / 12) - 1}
+                  </span>
+                  <span className="text-[13px] tabular-nums text-ink-soft">
+                    {live.cents > 0 ? `+${live.cents}` : live.cents}¢
+                  </span>
+                  <span className="text-[13px] text-ink-soft">
+                    {livePositions.length > 0
+                      ? `Lives on: ${livePositions
+                          .map((hit) =>
+                            hit.fret === 0
+                              ? `string ${6 - hit.stringIndex} open`
+                              : `string ${6 - hit.stringIndex} fret ${hit.fret}`
+                          )
+                          .join(' · ')}`
+                      : `Not on this neck (open E to fret ${fretsCount}).`}
+                  </span>
+                </>
+              ) : (
+                <span className="text-[13px] italic text-ink-muted">
+                  Play a note — Musix will name it and light up every fret it lives on.
+                </span>
+              )}
+            </>
+          )}
+        </div>
+      )}
       {/* String Head Stock / Nut Status (X / O indicators) */}
       {passedChord && (
         <div className="flex flex-wrap items-center gap-3 rounded-[10px] bg-[rgba(var(--inset-rgb),0.3)] px-4 py-2.5">
@@ -146,7 +220,11 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
 
             return (
               <div key={actualStringIdx} className="fretboard-string-row">
-                <div className="string-head-label">
+                <div
+                  className={`string-head-label${
+                    liveHitKeys.has(`${actualStringIdx}:0`) ? ' string-head-label--live' : ''
+                  }`}
+                >
                   <span className="string-num">{6 - actualStringIdx}</span>
                   <span className="string-note">{stringInfo.name}</span>
                 </div>
@@ -163,6 +241,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
                   const isChordPress = chordFret === fretNum;
                   const isScaleNote = activeScaleNotes.includes(note);
                   const isRoot = note === rootNote;
+                  const isLiveHit = liveHitKeys.has(`${actualStringIdx}:${fretNum}`);
 
                   let markerClass = '';
                   if (isChordPress) markerClass = 'chord-press-active';
@@ -172,7 +251,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
                   return (
                     <div
                       key={fretNum}
-                      className="fret-cell"
+                      className={`fret-cell${isLiveHit ? ' fret-cell--live' : ''}`}
                       onClick={() => handleNoteClick(actualStringIdx, fretNum)}
                       onMouseEnter={() => setHoveredNote({ stringIdx: actualStringIdx, fret: fretNum, note })}
                       onMouseLeave={() => setHoveredNote(null)}
@@ -193,6 +272,17 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
                           {isChordPress && finger !== undefined && (
                             <span className="badge-finger">F:{finger}</span>
                           )}
+                        </div>
+                      )}
+
+                      {/* A heard note with no chord/scale badge of its own still gets one,
+                          so every home of the pitch is named, not just ringed. */}
+                      {isLiveHit && !markerClass && (
+                        <div
+                          className="note-press-badge live-hit-badge"
+                          style={{ backgroundColor: noteColorFor(note) }}
+                        >
+                          <span className="badge-note-name">{note}</span>
                         </div>
                       )}
                     </div>
