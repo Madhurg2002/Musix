@@ -295,8 +295,12 @@ Ordered by value; none block the phases above.
   loses a layer marker, or ends up with unbalanced braces.- [x] **Decide on `package-lock.json`.** Decided: the project installs with bun, so a
   stale npm lock next to `bun.lock` is drift. Deleted in its own commit and gitignored so
   an accidental `npm install` cannot bring it back.
-- [ ] **Accessibility audit.** Contrast check on the new palette, and keyboard flows for the
-      chord card drag-and-drop (which currently has Alt+↑/↓ as the keyboard fallback).
+- [~] **Accessibility audit.** Contrast: shipped — an audit in `src/style.test.ts` parses
+      the token blocks out of the sheet and asserts every theme's three text tiers at
+      WCAG AA (4.5:1) against both page backgrounds. It immediately caught Paper's and
+      Arcade's muted greys below the bar (3.69:1 / 3.73:1); they were retuned to `#7a6b58`
+      and `#7b8598`. Remaining: keyboard flows for the chord card drag-and-drop (which
+      currently has Alt+↑/↓ as the keyboard fallback).
 - [x] **Progressions.** Shipped earlier than the tick: `src/utils/progressions.ts`
       resolves the named presets (I–V–vi–IV, ii–V–I, 12-bar blues) against any key with
       tests — the box was simply left unticked when they landed.
@@ -324,3 +328,8 @@ Ordered by value; none block the phases above.
   chord chart", …) read as clutter beside the label itself, so the rail now shows labels
   only. The `hint` field left the route table, its assertion left the router test, and the
   docs that described it were updated.
+- [x] **Strip the rail's borders.** The entries drew full outlines because Tailwind's
+  `border-l-2` emits `border-style: solid` on every side, letting the browser's default
+  button border through on the other three (the same leak is why the footer toggles carry
+  `border-0`). The entries now zero the other three widths explicitly and keep only the
+  brass left rule on the active screen, and the rail itself no longer draws an outer edge.
