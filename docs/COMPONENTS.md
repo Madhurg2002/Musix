@@ -31,8 +31,8 @@ The route table — the single source of truth for the app's screens.
 | `ScreenContext` | Shared state/callbacks handed to a route's `render` |
 
 A `RouteDefinition` holds `id`, `title`, `group` (`Practice` / `Fretboard` / `Harmony` /
-`Learn` / `Project`), `label`, `hint`, `instrument` (the Auto-mode voice), an optional
-`visibleFor` for the Piano/Fretboard pair, and `render(context)`.
+`Learn` / `Project`), `label`, `instrument` (the Auto-mode voice), an optional
+`visibleFor` for the Piano/Fretboard pair, an optional `railHidden`, and `render(context)`.
 
 Every screen is imported with `React.lazy` at the top of the file via
 `import('./components/X').then((m) => ({ default: m.X }))`, because the components use named
@@ -146,7 +146,7 @@ The left navigation rail.
   Harmony (Chord Studio, Piano), Learn (Guide), Project (Contact).
 - Filters out the `piano` or `fretboard` item unless the matching visualizer is selected
   (`route.visibleFor`), so only one of that pair is listed.
-- Each item is a `rail-item` with a label and a one-line hint, `aria-current="page"` on
+- Each item is a label-only button, `aria-current="page"` on
   the active entry, and a brass left rule while active.
 - The footer holds the theme `<select>` (from `THEMES`) and the Piano/Guitar visualizer
   toggle as a `role="group"` of two `aria-pressed` buttons. Changing the theme writes

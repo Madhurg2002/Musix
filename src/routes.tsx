@@ -64,9 +64,8 @@ export interface RouteDefinition {
   title: string;
   /** Rail group, which also fixes the on-screen order. */
   group: NavGroupLabel;
-  /** Rail entry label and its one-line hint. */
+  /** Rail entry label. */
   label: string;
-  hint: string;
   /** Voice this tool uses in Auto mode. */
   instrument: InstrumentType;
   /** Set on the Piano / Fretboard pair, which share a single slot in the rail. */
@@ -87,7 +86,6 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     title: 'Song Follower',
     group: 'Practice',
     label: 'Songs',
-    hint: 'Follow a chord chart',
     instrument: 'acoustic-guitar',
     render: () => <SongFollower />,
   },
@@ -96,7 +94,6 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     title: 'Instrument Tuner',
     group: 'Practice',
     label: 'Tuner',
-    hint: 'Mic pitch detection',
     instrument: 'acoustic-guitar',
     render: () => <GuitarTuner />,
   },
@@ -105,7 +102,6 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     title: 'Rhythm & Metronome',
     group: 'Practice',
     label: 'Rhythm',
-    hint: 'Metronome & tempo',
     instrument: 'acoustic-guitar',
     render: () => <RhythmMetronome />,
   },
@@ -114,7 +110,6 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     title: 'Guitar Fretboard',
     group: 'Fretboard',
     label: 'Fretboard',
-    hint: 'Press positions',
     instrument: 'acoustic-guitar',
     visibleFor: 'guitar',
     render: (context) => (
@@ -152,7 +147,6 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     title: 'Scales & Modes',
     group: 'Fretboard',
     label: 'Scales',
-    hint: 'Modes & formulas',
     instrument: 'acoustic-guitar',
     render: (context) => (
       <>
@@ -176,7 +170,6 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     title: 'Interval Explorer',
     group: 'Fretboard',
     label: 'Intervals',
-    hint: 'Distance & ear training',
     instrument: 'piano',
     render: () => <IntervalExplorer />,
   },
@@ -185,7 +178,6 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     title: 'Chord Studio',
     group: 'Harmony',
     label: 'Chord Studio',
-    hint: 'Compare side by side',
     instrument: 'acoustic-guitar',
     render: (context) => (
       <ChordWorkbench
@@ -200,7 +192,6 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     title: 'Piano Visualizer',
     group: 'Harmony',
     label: 'Piano',
-    hint: 'Keyboard visualizer',
     instrument: 'piano',
     visibleFor: 'piano',
     render: (context) => (
@@ -215,7 +206,6 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     title: 'Beginner Guide',
     group: 'Learn',
     label: 'Guide',
-    hint: 'Start here',
     instrument: 'acoustic-guitar',
     render: () => <TheoryCheatSheet />,
   },
@@ -224,7 +214,6 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     title: 'Contact',
     group: 'Project',
     label: 'Contact',
-    hint: 'Reach the author',
     instrument: 'acoustic-guitar',
     // Reachable from the footer: the rail stays a pure study plan.
     railHidden: true,

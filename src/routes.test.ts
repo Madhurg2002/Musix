@@ -35,7 +35,6 @@ describe('route table', () => {
     for (const route of ROUTES) {
       expect(route.title.length).toBeGreaterThan(0);
       expect(route.label.length).toBeGreaterThan(0);
-      expect(route.hint.length).toBeGreaterThan(0);
       expect(typeof route.render).toBe('function');
       expect(INSTRUMENT_IDS.includes(route.instrument)).toBe(true);
     }

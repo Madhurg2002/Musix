@@ -68,7 +68,7 @@ state (e.g. which mic preset is selected, which cards exist).
 Routing is hash-based and dependency-free, in two files:
 
 - **`src/routes.tsx` — the route table.** One `RouteDefinition` per screen carries the
-  fragment id, top-bar title, rail group/label/hint, the instrument that screen uses in
+  fragment id, top-bar title, rail group/label, the instrument that screen uses in
   Auto mode, and a `render(context)` function. `App` renders from it, `Header` builds the
   rail from it, and `TopBar` titles the screen from it, so those three cannot drift.
 - **`src/utils/router.ts` — the address.** `readHashRoute(validIds, fallback)` strips the

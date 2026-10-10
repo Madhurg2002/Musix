@@ -131,7 +131,7 @@ The suite is **66 tests across 4 files**, all passing:
 **A new screen**
 
 1. Create `src/components/YourScreen.tsx` and export it as a named export.
-2. Add one entry to `ROUTES` in `src/routes.tsx`: `id`, `title`, `group`, `label`, `hint`,
+2. Add one entry to `ROUTES` in `src/routes.tsx`: `id`, `title`, `group`, `label`,
    `instrument`, and a `render`. Import the component lazily at the top of that file.
 3. Style it in `src/style.css` using the existing `glass-card` pattern.
 

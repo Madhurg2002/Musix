@@ -24,7 +24,7 @@ const GROUP_LABELS: Record<NavGroupLabel, string> = {
  * than dumped into one flat row, so it reads as a study plan instead of a toolbar.
  *
  * Below 900px it flips into a horizontal, scrolling top bar: the `max-[900px]:` variants
- * carry that second layout, and the group labels and hints drop out to leave tappable chips.
+ * carry that second layout, and the group labels drop out to leave tappable chips.
  */
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
@@ -92,13 +92,6 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={() => setActiveTab(item.id)}
                   >
                     <span className="text-[14px] font-semibold leading-[1.25]">{item.label}</span>
-                    <span
-                      className={`text-[11px] max-[900px]:hidden ${
-                        isActive ? 'text-ink-soft' : 'text-ink-muted'
-                      }`}
-                    >
-                      {item.hint}
-                    </span>
                   </button>
                 );
               })}

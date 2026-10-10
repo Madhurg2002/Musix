@@ -315,8 +315,12 @@ Ordered by value; none block the phases above.
   some browsers — now it is plain cream text next to the brass ♫); the rail hides its
   internal scrollbar on desktop (`rail-scroll`, wheel and touch still scroll it, phones
   keep the thumb because the rail is a chip strip there); the rail's `data-tip` tooltips
-  are gone — each entry already shows its label and hint; and Contact left the rail
+  are gone; and Contact left the rail
   (footer only, still routable via `#contact`, `railHidden` in the route table).
   `html { overflow-x: clip }` also kills the window-level sideways scrollbar that stray
   tooltip overhang used to create, and the fretboard's horizontal scroller got
   `-webkit-overflow-scrolling: touch` for iOS momentum.
+- [x] **Drop the rail hint line.** The one-line hint under each rail label ("Follow a
+  chord chart", …) read as clutter beside the label itself, so the rail now shows labels
+  only. The `hint` field left the route table, its assertion left the router test, and the
+  docs that described it were updated.
