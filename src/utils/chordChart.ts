@@ -232,6 +232,32 @@ export function findBestChartPosition(
   return bestScore >= 1 ? bestIndex : null;
 }
 
+/**
+ * Encode a chart for a share link (`?song=…`). `encodeURIComponent` is the whole job —
+ * it escapes `&`, `=`, `+`, `#` and newlines, so the value can never end the parameter
+ * early — but keeping it a named pair makes the round trip testable.
+ */
+export function encodeSharedChart(text: string): string {
+  return encodeURIComponent(text);
+}
+
+/**
+ * The chart carried by a share link, or null when there is none (or the escape is
+ * malformed). Manual parsing rather than URLSearchParams: the form decoder reads `+` as
+ * a space, which would corrupt charts containing a `+`.
+ */
+export function decodeSharedChart(search: string): string | null {
+  const match = /[?&]song=([^&]*)/.exec(search);
+  const encoded = match?.[1];
+  if (!encoded) return null;
+  try {
+    const decoded = decodeURIComponent(encoded);
+    return decoded.length > 0 ? decoded : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Frequency in Hz for each note of the chord, voiced in ascending order above the root. */
 export function chordFrequencies(symbol: ChordSymbol, semitones = 0, baseMidi = 52): number[] {
   const root = transposeNote(symbol.root, semitones);

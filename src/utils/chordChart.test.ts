@@ -3,7 +3,9 @@ import {
   chordFitScore,
   chordPitchClasses,
   chordTones,
+  decodeSharedChart,
   describeChordSymbol,
+  encodeSharedChart,
   findBestChartPosition,
   isChordToken,
   parseChordChart,
@@ -207,6 +209,24 @@ describe('chordChart', () => {
       expect(findBestChartPosition([], [[0, 4, 7]], 0)).toBeNull();
       expect(findBestChartPosition([0], [], 0)).toBeNull();
       expect(findBestChartPosition([0], [null], 0)).toBeNull();
+    });
+  });
+
+  describe('share links', () => {
+    test('round-trips a chart with tricky characters', () => {
+      const chart = "[Verse]\nC G+ Am F\nwatch the & sign, #hash, %percent, ?q=1, ♯♭ end";
+      expect(decodeSharedChart(`?song=${encodeSharedChart(chart)}`)).toBe(chart);
+    });
+
+    test('reads the song parameter among others', () => {
+      expect(decodeSharedChart('?a=1&song=Hi%20there&b=2')).toBe('Hi there');
+    });
+
+    test('returns null when the link carries no usable chart', () => {
+      expect(decodeSharedChart('')).toBeNull();
+      expect(decodeSharedChart('?foo=bar')).toBeNull();
+      expect(decodeSharedChart('?song=')).toBeNull();
+      expect(decodeSharedChart('?song=%')).toBeNull(); // malformed escape
     });
   });
 });

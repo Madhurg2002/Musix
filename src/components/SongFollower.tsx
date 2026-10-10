@@ -4,6 +4,8 @@ import {
   SAMPLE_CHART,
   chordFrequencies,
   chordPitchClasses,
+  decodeSharedChart,
+  encodeSharedChart,
   findBestChartPosition,
   parseChordChart,
   parseChordSymbol,
@@ -44,12 +46,21 @@ const LOCATE_HOLD_MS = 1200;
  * with the selected instrument, and can transpose the whole song into a friendlier key.
  */
 export const SongFollower: React.FC = () => {
-  // A chart pasted in a previous session comes back already loaded, so practising a song is
-  // not a re-paste every time the page reloads.
+  // A shared link (?song=…) opens its chart first; otherwise a chart pasted in a
+  // previous session comes back already loaded, so practising a song is not a re-paste
+  // every time the page reloads. The link cleans itself out of the URL once consumed.
+  const sharedChart = useMemo(() => decodeSharedChart(window.location.search), []);
   const savedChart = useMemo(
-    () => readPreference(PREFERENCE_KEYS.songChart, '', isText),
-    []
+    () => sharedChart ?? readPreference(PREFERENCE_KEYS.songChart, '', isText),
+    [sharedChart]
   );
+
+  useEffect(() => {
+    if (sharedChart === null) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('song');
+    window.history.replaceState(null, '', url.toString());
+  }, [sharedChart]);
 
   const [draft, setDraft] = useState<string>(savedChart);
   const [chart, setChart] = useState<ParsedChart>(() =>
@@ -69,6 +80,10 @@ export const SongFollower: React.FC = () => {
   const [soundOn, setSoundOn] = useState<boolean>(() =>
     readPreference(PREFERENCE_KEYS.songSoundOn, true, isBoolean)
   );
+  const [shareState, setShareState] = useState<'idle' | 'copied' | 'too-long' | 'failed'>(
+    'idle'
+  );
+  const shareTimerRef = useRef<number | null>(null);
 
   // Mirror the practice settings back to storage.
   useEffect(() => writePreference(PREFERENCE_KEYS.songBpm, bpm), [bpm]);
@@ -104,6 +119,38 @@ export const SongFollower: React.FC = () => {
       writePreference(PREFERENCE_KEYS.songChart, text);
     }
   }, []);
+
+  /** Briefly show the outcome of a Share press, then fall back to the plain label. */
+  const flashShare = useCallback((next: 'copied' | 'too-long' | 'failed') => {
+    setShareState(next);
+    if (shareTimerRef.current !== null) window.clearTimeout(shareTimerRef.current);
+    shareTimerRef.current = window.setTimeout(() => setShareState('idle'), 2600);
+  }, []);
+
+  const handleShare = useCallback(() => {
+    if (!source.trim()) return;
+    const encoded = encodeSharedChart(source);
+    // Browsers cap URLs somewhere between 2k and 8k characters — beyond that the link
+    // would open with the chart missing, so say so instead of copying a broken link.
+    if (encoded.length > 6000) {
+      flashShare('too-long');
+      return;
+    }
+    const hash = window.location.hash || '#songs';
+    const url = `${window.location.origin}${window.location.pathname}?song=${encoded}${hash}`;
+    try {
+      if (!navigator.clipboard) {
+        flashShare('failed');
+        return;
+      }
+      navigator.clipboard
+        .writeText(url)
+        .then(() => flashShare('copied'))
+        .catch(() => flashShare('failed'));
+    } catch {
+      flashShare('failed');
+    }
+  }, [source, flashShare]);
 
   const playChordAt = useCallback(
     (index: number) => {
@@ -437,6 +484,23 @@ export const SongFollower: React.FC = () => {
                 onClick={() => window.print()}
               >
                 <Icon name="notes" /> Print chart
+              </button>
+              <button
+                className="btn btn-outline btn-sm"
+                data-tip="Copy a link that opens this chart for someone else"
+                disabled={!source.trim()}
+                onClick={handleShare}
+              >
+                <Icon name="copy" />
+                <span aria-live="polite">
+                  {shareState === 'copied'
+                    ? 'Copied!'
+                    : shareState === 'too-long'
+                      ? 'Too long to link'
+                      : shareState === 'failed'
+                        ? 'Copy blocked'
+                        : 'Share'}
+                </span>
               </button>
             </div>
           </div>

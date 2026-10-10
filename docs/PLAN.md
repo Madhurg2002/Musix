@@ -292,10 +292,13 @@ Ordered by value; none block the phases above.
   an accidental `npm install` cannot bring it back.
 - [ ] **Accessibility audit.** Contrast check on the new palette, and keyboard flows for the
       chord card drag-and-drop (which currently has Alt+↑/↓ as the keyboard fallback).
-- [ ] **Progressions.** Turn the "Play Progression" feature into a real chord-progression
-      builder with named presets (I–V–vi–IV, ii–V–I, 12-bar blues).
-- [x] **Save a followed song.** The pasted chart and its practice settings persist; a
-      shareable link (encoding the chart in the URL) is still open.
+- [x] **Progressions.** Shipped earlier than the tick: `src/utils/progressions.ts`
+      resolves the named presets (I–V–vi–IV, ii–V–I, 12-bar blues) against any key with
+      tests — the box was simply left unticked when they landed.
+- [x] **Save a followed song.** The pasted chart and its practice settings persist, and a
+      **Share** button copies a `?song=…` link that opens the chart for whoever clicks it
+      (the URL cleans itself up after loading; charts whose encoded text would exceed a
+      URL get a clear "Too long to link" instead of a link that silently fails).
 - [x] **Render a PDF/page export of the follower.** A `Print chart` button calls
       `window.print()`; `@media print` in `src/style.css` re-themes `.print-sheet` for paper
       (near-black ink, no dark chrome, it runs past the scroll box and keeps each line

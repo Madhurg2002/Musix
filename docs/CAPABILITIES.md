@@ -281,6 +281,9 @@ capability that makes it work.
   direct correction ("The chart says Am (A · C · E) — you played F♯, which is not in it")
   when they do not. While the follower is paused, the highlight snaps to the chart
   position your notes actually fit, so the follower works out where you are in the song.
+- **Share** copies a link (`?song=…`) that opens the pasted chart for whoever clicks it;
+  the URL cleans itself up once the chart is loaded, and charts too long to fit in a URL
+  are refused with a clear message instead of a silently broken link.
 - A progress bar and a large "now playing" chord read at a glance.
 
 **Technical**
@@ -300,6 +303,9 @@ capability that makes it work.
   position) in `src/utils/chordChart.test.ts`, fed by `src/utils/useLivePitch.ts`. Heard
   notes live in a 2-second window, and a better position must hold 1.2 seconds before the
   highlight snaps — silent, because the learner just played it.
+- Share links round-trip through `encodeSharedChart` / `decodeSharedChart` (also tested):
+  manual parsing rather than `URLSearchParams`, whose form decoder would read `+` in a
+  chart as a space.
 - **Ultimate Guitar cannot be fetched.** Their pages are not CORS-enabled and scraping them
   is against their terms, so there is deliberately no URL import. The screen explains this
   and works from pasted text instead.
