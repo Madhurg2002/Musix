@@ -114,26 +114,27 @@ Rules that keep it coherent:
 
 ### Phase 1 — Design language (theme + tokens) — done
 
-- [ ] Replace the `:root` token block with the Analog Studio palette and add tokens for
+- [x] Replace the `:root` token block with the Analog Studio palette and add tokens for
       radii, elevation, motion, and focus rings.
-- [ ] Remap every hardcoded legacy accent in `src/style.css` (33 × `rgba(0,240,255,…)`,
+- [x] Remap every hardcoded legacy accent in `src/style.css` (33 × `rgba(0,240,255,…)`,
       10 × `rgba(157,78,221,…)`, `#00a8ff`, `#00f5d4`, `#ffb703`, `#ff2a85`, …) to the new
-      palette so no neon remains.
-- [ ] Replace glow-based shadows with warm elevation; add visible `:focus-visible` rings.
-- [ ] De-neon the inline component colors (metronome `#00f5d4`, tuner arc colors).
+      palette so no neon remains. (Re-verified during the rail cleanup: the only neon left
+      is the Arcade theme's own tokens, which is by design.)
+- [x] Replace glow-based shadows with warm elevation; add visible `:focus-visible` rings.
+- [x] De-neon the inline component colors (metronome `#00f5d4`, tuner arc colors).
 
 **Verify:** `bunx tsc -b --noEmit`, `bun test`, preview renders on every tab with no leftover
 cyan/purple.
 
 ### Phase 2 — Shell reimagining (navigation + hero) — done
 
-- [ ] Replace the crowded top tab bar with a **left navigation rail** (desktop) that collapses
+- [x] Replace the crowded top tab bar with a **left navigation rail** (desktop) that collapses
       to an icon-free, horizontally scrollable bar on small screens.
-- [ ] Add a **top bar** that owns the sound/instrument control and the visualizer toggle,
+- [x] Add a **top bar** that owns the sound/instrument control and the visualizer toggle,
       freeing the nav.
-- [ ] Redesign the hero: a real headline, one sentence of orientation, and a clear primary
+- [x] Redesign the hero: a real headline, one sentence of orientation, and a clear primary
       action, with the key selector as a secondary control.
-- [ ] Give each screen a consistent header pattern (eyebrow, title, one-line purpose).
+- [x] Give each screen a consistent header pattern (eyebrow, title, one-line purpose).
 
 **Verify:** all 8 tabs reachable, hash routing and back/forward still work, instrument lock
 still follows tabs, responsive at ≤720px.
@@ -280,7 +281,11 @@ Ordered by value; none block the phases above.
 - [~] **Migrate to Tailwind.** Set up Tailwind v4 (preflight off) and move the markup off
   hand-written classes screen by screen, keeping `src/style.css` for tokens, keyframes,
   and the pieces utilities do not reach (SVG, fretboard grid, print). Each screen is its own
-  commit; the guard test keeps the sheet honest until the last layer moves.
+  commit; the guard test keeps the sheet honest until the last layer moves. Progress: the
+  Contact screen moved to utilities and its `.contact-*` block was deleted; what remains in
+  the sheet are the deliberate carve-outs (fretboard neck grid, headstock/pendulum SVG
+  graphics, print re-theme) plus the shared systems (tooltips, consent bar, keyframes,
+  tokens).
 - [x] **Preference-cookie permission.** First-visit bar, writes held until allowed, refusal
   clears everything, and `Cookie settings` in the footer reopens the choice. Cookies are
   first-party, one per preference, with local-storage overflow for pasted charts.

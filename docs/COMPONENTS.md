@@ -88,7 +88,8 @@ Props: none.
 Renders the contact lede, a card grid of GitHub destinations — **Open an issue** (marked
 primary), existing issues, the profile, the source tree, and the repository — and two
 sections: the MIT licence with a link to the full text, and a note that the Song Follower
-works from pasted chart text rather than scraping tab sites.
+works from pasted chart text rather than scraping tab sites. The markup is styled with
+Tailwind utilities; the `.contact-*` block was deleted from `src/style.css` when it moved.
 
 ---
 
