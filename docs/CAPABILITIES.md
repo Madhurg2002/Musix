@@ -128,12 +128,20 @@ capability that makes it work.
   fret, and exact frequency in Hz.
 - A **Strum Chord** button plays the whole chord with a 60 ms arpeggio.
 - A chord picker bar above the neck lets you jump between all 17 built-in chords.
+- A **Find my note** toggle listens through the microphone and turns the neck into a live
+  answer: the note you are playing is named with its octave and cents, and every
+  (string, fret) that sounds it pulses on the neck — including a ring around the open
+  string's head at the nut when the pitch is an open string.
 
 **Technical**
 
 - `src/components/GuitarFretboard.tsx`.
 - Fret notes come from `getFretNote(stringIndex, fret)`; frequencies from
   `getFretMidi` + `midiToFrequency`.
+- The live note finder runs on `src/utils/useLivePitch.ts` (mic loop on top of the shared
+  `detectPitch`, silence after 700 ms without a usable pitch) plus
+  `fretPositionsForMidi(midi, strings, maxFret)` in `src/utils/musicTheory.ts` — the tested
+  inverse of `getFretMidi`, so the tuner and this screen stay on one detector.
 - A `displayedChordId` state promotes the chord sent from the Chord Studio once, so
   closing the studio never blanks the neck.
 - String wire thickness scales with string index for a realistic look.
@@ -265,6 +273,9 @@ capability that makes it work.
 - **Transpose** shifts every chord up or down a semitone, with a reset, so a song written
   in an awkward key can be practised in a friendly one.
 - **Sound on/off** mutes playback without stopping the highlight.
+- **Print chart** sends the chart to the printer: the print stylesheet drops the dark
+  chrome for near-black ink on white, keeps every chord line whole across page breaks, and
+  hides the app shell so only the chart lands on paper.
 - A progress bar and a large "now playing" chord read at a glance.
 
 **Technical**

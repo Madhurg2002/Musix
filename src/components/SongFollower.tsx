@@ -148,7 +148,7 @@ export const SongFollower: React.FC = () => {
 
   return (
     <div className="glass-card flex flex-col gap-[18px]">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4 print:hidden">
         <div>
           <span className="section-badge">Song Follower</span>
           <h2 className="mt-2 mb-1.5">Follow a song from its chord chart</h2>
@@ -169,13 +169,13 @@ export const SongFollower: React.FC = () => {
         </div>
       </div>
 
-      <div className="rounded-r-[10px] border-l-[3px] border-l-accent bg-[rgba(var(--accent-rgb),0.08)] px-4 py-3 text-[0.9rem] leading-[1.55] text-ink-soft">
+      <div className="rounded-r-[10px] border-l-[3px] border-l-accent bg-[rgba(var(--accent-rgb),0.08)] px-4 py-3 text-[0.9rem] leading-[1.55] text-ink-soft print:hidden">
         <strong className="text-ink">Why not paste the link?</strong> Ultimate Guitar pages cannot be fetched from
         the browser — they are not CORS-enabled and scraping them is against their terms — so
         open the song there, copy the chord chart text, and paste it below.
       </div>
 
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-2.5 print:hidden">
         <label
           className="text-[0.78rem] uppercase tracking-[0.08em] text-ink-muted"
           htmlFor="song-chart-input"
@@ -216,7 +216,7 @@ export const SongFollower: React.FC = () => {
 
       {total > 0 && (
         <>
-          <div className="flex flex-col gap-3.5 rounded-2xl border border-[rgba(var(--overlay-rgb),0.1)] bg-[rgba(var(--inset-rgb),0.22)] px-4 py-3.5">
+          <div className="flex flex-col gap-3.5 rounded-2xl border border-[rgba(var(--overlay-rgb),0.1)] bg-[rgba(var(--inset-rgb),0.22)] px-4 py-3.5 print:hidden">
             <div className="flex flex-wrap items-center gap-2.5">
               <button
                 className="btn btn-outline btn-sm"
@@ -327,11 +327,18 @@ export const SongFollower: React.FC = () => {
               >
                 {soundOn ? '♪ Sound on' : '♪ Sound off'}
               </button>
+              <button
+                className="btn btn-outline btn-sm"
+                data-tip="Print the chart so you can practise it away from the screen"
+                onClick={() => window.print()}
+              >
+                <Icon name="notes" /> Print chart
+              </button>
             </div>
           </div>
 
           <div
-            className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-1.5"
+            className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-1.5 print:hidden"
             role="status"
             aria-live="polite"
           >
@@ -352,7 +359,15 @@ export const SongFollower: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex max-h-[min(58vh,560px)] flex-col gap-3 overflow-y-auto border-t border-t-[rgba(var(--overlay-rgb),0.1)] pt-[18px] max-sm:max-h-[62vh]">
+          <div className="print-sheet flex max-h-[min(58vh,560px)] flex-col gap-3 overflow-y-auto border-t border-t-[rgba(var(--overlay-rgb),0.1)] pt-[18px] max-sm:max-h-[62vh]">
+            <div className="hidden pb-1 text-[12px] font-semibold text-ink-muted print:block">
+              Musix chord chart
+              {transpose !== 0
+                ? ` · transposed ${transpose > 0 ? `+${transpose}` : transpose} semitone${Math.abs(transpose) === 1 ? '' : 's'}`
+                : ''}
+              {' · '}
+              {total} chords
+            </div>
             {chart.lines.map((line, lineIndex) => {
               if (line.kind === 'note' && line.text === '') {
                 return <div className="h-1" key={`space-${lineIndex}`} />;

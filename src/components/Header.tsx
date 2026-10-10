@@ -47,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <nav
-      className="sticky top-0 flex h-screen w-[236px] shrink-0 grow-0 flex-col gap-5 self-start overflow-y-auto border-r border-hairline bg-[linear-gradient(180deg,rgba(var(--bg-secondary-rgb),0.97)_0%,rgba(var(--bg-primary-rgb),0.97)_100%)] backdrop-blur-[18px] [padding:20px_14px] max-[900px]:z-[70] max-[900px]:h-auto max-[900px]:w-full max-[900px]:basis-auto max-[900px]:flex-row max-[900px]:items-center max-[900px]:gap-2.5 max-[900px]:overflow-x-auto max-[900px]:overflow-y-hidden max-[900px]:self-auto max-[900px]:border-r-0 max-[900px]:border-b max-[900px]:[-webkit-overflow-scrolling:touch] max-[900px]:[padding:max(10px,env(safe-area-inset-top))_12px_10px]"
+      className="print:hidden sticky top-0 flex h-screen w-[236px] shrink-0 grow-0 flex-col gap-5 self-start overflow-y-auto border-r border-hairline bg-[linear-gradient(180deg,rgba(var(--bg-secondary-rgb),0.97)_0%,rgba(var(--bg-primary-rgb),0.97)_100%)] backdrop-blur-[18px] [padding:20px_14px] max-[900px]:z-[70] max-[900px]:h-auto max-[900px]:w-full max-[900px]:basis-auto max-[900px]:flex-row max-[900px]:items-center max-[900px]:gap-2.5 max-[900px]:overflow-x-auto max-[900px]:overflow-y-hidden max-[900px]:self-auto max-[900px]:border-r-0 max-[900px]:border-b max-[900px]:[-webkit-overflow-scrolling:touch] max-[900px]:[padding:max(10px,env(safe-area-inset-top))_12px_10px]"
       aria-label="Musix sections"
     >
       <div className="px-2 pt-0.5 max-[700px]:basis-full max-[700px]:justify-center">

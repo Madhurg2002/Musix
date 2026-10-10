@@ -23,7 +23,7 @@ const LINK_CLASS =
  */
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onCookieSettings }) => {
   return (
-    <footer className="flex flex-col items-center gap-3 border-t border-hairline px-6 py-6 text-center text-[13px] text-ink-muted [padding-bottom:max(24px,env(safe-area-inset-bottom))]">
+    <footer className="print:hidden flex flex-col items-center gap-3 border-t border-hairline px-6 py-6 text-center text-[13px] text-ink-muted [padding-bottom:max(24px,env(safe-area-inset-bottom))]">
       <p className="m-0 max-w-[62ch]">
         Musix — a warm studio for learning music theory. Guitar, tuner, piano and song
         visualizers, all in the browser.

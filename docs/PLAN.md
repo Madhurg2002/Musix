@@ -30,7 +30,10 @@ Do **not** rewrite every doc on every change. The rule from here on:
 - `public/metronome.js` being gone, the helper aliases being collapsed into `noteNameAt` /
   `stringInfoAt`, and `detectPitch` now living only in `musicTheory.ts`.
 - `src/utils/preferences.test.ts` and `src/utils/chordVoicing.test.ts` (test counts are now
-  100 across 6 files).
+  148 across 10 files).
+- The live note finder (`src/utils/useLivePitch.ts`, `fretPositionsForMidi`), the Song
+  Follower's print stylesheet and button, the final de-emoji pass, and the closed
+  class-drift item.
 - `src/utils/chordVoicing.ts` — the chord studio's voicing maths moved out of the component,
   and `findChord` was added to `chordsData.ts`.
 
@@ -239,11 +242,20 @@ Ordered by value; none block the phases above.
 - [x] **Persist learner state.** `src/utils/preferences.ts` remembers the key, instrument,
       visualizer, scale, and the Song Follower's chart, tempo, beats-per-chord, transpose,
       and sound setting. Remaining: the chord-studio cards themselves.
-- [ ] **Finish de-emoji-ing the screens.** The rail and top bar are text-only now, but the
-      remaining tools still use emoji in headings and buttons.
-- [ ] **Close the CSS/component class drift.** Around 30 classes used by components (e.g.
-      `interval-header`, `dual-visualizers-grid`, `chord-card-body`, `strum-btn`) have no
-      stylesheet rule at all, so those wrappers render unstyled.
+- [x] **Finish de-emoji-ing the screens.** The rail and top bar went text-only first; this
+      run replaced the last emoji — the guide's 📚🎸🎹🎼 glyphs, the piano heading, and the
+      consent bar's ✓ — with `Icon` glyphs. Musical notation (♯ ♭ ♪ ✕) stays as text by
+      design (`src/components/Icon.tsx`).
+- [x] **Close the CSS/component class drift.** Verified closed: the named examples are gone
+      from the markup or keep a rule (`dual-visualizers-grid`), and a scan of every
+      `className` token — including classes inside template ternaries — finds no styled
+      class without a rule. The bare identifiers without one are element `id`s
+      (`bpm-slider`, `tap-tempo-btn`, `song-chart-input`), which never had styling.
+- [x] **Live note finder on the fretboard.** The screen listens through the mic
+      (`src/utils/useLivePitch.ts` on top of the shared `detectPitch`), names the note with
+      octave and cents, and lights up every (string, fret) that sounds it via the tested
+      `fretPositionsForMidi` — the inverse of `getFretMidi` — plus an open-string ring at
+      the nut. One detector still serves both the tuner and this screen.
 - [x] **Resolve `public/metronome.js`** — deleted; the real metronome is the React
       component.
 - [x] **Reconcile `.gitignore`** — the tracked-but-ignored paths were reconciled and the
@@ -268,7 +280,9 @@ Ordered by value; none block the phases above.
       builder with named presets (I–V–vi–IV, ii–V–I, 12-bar blues).
 - [x] **Save a followed song.** The pasted chart and its practice settings persist; a
       shareable link (encoding the chart in the URL) is still open.
-- [ ] **Render a PDF/page export of the follower.** Print stylesheet so a learner can take the
-      graded chart away from the screen.- [x] **Serve `LICENSE` from the built site.** `public/LICENSE` ships with the build, the
+- [x] **Render a PDF/page export of the follower.** A `Print chart` button calls
+      `window.print()`; `@media print` in `src/style.css` re-themes `.print-sheet` for paper
+      (near-black ink, no dark chrome, it runs past the scroll box and keeps each line
+      whole) and every piece of shell chrome hides with `print:hidden`.- [x] **Serve `LICENSE` from the built site.** `public/LICENSE` ships with the build, the
   footer links to `/LICENSE`, and `/robots.txt` stays published but is no longer linked from
   the footer — a crawler policy is not a button a learner needs.

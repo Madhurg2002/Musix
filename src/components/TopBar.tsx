@@ -41,7 +41,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-[60] flex flex-wrap items-center justify-between gap-4 border-b border-hairline bg-glass px-7 py-3 backdrop-blur-[18px] max-[900px]:static max-[900px]:px-4 max-[900px]:py-2.5">
+    <header className="print:hidden sticky top-0 z-[60] flex flex-wrap items-center justify-between gap-4 border-b border-hairline bg-glass px-7 py-3 backdrop-blur-[18px] max-[900px]:static max-[900px]:px-4 max-[900px]:py-2.5">
       <div className="flex flex-col gap-px">
         <span className="text-[10px] font-bold uppercase tracking-[1.5px] text-ink-muted">
           Now viewing

@@ -173,7 +173,7 @@ export function App() {
 
         <main className="main-content-container">
           {/* Screen hero: one idea, one action, one secondary control */}
-          <section className="flex flex-col gap-3 px-0.5 pt-1.5">
+          <section className="print:hidden flex flex-col gap-3 px-0.5 pt-1.5">
             <p className="text-[11px] font-bold uppercase tracking-[1.8px] text-accent">
               Music theory, made visible
             </p>
