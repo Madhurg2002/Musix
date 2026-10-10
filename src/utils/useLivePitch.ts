@@ -7,20 +7,25 @@ export interface LivePitch {
   midi: number | null;
   /** Cents sharp (+) or flat (−) of that semitone. 0 while silent. */
   cents: number;
+  /**
+   * Frequency in Hz behind the current note; null while silent. It rides along with
+   * accepted note/cents updates rather than updating per frame, so the coalescing below
+   * stays the only thing that triggers a re-render.
+   */
+  frequency: number | null;
 }
 
 /** After this long without a usable pitch the readout returns to silence. */
 const SILENCE_MS = 700;
 
 /**
- * Continuous microphone pitch tracking — the engine behind the fretboard's live note
- * finder ("what note at what fret am I playing right now?").
+ * Continuous microphone pitch tracking — the engine behind every microphone path in the
+ * app: the fretboard's live note finder, the Song Follower's follow-along, and the tuner.
  *
- * The analysis itself is `detectPitch` from musicTheory: the *same* detector the tuner
- * uses, so the two microphone paths cannot drift apart. This hook owns only the
- * plumbing — request the mic, run one analysis per animation frame, and fall back to
- * silence after `SILENCE_MS` so a note that stopped ringing does not sit on the neck
- * forever.
+ * The analysis itself is `detectPitch` from musicTheory, so the paths cannot drift apart.
+ * This hook owns only the plumbing — request the mic, run one analysis per animation
+ * frame, and fall back to silence after `SILENCE_MS` so a note that stopped ringing does
+ * not sit on the screen forever.
  *
  * State updates are coalesced (midi change, or cents moved ≥2) so a 60 fps analysis loop
  * does not re-render the screen on every frame.
@@ -31,7 +36,7 @@ export function useLivePitch(): LivePitch & {
   start: () => void;
   stop: () => void;
 } {
-  const [pitch, setPitch] = useState<LivePitch>({ midi: null, cents: 0 });
+  const [pitch, setPitch] = useState<LivePitch>({ midi: null, cents: 0, frequency: null });
   const [listening, setListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,11 +54,21 @@ export function useLivePitch(): LivePitch & {
     ctxRef.current = null;
     lastHeardRef.current = 0;
     setListening(false);
-    setPitch({ midi: null, cents: 0 });
+    setPitch({ midi: null, cents: 0, frequency: null });
   }, []);
 
   const start = useCallback(() => {
     if (streamRef.current) return; // already running
+
+    // `mediaDevices` only exists on secure origins; without this guard the property
+    // access below throws synchronously and the caller never sees an error message.
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError(
+        'This browser cannot reach a microphone here. Open Musix over https (or localhost) and try again, or interact with the screen directly instead.'
+      );
+      return;
+    }
+
     setError(null);
 
     navigator.mediaDevices
@@ -83,10 +98,14 @@ export function useLivePitch(): LivePitch & {
             const cents = Math.round(100 * (noteFloat - midi));
             lastHeardRef.current = Date.now();
             setPitch((prev) =>
-              prev.midi === midi && Math.abs(prev.cents - cents) < 2 ? prev : { midi, cents }
+              prev.midi === midi && Math.abs(prev.cents - cents) < 2
+                ? prev
+                : { midi, cents, frequency }
             );
           } else if (Date.now() - lastHeardRef.current > SILENCE_MS) {
-            setPitch((prev) => (prev.midi === null ? prev : { midi: null, cents: 0 }));
+            setPitch((prev) =>
+              prev.midi === null ? prev : { midi: null, cents: 0, frequency: null }
+            );
           }
 
           frameRef.current = requestAnimationFrame(tick);
@@ -96,7 +115,7 @@ export function useLivePitch(): LivePitch & {
       .catch(() => {
         stop();
         setError(
-          'Microphone access denied or unavailable. Allow the microphone in your browser, or click the frets to hear notes instead.'
+          'Microphone access denied or unavailable. Allow the microphone in your browser, or interact with the screen directly instead.'
         );
       });
   }, [stop]);

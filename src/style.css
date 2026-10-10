@@ -733,10 +733,6 @@ body {
   will-change: transform;
 }
 
-.arc-needle-line {
-  transition: stroke 0.05s;
-}
-
 .metro-weight {
   transition: fill 0.1s;
 }
@@ -1016,12 +1012,15 @@ html[data-theme="arcade"] {
   }
 }
 
-/* Headstock visual cue: where the active string sits on the body */
+/* Headstock visual cue: where the active string sits on the body. The old gradient
+   mixed a hex colour with an RGB triplet (`var(--accent-2-rgb)` = "184, 103, 47"),
+   which is invalid at computed-value time and wiped the wire's background entirely —
+   the active string disappeared instead of glowing. Both stops are real colours now. */
 .active-wire {
   background: linear-gradient(
     to bottom,
     var(--accent-primary),
-    var(--accent-2-rgb)
+    var(--accent-secondary)
   ) !important;
   box-shadow: 0 0 8px rgba(var(--accent-primary), 0.6);
 }

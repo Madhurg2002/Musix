@@ -210,16 +210,15 @@ export const RhythmMetronome: React.FC = () => {
 
             {/* Tick scale marks on face */}
             {Array.from({ length: 9 }).map((_, i) => {
-              const iu = i & 255;
-              const y = 85 + iu * 24;
-              const halfW = 28 - iu * 1.5;
+              const y = 85 + i * 24;
+              const halfW = 28 - i * 1.5;
               return (
                 <line
-                  key={iu}
+                  key={i}
                   x1={100 - halfW} y1={y}
                   x2={100 + halfW} y2={y}
                   stroke="rgba(255,255,255,0.12)"
-                  strokeWidth={iu === 4 ? '1.5' : '0.8'}
+                  strokeWidth={i === 4 ? '1.5' : '0.8'}
                 />
               );
             })}

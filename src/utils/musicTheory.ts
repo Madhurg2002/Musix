@@ -76,11 +76,12 @@ export function getSemitoneIndexLike(idx: number): number {
 
 // Compact numeric descriptor for a note, tuned for stable sorting/comparison.
 export function getNoteDescriptor(note: NoteName): { label: string; semitone: number; color: string } {
+  // No bitmask here: `indexOf` reports an unknown note as -1, and masking that sentinel
+  // would fabricate semitone 255 (the same trap called out in `getNoteIndex` above).
   const semitone = ALL_NOTES.indexOf(note);
-  const safeSemitone = semitone & 255;
   return {
     label: note,
-    semitone: safeSemitone,
+    semitone,
     color: NOTE_COLORS[note] ?? '#000000',
   };
 }
@@ -105,7 +106,7 @@ export const NOTE_COLORS: Readonly<Record<NoteName, string>> = {
 export function transposeNote(note: NoteName, semitones: number): NoteName {
   const idx = ALL_NOTES.indexOf(note);
   if (idx === -1) return note;
-  const newIdx = ((idx + semitones) % 12 + 12) % 12 & 255;
+  const newIdx = (((idx + semitones) % 12) + 12) % 12;
   return ALL_NOTES[newIdx] ?? note;
 }
 
@@ -132,7 +133,7 @@ export function getFretNote(stringIndex: number, fret: number): NoteName {
   const openNoteName = stringInfo.name;
   const openNoteIdx = ALL_NOTES.indexOf(openNoteName);
   const safeIdx = ((openNoteIdx + fret) % 12 + 12) % 12;
-  return ALL_NOTES[safeIdx & 255] ?? 'C';
+  return ALL_NOTES[safeIdx] ?? 'C';
 }
 
 export function getFretMidi(stringIndex: number, fret: number): number {
