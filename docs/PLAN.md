@@ -305,3 +305,13 @@ Ordered by value; none block the phases above.
       whole) and every piece of shell chrome hides with `print:hidden`.- [x] **Serve `LICENSE` from the built site.** `public/LICENSE` ships with the build, the
   footer links to `/LICENSE`, and `/robots.txt` stays published but is no longer linked from
   the footer — a crawler policy is not a button a learner needs.
+- [x] **Rail cleanup pass.** Four header bugs from a user report, all fixed: the wordmark
+  no longer uses `background-clip: text` at all (the gradient painted as a rectangle on
+  some browsers — now it is plain cream text next to the brass ♫); the rail hides its
+  internal scrollbar on desktop (`rail-scroll`, wheel and touch still scroll it, phones
+  keep the thumb because the rail is a chip strip there); the rail's `data-tip` tooltips
+  are gone — each entry already shows its label and hint; and Contact left the rail
+  (footer only, still routable via `#contact`, `railHidden` in the route table).
+  `html { overflow-x: clip }` also kills the window-level sideways scrollbar that stray
+  tooltip overhang used to create, and the fretboard's horizontal scroller got
+  `-webkit-overflow-scrolling: touch` for iOS momentum.

@@ -70,6 +70,10 @@
 
 html {
   scroll-behavior: smooth;
+  /* The page never scrolls sideways: wide tools scroll inside their own containers, and
+     stray tooltip overhang cannot create a window-level horizontal scrollbar. `clip` (not
+     `hidden`) so position: sticky keeps working on the rail and top bar. */
+  overflow-x: clip;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -155,21 +159,16 @@ body {
   gap: 32px;
 }
 
-/* The rail wordmark. Gradient text needs `background-clip: text`; a browser that lacks it
-   (or drops only the -webkit- form) would otherwise paint a gradient rectangle behind the
-   word or hide it entirely — the header reading as "distorted and wrong". Anything that
-   cannot clip gets solid cream text instead, which is always correct. */
-.brand-wordmark {
-  color: var(--text-primary);
-}
+/* The rail scrolls internally on short screens. Its thumb is noise next to the content
+   scroller, so it is hidden on desktop — wheel and touch still scroll the rail. Phones keep
+   the thumb: there the rail is a horizontal chip strip and the thumb shows it scrolls. */
+@media (min-width: 901px) {
+  .rail-scroll {
+    scrollbar-width: none;
+  }
 
-@supports ((background-clip: text) or (-webkit-background-clip: text)) {
-  .brand-wordmark {
-    background: linear-gradient(135deg, #fff 0%, var(--accent-primary) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+  .rail-scroll::-webkit-scrollbar {
+    display: none;
   }
 }
 

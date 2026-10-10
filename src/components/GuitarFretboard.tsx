@@ -72,7 +72,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
   const doubleMarkers = [12];
 
   return (
-    <div className="glass-card flex flex-col gap-5 overflow-x-auto">
+    <div className="glass-card flex flex-col gap-5 overflow-x-auto [-webkit-overflow-scrolling:touch]">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Icon name="guitar" size={28} className="shrink-0" />

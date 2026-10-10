@@ -71,6 +71,8 @@ export interface RouteDefinition {
   instrument: InstrumentType;
   /** Set on the Piano / Fretboard pair, which share a single slot in the rail. */
   visibleFor?: 'piano' | 'guitar';
+  /** Set to keep a screen out of the rail: it stays routable and linked from the footer. */
+  railHidden?: boolean;
   render: (context: ScreenContext) => ReactNode;
 }
 
@@ -224,6 +226,8 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     label: 'Contact',
     hint: 'Reach the author',
     instrument: 'acoustic-guitar',
+    // Reachable from the footer: the rail stays a pure study plan.
+    railHidden: true,
     render: () => <Contact />,
   },
 ];

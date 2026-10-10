@@ -23,7 +23,9 @@ capability that makes it work.
 - Browser back/forward navigation moves between tabs (`hashchange` + `popstate`).
 - Navigation is a **left rail** grouped by intent (Practice, Fretboard, Harmony, Learn)
   rather than one flat row of tabs. It hides the Piano or Guitar item to match the current
-  visualizer choice and becomes a scrollable top strip on small screens.
+  visualizer choice and becomes a scrollable top strip on small screens. Contact is
+  deliberately not listed there — the footer owns it (still routable via `#contact`) —
+  and on desktop the rail hides its internal scrollbar (wheel and touch still scroll it).
 - A **top bar** above the content names the current screen and owns the instrument control.
 - A **hero** opens each visit with a headline, a primary "Follow a song" action, a
   secondary "Start with the basics" action, and key chips for **C, G, D, A, E, F**; the

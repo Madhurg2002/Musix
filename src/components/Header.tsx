@@ -36,7 +36,8 @@ export const Header: React.FC<HeaderProps> = ({
 
   // Piano and Fretboard are two views of the same idea, so only the selected one is listed.
   const visibleRoutes = ROUTES.filter(
-    (route) => !route.visibleFor || route.visibleFor === selectedVisualizer
+    (route) =>
+      (!route.visibleFor || route.visibleFor === selectedVisualizer) && !route.railHidden
   );
 
   const handleThemeChange = (value: string) => {
@@ -47,10 +48,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <nav
-      className="print:hidden sticky top-0 flex h-screen w-[236px] shrink-0 grow-0 flex-col gap-5 self-start overflow-y-auto border-r border-hairline bg-[linear-gradient(180deg,rgba(var(--bg-secondary-rgb),0.97)_0%,rgba(var(--bg-primary-rgb),0.97)_100%)] backdrop-blur-[18px] [padding:20px_14px] max-[900px]:z-[70] max-[900px]:h-auto max-[900px]:w-full max-[900px]:basis-auto max-[900px]:flex-row max-[900px]:items-center max-[900px]:gap-2.5 max-[900px]:overflow-x-auto max-[900px]:overflow-y-hidden max-[900px]:self-auto max-[900px]:border-r-0 max-[900px]:border-b max-[900px]:[-webkit-overflow-scrolling:touch] max-[900px]:[padding:max(10px,env(safe-area-inset-top))_12px_10px]"
+      className="rail-scroll print:hidden sticky top-0 flex h-screen w-[236px] shrink-0 grow-0 flex-col gap-5 self-start overflow-y-auto border-r border-hairline bg-[linear-gradient(180deg,rgba(var(--bg-secondary-rgb),0.97)_0%,rgba(var(--bg-primary-rgb),0.97)_100%)] backdrop-blur-[18px] [padding:20px_14px] max-[900px]:z-[70] max-[900px]:h-auto max-[900px]:w-full max-[900px]:basis-auto max-[900px]:flex-row max-[900px]:items-center max-[900px]:gap-2.5 max-[900px]:overflow-x-auto max-[900px]:overflow-y-hidden max-[900px]:self-auto max-[900px]:border-r-0 max-[900px]:border-b max-[900px]:[-webkit-overflow-scrolling:touch] max-[900px]:[padding:max(10px,env(safe-area-inset-top))_12px_10px]"
       aria-label="Musix sections"
     >
-      <div className="px-2 pt-0.5 max-[700px]:basis-full max-[700px]:justify-center">
+      <div className="px-2 pt-0.5 max-[700px]:flex max-[700px]:basis-full max-[700px]:justify-center">
         <span
           className="text-[32px] text-accent drop-shadow-[0_0_10px_var(--accent-primary)]"
           aria-hidden="true"
@@ -58,9 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
           ♫
         </span>
         <div className="max-[900px]:hidden">
-          <h1 className="brand-wordmark text-[24px] font-extrabold tracking-[-0.5px]">
-            Musix
-          </h1>
+          <h1 className="text-[24px] font-extrabold tracking-[-0.5px] text-ink">Musix</h1>
           <p className="text-[13px] text-ink-soft">Analog studio for theory</p>
         </div>
       </div>
@@ -90,8 +89,6 @@ export const Header: React.FC<HeaderProps> = ({
                         : 'border-l-transparent text-ink-soft hover:text-ink max-[900px]:border-b-transparent'
                     }`}
                     aria-current={isActive ? 'page' : undefined}
-                    data-tip={`${item.label} — ${item.hint}`}
-                    data-tip-pos="right"
                     onClick={() => setActiveTab(item.id)}
                   >
                     <span className="text-[14px] font-semibold leading-[1.25]">{item.label}</span>
