@@ -2,6 +2,7 @@ import React from 'react';
 import { NoteName } from '../types';
 import { ALL_NOTES, midiToFrequency, noteColorFor } from '../utils/musicTheory';
 import { soundEngine, type InstrumentType } from '../utils/audio';
+import { Icon } from './Icon';
 
 interface PianoKeyboardProps {
   activeNotes?: NoteName[];
@@ -73,7 +74,9 @@ export const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
     <div className="piano-container glass-card">
       <div className="piano-header">
         <div>
-          <h3>🎹 Interactive Piano Visualizer</h3>
+          <h3 className="flex items-center gap-2">
+            <Icon name="piano" /> Interactive Piano Visualizer
+          </h3>
           <p>Click keys to play. Active notes in current chord/scale light up dynamically.</p>
         </div>
         <div className="piano-legend">

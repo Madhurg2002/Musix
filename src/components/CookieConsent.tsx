@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { declineConsent, grantConsent, readConsent, type ConsentChoice } from '../utils/consent';
 import { clearAllPreferences } from '../utils/preferences';
+import { Icon } from './Icon';
 
 interface CookieConsentProps {
   /** Held true while the footer's "Cookie settings" button wants the panel open. */
@@ -42,7 +43,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ forceOpen = false,
         : { label: 'Not now', action: () => decide('declined') };
 
   return (
-    <aside className="consent-bar" role="dialog" aria-labelledby="consent-title">
+    <aside className="consent-bar print:hidden" role="dialog" aria-labelledby="consent-title">
       <div className="consent-bar__text">
         <strong className="consent-bar__title" id="consent-title">
           Remember my settings?
@@ -61,7 +62,13 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ forceOpen = false,
           disabled={choice === 'granted'}
           onClick={() => decide('granted')}
         >
-          {choice === 'granted' ? 'Allowed ✓' : 'Allow preferences'}
+          {choice === 'granted' ? (
+            <>
+              <Icon name="check" /> Allowed
+            </>
+          ) : (
+            'Allow preferences'
+          )}
         </button>
         <button type="button" className="btn btn-outline btn-sm" onClick={secondary.action}>
           {secondary.label}
