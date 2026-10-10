@@ -303,8 +303,10 @@ adds `active-key` / `root-key` classes, and plays a piano note on click.
 **State:** `selectedScaleId` (default `'major'`).
 
 Computes scale notes with `transposeNote`, plays the scale ascending with 350 ms spacing
-plus a closing octave, and reports notes upward via an effect. Renders the step pattern,
-the degree/note cards, and the root + scale selectors.
+plus a closing octave, and reports notes upward via an effect. Renders two standard
+dropdowns — key root, and a scale picker grouped Scales then Modes by name — plus the
+degree/note cards. The root is a dropdown here; the 12-chip `NotePicker` remains on the
+interval explorer.
 
 ---
 

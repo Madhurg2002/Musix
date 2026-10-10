@@ -202,9 +202,11 @@ capability that makes it work.
 
 - Eight scales/modes: Major (Ionian), Natural Minor (Aeolian), Minor Pentatonic,
   Blues, Dorian, Mixolydian, Phrygian, and Lydian.
-- Pick any of the 12 roots; the title, description, and note cards update live.
-- Shows the step pattern (`W - W - H …`), each scale degree label, and the semitone
-  offset for every note.
+- Pick any of the 12 roots from a standard key dropdown, and the scale or mode from a
+  second dropdown grouped Scales then Modes; the title, description, and note cards
+  update live.
+- Each note card shows its scale degree label and semitone offset. The old `W - W - H …`
+  "step pattern" box was removed as clutter.
 - **Play Scale Ascending** plays the scale note-by-note (350 ms apart) and finishes on
   the octave.
 - The chosen scale notes are pushed to the shared visualizer, so the piano or fretboard

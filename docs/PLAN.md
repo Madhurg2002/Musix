@@ -333,3 +333,8 @@ Ordered by value; none block the phases above.
   button border through on the other three (the same leak is why the footer toggles carry
   `border-0`). The entries now zero the other three widths explicitly and keep only the
   brass left rule on the active screen, and the rail itself no longer draws an outer edge.
+- [x] **Scales page declutter.** The `W - W - H …` "step pattern" box went the way of the
+  rail hints — the degree/semitone cards already carry that information per note. The
+  twelve-chip root picker became a standard key dropdown (matching the theme and
+  instrument pickers), and the scale picker is one dropdown grouped Scales then Modes
+  with clean option text; `NotePicker` stays on the interval explorer.
