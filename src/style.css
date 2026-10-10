@@ -155,6 +155,24 @@ body {
   gap: 32px;
 }
 
+/* The rail wordmark. Gradient text needs `background-clip: text`; a browser that lacks it
+   (or drops only the -webkit- form) would otherwise paint a gradient rectangle behind the
+   word or hide it entirely — the header reading as "distorted and wrong". Anything that
+   cannot clip gets solid cream text instead, which is always correct. */
+.brand-wordmark {
+  color: var(--text-primary);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .brand-wordmark {
+    background: linear-gradient(135deg, #fff 0%, var(--accent-primary) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
 /* Header sound selector — styled with Tailwind utilities in src/components/TopBar.tsx. */
 
 /* Buttons System */

@@ -58,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
           ♫
         </span>
         <div className="max-[900px]:hidden">
-          <h1 className="text-[24px] font-extrabold tracking-[-0.5px] [background:linear-gradient(135deg,#fff_0%,var(--accent-primary)_100%)] [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">
+          <h1 className="brand-wordmark text-[24px] font-extrabold tracking-[-0.5px]">
             Musix
           </h1>
           <p className="text-[13px] text-ink-soft">Analog studio for theory</p>
@@ -84,10 +84,10 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     key={item.id}
                     type="button"
-                    className={`w-full cursor-pointer flex-col items-start gap-px border-l-2 border-l-transparent bg-transparent px-3 py-2 text-left font-sans text-ink-soft transition-[background-color,color,border-color] duration-[180ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] hover:bg-[rgba(var(--overlay-rgb),0.05)] hover:text-ink [border-radius:0_var(--radius-sm)_var(--radius-sm)_0] max-[900px]:flex-row max-[900px]:w-auto max-[900px]:min-h-10 max-[900px]:justify-center max-[900px]:whitespace-nowrap max-[900px]:border-l-0 max-[900px]:border-b-2 max-[900px]:border-b-transparent max-[900px]:px-3 max-[900px]:py-[7px] max-[900px]:[border-radius:var(--radius-sm)] ${
+                    className={`w-full cursor-pointer flex-col items-start gap-px border-l-2 bg-transparent px-3 py-2 text-left font-sans transition-[background-color,color,border-color] duration-[180ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] hover:bg-[rgba(var(--overlay-rgb),0.05)] [border-radius:0_var(--radius-sm)_var(--radius-sm)_0] max-[900px]:flex-row max-[900px]:w-auto max-[900px]:min-h-10 max-[900px]:justify-center max-[900px]:whitespace-nowrap max-[900px]:border-l-0 max-[900px]:border-b-2 max-[900px]:px-3 max-[900px]:py-[7px] max-[900px]:[border-radius:var(--radius-sm)] ${
                       isActive
                         ? 'border-l-accent bg-[linear-gradient(90deg,rgba(var(--accent-rgb),0.18)_0%,rgba(var(--accent-rgb),0.02)_100%)] text-ink max-[900px]:border-b-accent max-[900px]:bg-[rgba(var(--accent-rgb),0.14)]'
-                        : ''
+                        : 'border-l-transparent text-ink-soft hover:text-ink max-[900px]:border-b-transparent'
                     }`}
                     aria-current={isActive ? 'page' : undefined}
                     data-tip={`${item.label} — ${item.hint}`}
@@ -139,8 +139,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               aria-pressed={selectedVisualizer === 'piano'}
-              className={`min-h-8 cursor-pointer rounded-[4px] border-0 bg-transparent px-2.5 font-sans text-[12px] font-bold text-ink-soft hover:text-ink ${
-                selectedVisualizer === 'piano' ? 'bg-accent text-[#071114]' : ''
+              className={`min-h-8 cursor-pointer rounded-[4px] border-0 px-2.5 font-sans text-[12px] font-bold ${
+                selectedVisualizer === 'piano'
+                  ? 'bg-accent text-[color:var(--bg-primary)]'
+                  : 'bg-transparent text-ink-soft hover:text-ink'
               }`}
               onClick={() => setSelectedVisualizer('piano')}
             >
@@ -149,8 +151,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               aria-pressed={selectedVisualizer === 'guitar'}
-              className={`min-h-8 cursor-pointer rounded-[4px] border-0 bg-transparent px-2.5 font-sans text-[12px] font-bold text-ink-soft hover:text-ink ${
-                selectedVisualizer === 'guitar' ? 'bg-accent text-[#071114]' : ''
+              className={`min-h-8 cursor-pointer rounded-[4px] border-0 px-2.5 font-sans text-[12px] font-bold ${
+                selectedVisualizer === 'guitar'
+                  ? 'bg-accent text-[color:var(--bg-primary)]'
+                  : 'bg-transparent text-ink-soft hover:text-ink'
               }`}
               onClick={() => setSelectedVisualizer('guitar')}
             >

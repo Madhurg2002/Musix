@@ -123,10 +123,10 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
             {COMPREHENSIVE_CHORDS.map((chord) => (
               <button
                 key={chord.id}
-                className={`rounded-xl border px-4 py-2 font-sans text-[13px] font-semibold transition-all duration-200 ${
+                className={`rounded-xl border px-4 py-2 font-sans text-[13px] transition-all duration-200 ${
                   context.activeChord?.id === chord.id
                     ? 'border-accent bg-[linear-gradient(135deg,var(--accent-primary)_0%,#c98a3f_100%)] font-bold text-black shadow-[0_0_16px_var(--accent-primary)]'
-                    : 'border-hairline bg-[rgba(var(--overlay-rgb),0.05)] text-ink hover:border-[rgba(var(--accent-rgb),0.4)] hover:bg-[rgba(var(--overlay-rgb),0.12)]'
+                    : 'border-hairline bg-[rgba(var(--overlay-rgb),0.05)] font-semibold text-ink hover:border-[rgba(var(--accent-rgb),0.4)] hover:bg-[rgba(var(--overlay-rgb),0.12)]'
                 }`}
                 data-tip={`Show ${chord.name} pressed on the neck`}
                 onClick={() => context.setActiveChord(chord)}
