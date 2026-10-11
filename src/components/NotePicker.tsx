@@ -1,6 +1,6 @@
 import React from 'react';
 import { NoteName } from '../types';
-import { ALL_NOTES, NOTE_COLORS } from '../utils/musicTheory';
+import { ALL_NOTES, NOTE_COLORS, inkOnNoteColor } from '../utils/musicTheory';
 
 interface NotePickerProps {
   /** Which note the picker currently has selected. */
@@ -39,9 +39,9 @@ export const NotePicker: React.FC<NotePickerProps> = ({
         className={`flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-[10px] border border-hairline font-bold transition-all duration-200 ${
           note === value
             ? variant === 'fill'
-              // The fill variant paints the note's own colour behind the label, which is
-              // mid-bright in every theme, so dark ink stays readable on it.
-              ? 'bg-accent text-black shadow-[0_0_12px_var(--accent-primary)]'
+              // The fill variant paints the note's own colour behind the label; the ink
+              // flips per hue via inkOnNoteColor (black on the amber, white on the indigo).
+              ? 'bg-accent shadow-[0_0_12px_var(--accent-primary)]'
               // The border variant keeps the theme accent, whose lightness flips per
               // theme — `text-white` vanished on the Paper palette's dark brass.
               : 'bg-accent text-[color:var(--bg-primary)] shadow-[0_0_12px_var(--accent-primary)]'
@@ -51,7 +51,9 @@ export const NotePicker: React.FC<NotePickerProps> = ({
         onClick={() => onChange(note)}
         style={
           variant === 'fill'
-            ? { backgroundColor: note === value ? NOTE_COLORS[note] : undefined }
+            ? note === value
+              ? { backgroundColor: NOTE_COLORS[note], color: inkOnNoteColor(NOTE_COLORS[note]) }
+              : undefined
             : { borderColor: note === value ? NOTE_COLORS[note] : undefined }
         }
       >

@@ -64,6 +64,7 @@ Full D1 list: `writeFileSync`, `relative`, `mdFiles` (build-pages), `useMemo` (A
 | A2 | Chord-card reordering is drag-only apart from an `Alt+↑/↓` fallback on the handle; touch users have no reorder affordance. | `ChordWorkbench.tsx` | **open** |
 | A3 | Audio depends on an `AudioContext` created inside a user gesture, and iOS suspends that context whenever the tab is backgrounded. Desktop masked this; on iOS every play button stayed silent. | `src/utils/audio.ts` | **fixed** — one-shot pointer/touch/key listeners unlock on the first interaction and a `visibilitychange` handler resumes on return |
 | A4 | Touch targets were sized for a mouse (24–32px rail items) and there was no safe-area padding, so the rail sat under the notch and taps were fiddly. | `src/style.css` | **fixed** — 40px rail items, 44px buttons, `touch-action: manipulation`, `env(safe-area-inset-*)` |
+| A5 | Accent-fill controls carried ink that failed WCAG AA once measured against the real tokens: `.btn-accent` kept `color: #fff` over its ramp (3.36:1 on Nocturne's violet), `.btn-primary`'s ramp end stops sat at 4.42:1 (Nocturne) and 4.23:1 (Arcade) under the page-background ink, Studio's terracotta stop was 4.48:1, and the note pills drew uniform black ink that fell to 2.03:1 on G♯'s indigo (white wins on exactly the three dark hues). | `src/style.css`, `NotePicker.tsx`, `ChordWorkbench.tsx`, `musicTheory.ts` | **fixed** — `.btn-accent` ink follows the page background like the other buttons, three accent tokens were nudged within their hue (`--accent-secondary` on Nocturne/Arcade, `--accent-tertiary` on Studio, with their RGB triplets), and the pills pick black or white per hue via the new `inkOnNoteColor`; the audit in `src/style.test.ts` now checks both gradient stops per theme and `musicTheory.test.ts` checks all twelve note hues |
 
 ## Performance
 
@@ -74,12 +75,13 @@ Full D1 list: `writeFileSync`, `relative`, `mdFiles` (build-pages), `useMemo` (A
 
 ## Test coverage gaps
 
-- `bun test` now covers 157 tests across 10 files — music theory and the pitch detector,
-  the chart parser (including the follow-along matching maths), the router, the route
-  table, chord voicing, preferences, consent, instruments, progressions, and the
-  stylesheet guard with its WCAG contrast audit. Still **no** component, audio, or tuner
-  behaviour is covered, so the audio and UI fixes above were verified by inspection and
-  in the preview rather than by assertions.
+- `bun test` now covers 161 tests across 10 files — music theory and the pitch detector
+  (including the note-pill ink helper `inkOnNoteColor`), the chart parser (including the
+  follow-along matching maths), the router, the route table, chord voicing, preferences,
+  consent, instruments, progressions, and the stylesheet guard with its WCAG contrast
+  audit (text tiers on both page backgrounds, plus both accent-gradient buttons per
+  theme). Still **no** component, audio, or tuner behaviour is covered, so the audio and
+  UI fixes above were verified by inspection and in the preview rather than by assertions.
 - `getChordPosition` is covered via `chordVoicing.test.ts`; the transpose handler it
   guards fixed T3.
 - The screen components themselves are untested. A DOM test runner would be the next step;

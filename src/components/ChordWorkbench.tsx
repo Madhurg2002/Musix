@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ChordCardItem, NoteName, ChordShape } from '../types';
 import { findOrCreateChord, asSafeChord } from '../data/chordsData';
 import { INSTRUMENTS, instrumentFor } from '../data/instruments';
-import { ALL_NOTES, noteColorFor } from '../utils/musicTheory';
+import { ALL_NOTES, inkOnNoteColor, noteColorFor } from '../utils/musicTheory';
 import {
   chordFrequencies,
   isStandardGuitarTuning,
@@ -404,8 +404,8 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({
                   {asSafeChord(chord).notes.map((note: NoteName, idx: number) => (
                     <span
                       key={idx}
-                      className="rounded-xl px-2.5 py-1 text-[13px] font-bold text-black shadow-[0_2px_8px_rgba(var(--inset-rgb),0.3)]"
-                      style={{ backgroundColor: noteColorFor(note) }}
+                      className="rounded-xl px-2.5 py-1 text-[13px] font-bold shadow-[0_2px_8px_rgba(var(--inset-rgb),0.3)]"
+                      style={{ backgroundColor: noteColorFor(note), color: inkOnNoteColor(noteColorFor(note)) }}
                     >
                       {note} <small>({asSafeChord(chord).intervals[idx] ?? ''})</small>
                     </span>

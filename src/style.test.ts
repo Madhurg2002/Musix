@@ -94,6 +94,51 @@ describe('palette contrast (docs/PLAN.md, accessibility audit)', () => {
   });
 });
 
+// The first audit pass only checked text tiers on page backgrounds, so the accent-gradient
+// buttons slipped through: they carry their label in the page-background colour across a
+// two-stop 135deg ramp, so both stops must clear AA on their own — glyphs sit on both
+// extremes. Arcade's purple end stop was at 4.23:1 before this test existed.
+const GRADIENT_BUTTONS: Record<string, readonly [string, string]> = {
+  '.btn-primary': ['--accent-primary', '--accent-secondary'],
+  '.btn-accent': ['--accent-tertiary', '--accent-secondary'],
+};
+
+describe('accent-gradient button contrast (docs/PLAN.md, accessibility audit)', () => {
+  test('both button rules use the page-background ink the audit assumes', () => {
+    const missing = Object.keys(GRADIENT_BUTTONS).filter((button) => {
+      const start = css.indexOf(`${button} {`);
+      return (
+        start === -1 ||
+        !css.slice(start, css.indexOf('}', start)).includes('color: var(--bg-primary)')
+      );
+    });
+    expect(missing).toEqual([]);
+  });
+
+  test('every theme clears WCAG AA (4.5:1) at both gradient stops with the page-background ink', () => {
+    const failures: string[] = [];
+    for (const [theme, selector] of Object.entries(THEME_SELECTORS)) {
+      const ink = tokenFrom(selector, '--bg-primary');
+      for (const [button, stops] of Object.entries(GRADIENT_BUTTONS)) {
+        for (const stop of stops) {
+          const fill = tokenFrom(selector, stop);
+          const ratio = contrastRatio(ink, fill);
+          if (ratio < AA_SMALL_TEXT) {
+            failures.push(
+              `${theme}: ${button} ${stop} ${fill} under ${ink} ink is ${ratio.toFixed(2)}:1`
+            );
+          }
+        }
+      }
+    }
+    expect(failures).toEqual([]);
+  });
+});
+
+// The palette audit above covers token-driven text. Component-level ink on the
+// theme-independent NOTE_COLORS hues is asserted in src/utils/musicTheory.test.ts
+// (inkOnNoteColor), since those fills live in the data module, not the sheet.
+
 describe('src/style.css', () => {
   test('is still a full stylesheet, not a fragment', () => {
     // The intact sheet was ~3,800 lines before the Tailwind migration started deleting

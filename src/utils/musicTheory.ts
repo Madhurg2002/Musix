@@ -102,6 +102,23 @@ export const NOTE_COLORS: Readonly<Record<NoteName, string>> = {
   'B': '#E74C3C',   // Bright Red
 };
 
+/**
+ * Readable label ink for a chip or pill filled with one of the `NOTE_COLORS` hues.
+ *
+ * The note hues are theme-independent, so no palette token can track them — instead pick
+ * the better of black and white by WCAG contrast. Every hue clears AA (4.5:1) this way:
+ * black wins on the bright hues (13.1:1 on D's amber) and white on the dark ones (10.3:1
+ * on G♯'s indigo, where black would be an unreadable 2.0:1).
+ */
+export function inkOnNoteColor(hex: string): '#000000' | '#ffffff' {
+  const channel = (index: number): number => {
+    const c = parseInt(hex.slice(index, index + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  const luminance = 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
+  return (luminance + 0.05) / 0.05 >= 1.05 / (luminance + 0.05) ? '#000000' : '#ffffff';
+}
+
 // Transpose a pitch class by a number of semitones.
 export function transposeNote(note: NoteName, semitones: number): NoteName {
   const idx = ALL_NOTES.indexOf(note);

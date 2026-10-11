@@ -19,6 +19,7 @@ Do **not** rewrite every doc on every change. The rule from here on:
 | 4 | `93d7acc`, `42398c9`, `de04710`, `22954b4`, `d6dcf4a` | `CAPABILITIES.md` (tooltips), `CONTRIBUTING.md` (new), this file |
 | 5 | `bebfafe`, `5decd5d`, `9e45dc2`, `cc5ef5a` | this file only (Tailwind migration starts) |
 | 6 | `b958f41` + this run | `COMPONENTS.md` (tuner + `useLivePitch` sections, index.html, musicTheory table), `CAPABILITIES.md` (tuner technical, stylesheet-once, Song-Follower gap), `BUGS.md` (F6/F7/D2/D3 closed, P2 narrowed), this file |
+| 7 | `233d2d5` follow-up (this run) | `BUGS.md` (A5 added, test counts), this file |
 
 ### Deferred doc edits (sweep up in the next batch)
 
@@ -46,7 +47,7 @@ match the code (fonts, single stylesheet import, collapsed aliases, `fretPositio
 `CAPABILITIES.md` describes the shared `useLivePitch` path and the chord studio's cards as
 the remaining unpersisted state, and `BUGS.md` closed F6/F7/D2/D3 while narrowing P2 to
 the per-call buffers that still exist. Still owed: the scripts/CI/preferences mentions and
-the current test count (157 across 10 files).
+the current test count (161 across 10 files).
 
 Batch 4 (this run) still owes the other docs:
 
@@ -369,6 +370,21 @@ Ordered by value; none block the phases above.
   All four now follow the page-background ink convention the chips already used
   (`var(--bg-primary)` on accent fills, `var(--text-primary)` on tints),
   `.btn-primary`'s gradient both stops ride the accent ramp (the hardcoded tan ended up
-  blue-to-tan on Nocturne), and the chord studio's `hover:text-white` icon buttons plus
-  its `text-white` note pills (bright `NOTE_COLORS`, so dark ink reads on all twelve)
-  were folded into the same convention.
+  blue-to-tan on Nocturne), and the chord studio's `hover:text-white` icon buttons were
+  folded into the same convention. The note pills needed per-hue ink rather than one
+  dark colour — fixed in the next entry.
+- [x] **Finish the contrast verification on the accent fills** (this run). Measuring the
+  theme-drift fix against the real tokens surfaced what the audit could not yet see:
+  `.btn-accent` still carried `color: #fff` over its ramp (3.36:1 on Nocturne's violet),
+  `.btn-primary`'s new end stops missed AA on Nocturne (4.42:1) and Arcade (4.23:1),
+  Studio's terracotta stop sat at 4.48:1 under the page-background ink, and the pills'
+  uniform black ink fell to 2.03:1 on G♯'s indigo — white wins on exactly the three dark
+  hues and black on the nine bright ones, so every hue clears AA with the better of the
+  two. `.btn-accent` now uses the page-background ink like the other buttons, three
+  accent tokens were nudged within their hue (`--accent-secondary` on Nocturne/Arcade,
+  `--accent-tertiary` on Studio, RGB triplets kept in step), and the pills pick their ink
+  per hue through a new `inkOnNoteColor` in `musicTheory.ts`. The audit gained two guards
+  so this cannot silently regress: every theme's gradient-button stops are checked
+  against the page-background ink (and the rules are checked to still carry that ink),
+  and all twelve `NOTE_COLORS` hues are checked against the ink `inkOnNoteColor` picks —
+  161 tests across 10 files.

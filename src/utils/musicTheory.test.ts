@@ -13,6 +13,8 @@ import {
   noteNameAt,
   NOTE_ALIASES,
   noteColorFor,
+  inkOnNoteColor,
+  NOTE_COLORS,
   transposeNote,
   transposeNoteSafe,
   transposeNoteSafeAny,
@@ -190,6 +192,44 @@ describe('musicTheory helpers', () => {
     test('noteColorFor returns default color for unknown input', () => {
       // @ts-expect-error testing runtime fallback for unknown note shape
       expect(noteColorFor('XyZ')).toBe('#555555');
+    });
+
+    describe('inkOnNoteColor (label ink for the note-colour pills)', () => {
+      /** WCAG contrast ratio between two `#rrggbb` colours. */
+      const contrast = (a: string, b: string): number => {
+        const luminance = (hex: string): number => {
+          const channel = (index: number): number => {
+            const c = parseInt(hex.slice(index, index + 2), 16) / 255;
+            return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+          };
+          return 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
+        };
+        const hi = Math.max(luminance(a), luminance(b));
+        const lo = Math.min(luminance(a), luminance(b));
+        return (hi + 0.05) / (lo + 0.05);
+      };
+
+      test('every note colour clears WCAG AA (4.5:1) with the ink it picks', () => {
+        const failures: string[] = [];
+        for (const note of ALL_NOTES) {
+          const fill = NOTE_COLORS[note];
+          const ink = inkOnNoteColor(fill);
+          const ratio = contrast(fill, ink);
+          if (ratio < 4.5) {
+            failures.push(`${note} (${fill}) with ${ink} ink is ${ratio.toFixed(2)}:1`);
+          }
+        }
+        expect(failures).toEqual([]);
+      });
+
+      test('flips to white on the dark hues and stays black on the bright ones', () => {
+        // Black on G♯'s indigo would be 2.0:1; white on D's amber would be 1.6:1.
+        expect(inkOnNoteColor(NOTE_COLORS['G♯'])).toBe('#ffffff');
+        expect(inkOnNoteColor(NOTE_COLORS['A'])).toBe('#ffffff');
+        expect(inkOnNoteColor(NOTE_COLORS['A♯'])).toBe('#ffffff');
+        expect(inkOnNoteColor(NOTE_COLORS['D'])).toBe('#000000');
+        expect(inkOnNoteColor(NOTE_COLORS['C♯'])).toBe('#000000');
+      });
     });
   });
 
