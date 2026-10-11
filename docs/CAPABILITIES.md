@@ -103,15 +103,20 @@ capability that makes it work.
 
 **Technical**
 
-- `src/components/GuitarTuner.tsx`.
-- `navigator.mediaDevices.getUserMedia({ audio: true })` → `AudioContext` →
-  `AnalyserNode` (`fftSize = 2048`), sampled every animation frame.
-- Autocorrelation pitch detection with an RMS gate (`rms < 0.012` returns "no pitch")
-  and parabolic interpolation around the correlation peak.
-- Frequency → note via `noteNum = 12·log2(f/440) + 69`; cents = `100·(noteNum − round)`.
-- Valid pitch range is restricted to 60–1000 Hz; string match tolerance is < 1.8
-  semitones of error.
-- Cleanup stops all mic tracks and closes the audio context on stop/unmount.
+- `src/components/GuitarTuner.tsx` owns only the tuning UI; the microphone runs through
+  the shared `src/utils/useLivePitch.ts` hook (the same engine as the fretboard note
+  finder and the Song Follower play-along).
+- The hook requests `getUserMedia({ audio: true })`, wires an `AnalyserNode`
+  (`fftSize = 2048`), and analyses one animation frame per tick on top of the single
+  `detectPitch` in `src/utils/musicTheory.ts` (RMS gate `rms < 0.012`, parabolic
+  interpolation around the correlation peak).
+- Cents are measured against the matched string's real pitch (nearest chromatic note as
+  the fallback for off-target strings); the needle clamps at ±45° over ±50 cents, and
+  **IN TUNE** requires a detected pitch within 4 cents — silence no longer reads as in
+  tune. String match tolerance is < 1.8 semitones of error.
+- On insecure origins (no `navigator.mediaDevices`) the screen shows an explanatory
+  banner instead of throwing; cleanup stops all mic tracks and closes the audio context
+  on stop/unmount.
 
 ---
 
@@ -394,7 +399,7 @@ capability that makes it work.
 **Technical**
 
 - Vite + React 19 + TypeScript (strict, with `noUncheckedIndexedAccess`).
-- Single theme file `src/style.css`, imported both from `index.html` and `src/main.tsx`.
+- Single theme file `src/style.css`, imported once from `src/main.tsx`.
 - Design tokens live in `:root` as channel triplets (`--accent-rgb`, `--overlay-rgb`, …),
   so each `html[data-theme=…]` block only restates the palette and every translucent tint
   follows it. `src/utils/theme.ts` applies the theme and persists the choice.
@@ -422,8 +427,9 @@ Documented so the docs stay honest about the current state:
   ids, titles, rail groups, and per-screen instrument defaults, so adding a screen is one
   `RouteDefinition` entry plus a lazily imported component — but it does mean that file
   grows with the app.
-- **The Song Follower keeps nothing.** A pasted chart, the transpose choice, and the tempo
-  are all in memory, so a reload loses the chart. Persisting them is on the follow-up list in
-  `docs/PLAN.md`.
+- **The chord studio's cards are not persisted.** The Song Follower's chart, tempo,
+  beats-per-chord, transpose, and sound setting all survive a reload
+  (`src/utils/preferences.ts`), but the chord-studio cards reset — persisting them is on
+  the follow-up list in `docs/PLAN.md`.
 - **There is no URL import for songs.** Ultimate Guitar pages are not fetchable from a
   browser and their terms disallow scraping, so chart text is pasted by hand.

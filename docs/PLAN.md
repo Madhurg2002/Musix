@@ -18,6 +18,7 @@ Do **not** rewrite every doc on every change. The rule from here on:
 | 3 | `938fd47`, `c5ce232`, `07483ff`, `975ae19` | **this file only** |
 | 4 | `93d7acc`, `42398c9`, `de04710`, `22954b4`, `d6dcf4a` | `CAPABILITIES.md` (tooltips), `CONTRIBUTING.md` (new), this file |
 | 5 | `bebfafe`, `5decd5d`, `9e45dc2`, `cc5ef5a` | this file only (Tailwind migration starts) |
+| 6 | `b958f41` + this run | `COMPONENTS.md` (tuner + `useLivePitch` sections, index.html, musicTheory table), `CAPABILITIES.md` (tuner technical, stylesheet-once, Song-Follower gap), `BUGS.md` (F6/F7/D2/D3 closed, P2 narrowed), this file |
 
 ### Deferred doc edits (sweep up in the next batch)
 
@@ -38,6 +39,14 @@ Do **not** rewrite every doc on every change. The rule from here on:
   and `findChord` was added to `chordsData.ts`.
 
 `docs/BUGS.md` has the statuses updated in the same sweep.
+
+Batch 6 (this run) swept the tuner rewrite's stale claims: `COMPONENTS.md` no longer
+advertises the tuner's deleted private detectors, its `index.html`/`musicTheory` sections
+match the code (fonts, single stylesheet import, collapsed aliases, `fretPositionsForMidi`),
+`CAPABILITIES.md` describes the shared `useLivePitch` path and the chord studio's cards as
+the remaining unpersisted state, and `BUGS.md` closed F6/F7/D2/D3 while narrowing P2 to
+the per-call buffers that still exist. Still owed: the scripts/CI/preferences mentions and
+the current test count (157 across 10 files).
 
 Batch 4 (this run) still owes the other docs:
 
@@ -179,7 +188,10 @@ still follows tabs, responsive at ≤720px.
 
 - [ ] Chord Studio: clearer card hierarchy, obvious add/compare affordances, better empty state.
 - [ ] Fretboard + Piano: shared visual language, legible legend, consistent note badges.
-- [ ] Tuner: warmer gauge, clearer in-tune state, calmer meter.
+- [~] Tuner: the in-tune state and the meter shipped in the mic rewrite (below) — the
+      badge no longer fires on silence, cents measure against the matched string's real
+      pitch, and the arc ticks stop being masked into the wrong quadrant. A warmer gauge
+      skin is still open if a visual pass is wanted.
 - [ ] Metronome: unify the pendulum and controls on one grid.
 - [ ] Scales/Intervals: tighten the degree/card readouts.
 
@@ -338,3 +350,25 @@ Ordered by value; none block the phases above.
   twelve-chip root picker became a standard key dropdown (matching the theme and
   instrument pickers), and the scale picker is one dropdown grouped Scales then Modes
   with clean option text; `NotePicker` stays on the interval explorer.
+- [x] **Fix the dead tuner microphone** (`b958f41`). The pitch loop never ran:
+  `hasLiveAudio` was captured at render time while the AudioContext/Analyser refs were
+  still null, so the first `updatePitch()` returned without scheduling a frame and the
+  meter sat at "--" forever. The tuner also kept a private copy of the mic plumbing (and
+  two alias detectors) that the rest of the app had long since shared through
+  `useLivePitch` — which is how the paths drifted apart. It now runs on the shared hook
+  (plus an insecure-origin guard where `navigator.mediaDevices` is missing): cents are
+  measured against the matched string's real pitch, the IN TUNE badge no longer shows on
+  silence, the arc ticks stop being masked into the wrong quadrant (`deg & 255` turned
+  −40 into 216), and the pegs sit in real headstock order. `useLivePitch` gained a
+  `frequency` field for all three mic consumers.
+- [x] **Close the theme-drift ink bugs.** Several controls hardcoded white or black text
+  that only worked on the default palette and went invisible on Sheet Paper (and other
+  themes): `.select-input` and `.btn-nano` drew white text on the overlay tint (a dark
+  wash on Paper), `.btn-primary` drew black text on Paper's dark brass (3.9:1), and
+  `.btn-danger` used a hardcoded red with white text (3.26:1) instead of the alert token.
+  All four now follow the page-background ink convention the chips already used
+  (`var(--bg-primary)` on accent fills, `var(--text-primary)` on tints),
+  `.btn-primary`'s gradient both stops ride the accent ramp (the hardcoded tan ended up
+  blue-to-tan on Nocturne), and the chord studio's `hover:text-white` icon buttons plus
+  its `text-white` note pills (bright `NOTE_COLORS`, so dark ink reads on all twelve)
+  were folded into the same convention.

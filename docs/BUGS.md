@@ -14,8 +14,8 @@ not yet fixed.
 | F3 | `getFindIndex(strings, idx)` ignores its `strings` argument and returns `idx & 255` — a no-op with a misleading name. Unused by the app. | `musicTheory.ts` | Dead, confusing API | **fixed** |
 | F4 | `getNoteIndex` masked its result with `& 255`, turning the `-1` "not found" sentinel into `255`. | `musicTheory.ts` | Wrong lookup result | **fixed** (earlier) |
 | F5 | `transposeNoteSafeAny` ignored `NOTE_ALIASES`, so `'Db'` returned `C` instead of transposing. | `musicTheory.ts` | Wrong transposition | **fixed** (earlier) |
-| F6 | `ChordWorkbench` labels the third default card `// B Minor`, but index 12 of `COMPREHENSIVE_CHORDS` is **D Major**. | `ChordWorkbench.tsx` | Wrong comment | **open** |
-| F7 | `public/metronome.js` is a comment-only stub with no implementation and no `<script>` tag loading it. The real metronome is the React component. | `public/metronome.js` | Dead asset shipped to production | **open** |
+| F6 | `ChordWorkbench` labels the third default card `// B Minor`, but index 12 of `COMPREHENSIVE_CHORDS` is **D Major**. | `ChordWorkbench.tsx` | Wrong comment | **fixed** — the studio resolves its starting cards by name (`findOrCreateChord('B', 'Minor')`) |
+| F7 | `public/metronome.js` is a comment-only stub with no implementation and no `<script>` tag loading it. | `public/metronome.js` | Dead asset shipped to production | **fixed** — deleted; the real metronome is the React component |
 | F8 | The BPM slider's fill referenced `var(--v, 50)`, but `--v` was never set, so the filled track sat at a fixed 27.8% instead of tracking the thumb. | `style.css`, `RhythmMetronome.tsx` | Slider fill never moved | **fixed** |
 | F9 | Auto mode pinned a concrete instrument on the sound engine, and the engine's priority order (`activeInstrument !== 'auto'` wins) then beat every per-call voice. On the Scales tab with the piano visualizer, clicking piano keys played **guitar**, and the engine could never return to `auto` once the tab effect had run. | `App.tsx`, `TopBar.tsx`, `utils/audio.ts` | Wrong instrument played | **fixed** |
 
@@ -24,8 +24,8 @@ not yet fixed.
 | # | Issue | Where | Status |
 | --- | --- | --- | --- |
 | D1 | 17 unused locals/imports flagged by the compiler (unused imports, write-only state, unused params). See the full list below. | across `src/`, `scripts/` | **fixed** |
-| D2 | Three parallel copies of autocorrelation pitch detection: `detectPitch` (+ `detectPitchVanilla`/`detectPitchLite` aliases) and `autoCorrelate` in the tuner, plus `detectPitch` in `musicTheory.ts`. Two are unreachable from the running UI. | `GuitarTuner.tsx`, `musicTheory.ts` | **open** |
-| D3 | Overlapping helper aliases: `noteNameAt` / `getNoteByCheckedIndex` / `noteNameFromIndex`, and `stringInfoAt` / `getGuitarStringInfo` / `resolveGuitarString` are identical behaviours under different names. | `musicTheory.ts` | **open** |
+| D2 | Three parallel copies of autocorrelation pitch detection: `detectPitch` (+ `detectPitchVanilla`/`detectPitchLite` aliases) and `autoCorrelate` in the tuner, plus `detectPitch` in `musicTheory.ts`. | `GuitarTuner.tsx`, `musicTheory.ts` | **fixed** — the tuner now runs on the shared `useLivePitch` hook over the one `detectPitch` in `musicTheory.ts`; the tuner's private copies and aliases are gone |
+| D3 | Overlapping helper aliases: `noteNameAt` / `getNoteByCheckedIndex` / `noteNameFromIndex`, and `stringInfoAt` / `getGuitarStringInfo` / `resolveGuitarString` are identical behaviours under different names. | `musicTheory.ts` | **fixed** — collapsed into `noteNameAt` / `stringInfoAt` |
 | D4 | `scripts/build-pages.ts` walked the whole reference tree into `mdFiles` and then discarded it — wasted I/O on every run. | `scripts/build-pages.ts` | **fixed** |
 
 Full D1 list: `writeFileSync`, `relative`, `mdFiles` (build-pages), `useMemo` (App),
@@ -70,15 +70,17 @@ Full D1 list: `writeFileSync`, `relative`, `mdFiles` (build-pages), `useMemo` (A
 | # | Issue | Where | Status |
 | --- | --- | --- | --- |
 | P1 | `@import url(fonts.googleapis.com…)` at the top of `style.css` blocks CSS parsing on a second network round-trip; the `<link>` in `index.html` is the faster path and was already half-present. | `style.css` | **fixed** (C2) |
-| P2 | The tuner allocates a new `Float32Array` and rebuilt correlation buffer every animation frame (~60/s) while listening. | `GuitarTuner.tsx` | **open** |
+| P2 | Every animation frame (~60/s) while a mic path listens, `detectPitch` copies the time-domain window (`buf.slice`) and allocates a fresh correlation `Float32Array`. The session-level analyser buffer is now allocated once in `useLivePitch.ts` (was per-frame in the tuner), but the per-call slice and correlation buffer remain. | `musicTheory.ts`, `useLivePitch.ts` | **open** (narrowed — pooled buffers would remove the remaining per-frame allocation)
 
 ## Test coverage gaps
 
-- `bun test` now covers 66 tests across four files — `musicTheory.ts` (24), `chordChart.ts`
-  (24), `utils/router.ts` (12), and the `routes.tsx` table (6). Still **no** component,
-  audio, or tuner behaviour is covered, so the audio and UI fixes above were verified by
-  inspection and in the preview rather than by assertions.
-- `getChordPosition` (fret-window generation and finger numbering) and `handleTranspose`
-  are untested — T3 in particular would have been caught by a test.
+- `bun test` now covers 157 tests across 10 files — music theory and the pitch detector,
+  the chart parser (including the follow-along matching maths), the router, the route
+  table, chord voicing, preferences, consent, instruments, progressions, and the
+  stylesheet guard with its WCAG contrast audit. Still **no** component, audio, or tuner
+  behaviour is covered, so the audio and UI fixes above were verified by inspection and
+  in the preview rather than by assertions.
+- `getChordPosition` is covered via `chordVoicing.test.ts`; the transpose handler it
+  guards fixed T3.
 - The screen components themselves are untested. A DOM test runner would be the next step;
   today the pure logic is pulled out into `utils/` specifically so it can be asserted.

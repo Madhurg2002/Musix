@@ -12,8 +12,9 @@ and imports the global stylesheet.
 
 ## `index.html`
 
-Document shell. Loads Google Fonts (Outfit, JetBrains Mono), `src/style.css`, and
-`src/main.tsx`. Contains the `#app` mount node.
+Document shell. Preconnects and loads the Google Fonts stylesheet (Outfit + Space
+Grotesk), then `src/main.tsx` — which imports `src/style.css`, so the stylesheet ships
+once. Contains the `#app` mount node.
 
 ---
 
@@ -252,37 +253,56 @@ Interactive fretboard with chord press visualization.
 
 ## `src/components/GuitarTuner.tsx` — `GuitarTuner`
 
-Microphone pitch tuner with a visual headstock.
+GuitarTuna-style microphone tuner with a visual headstock and an arc gauge. The component
+owns only the tuning UI — the microphone itself is the shared `useLivePitch` hook (below),
+so this screen and the other two mic paths cannot drift apart.
 
 **Exports**
 
 - `GuitarTuner` — the component.
-- `detectPitch` / `detectPitchVanilla` / `detectPitchLite` — the autocorrelation
-  detector (a second copy of the one in `musicTheory.ts`).
-- `autoCorrelate` — a near-identical internal detector.
 - `TUNING_PRESETS: TuningPreset[]` — Standard, Drop D, Half Step Down.
 - Types `StringInfo` and `TuningPreset`.
 
 **State**
+- `selectedPresetIndex`, `autoDetectMode` (auto vs manual string lock),
+  `selectedStringIndex`, `activePegIndex`.
 
-- `selectedPresetIndex`, `autoDetectMode`, `selectedStringIndex`, `isMicListening`,
-  `detectedPitch`, `detectedNoteName`, `centsOff`, `activePegIndex`, `micError`.
-
-**Refs:** `audioCtxRef`, `analyserRef`, `micStreamRef`, `animFrameRef`,
-`lastChimeTimeRef`.
+**Refs:** `lastChimeTimeRef` (2 s chime cooldown).
 
 **Behavior**
 
-- `startMic()` requests `getUserMedia`, wires an `AnalyserNode` (fft 2048), and starts
-  the `requestAnimationFrame` pitch loop.
-- `stopMic()` cancels the loop, stops tracks, closes the context, and resets readouts.
-- `updatePitch()` gates on RMS and a 60–1000 Hz range, computes note + cents, matches a
-  string (< 1.8 semitone error) in auto mode or the locked string otherwise, and plays a
-  chime when within 4 cents (2 s cooldown).
-- Peg click plays a 2.5 s reference tone.
-- Gauge needle angle = `clamp((cents / 50) * 45, −45, 45)`.
+- `useLivePitch()` supplies `{ midi, cents, frequency, listening, error, start, stop }`;
+  the mic error banner and the enable/stop button read straight from it.
+- The needle retunes to whichever string the pitch belongs to: auto mode matches the
+  nearest string within ~1.8 semitones (strings sit ~5 apart, so no ambiguity), manual
+  mode follows the locked peg. Off-target pitches fall back to cents against the nearest
+  chromatic note so the needle still moves.
+- **IN TUNE** (≤ 4 cents) requires an actually detected pitch — silence no longer reads
+  as "0 cents, in tune". A success chime fires on tune with the 2 s cooldown.
+- Peg click plays a 2.5 s reference tone and locks manual mode to that string.
+- Gauge needle angle = `clamp((cents / 50) * 45, −45, 45)`; the arc ticks are degrees
+  from straight up and stay signed (masking them with `& 255` used to fling the flat-side
+  ticks below the arc).
 - The preset selector and both peg columns re-render from `TUNING_PRESETS`.
-- Unmount cleanup calls `stopMic()`.
+
+---
+
+## `src/utils/useLivePitch.ts` — `useLivePitch`
+
+The one microphone pipeline in the app, behind the tuner, the fretboard's live note
+finder, and the Song Follower's play-along.
+
+- Requests `getUserMedia({ audio: true })`, wires an `AnalyserNode` (`fftSize = 2048`),
+  and runs the shared `detectPitch` once per animation frame into a buffer allocated once
+  per session (not per frame).
+- Accepts 55–1400 Hz, converts to MIDI + cents, and returns `{ midi, cents, frequency }`.
+- State updates are coalesced (note change, or cents moved ≥2) so the 60 fps loop does
+  not re-render the screen every frame.
+- Falls back to silence after 700 ms without a usable pitch, so a note that stopped
+  ringing does not sit on the screen.
+- `start` guards insecure origins (no `navigator.mediaDevices`) with a readable error
+  instead of throwing; `stop` releases the mic and closes the context, and unmount
+  always calls it.
 
 ---
 
@@ -457,17 +477,17 @@ color per pitch class).
 | Function | Purpose |
 | --- | --- |
 | `midiToFrequency(midi)` | `440 · 2^((midi − 69)/12)` |
-| `getNoteIndex(note)` | Alias-aware index; `-1` when unknown |
-| `noteNameAt` / `getNoteByCheckedIndex` / `noteNameFromIndex` | Safe note lookup (aliases) |
-| `stringInfoAt` / `getGuitarStringInfo` / `resolveGuitarString` | Safe string lookup (aliases) |
+| `getNoteIndex(note)` | Alias-aware index; `-1` when unknown (not masked to 255) |
+| `noteNameAt(idx)` | Safe note lookup by pitch-class index |
+| `stringInfoAt(idx)` | Safe guitar-string lookup (clamps out of range) |
 | `getSemitoneIndexLike(idx)` | Normalizes any number into 0–11 |
 | `getNoteDescriptor(note)` | `{ label, semitone, color }` |
-| `getFindIndex(strings, idx)` | Argument pass-through (`idx & 255`) |
 | `noteColorFor(note)` | Color with a `#555555` fallback |
-| `transposeNote` / `transposeNoteSafe` / `transposeNoteSafeAny` | Pitch-class transposition |
+| `transposeNote` / `transposeNoteSafe` / `transposeNoteSafeAny` | Pitch-class transposition (alias-aware) |
 | `getFretNote(stringIndex, fret)` | Note at a fret |
 | `getFretMidi(stringIndex, fret)` | MIDI at a fret |
-| `detectPitch(buf, sampleRate)` (+ `Vanilla`/`Lite` aliases) | Autocorrelation pitch detection |
+| `fretPositionsForMidi(midi, strings, maxFret)` | Every (string, fret) that sounds a MIDI note — tested inverse of `getFretMidi` |
+| `detectPitch(buf, sampleRate)` | The single autocorrelation detector (shared by every mic path) |
 
 ---
 
