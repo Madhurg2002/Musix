@@ -54,13 +54,13 @@ Full D1 list: `writeFileSync`, `relative`, `mdFiles` (build-pages), `useMemo` (A
 | --- | --- | --- | --- |
 | T1 | `f-major` in `chordsData.ts` is named "F Major (Barre / Easy)" but provides only the full barre shape (`[1,3,3,2,1,1]`); there is no easy variant despite the name. | `src/data/chordsData.ts` | **open** |
 | T2 | `COMPREHENSIVE_CHORDS` has no slash chords or bass-note variants, although the README describes comparing "a chord, a slash chord, and a bass-note variant". | `src/data/chordsData.ts` | **open** |
-| T3 | `handleTranspose` in the chord studio changes the chord's `root`, `name`, and `notes` but leaves `frets` and `fingers` from the original voicing, so a transposed card shows the wrong shape. | `ChordWorkbench.tsx` | **open** |
+| T3 | `handleTranspose` in the chord studio changed the chord's `root`, `name`, and `notes` but left `frets` and `fingers` from the original voicing, so a transposed card showed the wrong shape. | `ChordWorkbench.tsx` | **fixed** — the handler delegates to the tested `transposeChordShape` in `chordVoicing.ts`, so the stored shape moves with the name |
 
 ## Accessibility and responsive faults
 
 | # | Issue | Where | Status |
 | --- | --- | --- | --- |
-| A1 | Around 30 classes used by components have **no stylesheet rule at all** (e.g. `interval-header`, `dual-visualizers-grid`, `chord-card-body`, `strum-btn`, `steel-name` wrappers), so those wrappers render unstyled. | `src/style.css` vs `src/components/*` | **open** |
+| A1 | Classes used by components once had **no stylesheet rule at all** (`interval-header`, `chord-card-body`, `strum-btn`, `steel-name` wrappers), so those wrappers rendered unstyled. | `src/style.css` vs `src/components/*` | **fixed** — the named examples no longer appear in any component, `dual-visualizers-grid` gained its rule, and the class-drift scan recorded in `docs/PLAN.md` found no remaining styled class without a rule (plain utilities are Tailwind's) |
 | A2 | Chord-card reordering is drag-only apart from an `Alt+↑/↓` fallback on the handle; touch users have no reorder affordance. | `ChordWorkbench.tsx` | **open** |
 | A3 | Audio depends on an `AudioContext` created inside a user gesture, and iOS suspends that context whenever the tab is backgrounded. Desktop masked this; on iOS every play button stayed silent. | `src/utils/audio.ts` | **fixed** — one-shot pointer/touch/key listeners unlock on the first interaction and a `visibilitychange` handler resumes on return |
 | A4 | Touch targets were sized for a mouse (24–32px rail items) and there was no safe-area padding, so the rail sat under the notch and taps were fiddly. | `src/style.css` | **fixed** — 40px rail items, 44px buttons, `touch-action: manipulation`, `env(safe-area-inset-*)` |
