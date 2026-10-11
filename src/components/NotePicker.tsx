@@ -38,8 +38,14 @@ export const NotePicker: React.FC<NotePickerProps> = ({
         key={note}
         className={`flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-[10px] border border-hairline font-bold transition-all duration-200 ${
           note === value
-            ? 'bg-accent text-black shadow-[0_0_12px_var(--accent-primary)]'
-            : 'bg-chip text-white'
+            ? variant === 'fill'
+              // The fill variant paints the note's own colour behind the label, which is
+              // mid-bright in every theme, so dark ink stays readable on it.
+              ? 'bg-accent text-black shadow-[0_0_12px_var(--accent-primary)]'
+              // The border variant keeps the theme accent, whose lightness flips per
+              // theme — `text-white` vanished on the Paper palette's dark brass.
+              : 'bg-accent text-[color:var(--bg-primary)] shadow-[0_0_12px_var(--accent-primary)]'
+            : 'bg-chip text-ink'
           }`}
         data-tip={tipFor ? tipFor(note) : undefined}
         onClick={() => onChange(note)}

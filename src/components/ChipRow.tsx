@@ -32,7 +32,10 @@ export function ChipRow<T extends string>({ label, options, value, onChange }: C
             key={option.value}
             className={`cursor-pointer rounded-xl border px-3.5 py-1.5 text-[13px] font-semibold transition-all duration-200 ${
               value === option.value
-                ? 'border-accent bg-accent text-[#1a1208]'
+                // The accent's lightness flips with the theme (pale brass on Analog,
+                // dark brass on Paper), so the label follows the page background — the
+                // same pairing the rail's visualizer toggle uses.
+                ? 'border-accent bg-accent text-[color:var(--bg-primary)]'
                 : 'border-hairline bg-chip text-ink'
             }`}
             aria-pressed={value === option.value}

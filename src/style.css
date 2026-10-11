@@ -189,9 +189,13 @@ body {
   transition: all 0.2s ease;
 }
 
+/* Both stops ride the accent ramp so the gradient follows the palette (the hardcoded
+   tan ended up blue-to-tan on Nocturne), and the ink is the page background: dark on
+   the light accents of the dark themes, cream on Paper's dark brass. Black text on
+   Paper's #9a5b12 was 3.9:1 — below AA. */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, #c98a3f 100%);
-  color: #000;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  color: var(--bg-primary);
 }
 
 .btn-primary:hover {
@@ -219,15 +223,19 @@ body {
   background: rgba(var(--overlay-rgb), 0.1);
 }
 
+/* Alert token, not a hardcoded red, and the ink follows the page background like the
+   other buttons: white on #e06c5a was 3.26:1 (below AA) and bypassed the theme. */
 .btn-danger {
-  background: #e06c5a;
-  color: #fff;
+  background: var(--accent-alert);
+  color: var(--bg-primary);
 }
 
+/* Ink follows the text ramp: the field background is the page primary, so on Paper the
+   old white text sat on cream and vanished. */
 .select-input {
   background: rgba(var(--bg-primary-rgb), 0.8);
   border: 1px solid var(--card-border);
-  color: #fff;
+  color: var(--text-primary);
   padding: 10px 14px;
   border-radius: 10px;
   font-family: var(--font-main);
@@ -250,10 +258,12 @@ body {
 
 /* The studio's compact fingering diagram (strings, frets, finger dots) and card layout
    are utilities in src/components/ChordFretGrid.tsx now. */
+/* Same story as select-input: the tint is the overlay channel (a dark wash on Paper),
+   so white text disappeared there. Hover flips to accent + page-background ink. */
 .btn-nano {
   background: rgba(var(--overlay-rgb), 0.1);
   border: none;
-  color: #fff;
+  color: var(--text-primary);
   padding: 3px 8px;
   border-radius: 4px;
   cursor: pointer;
@@ -263,7 +273,7 @@ body {
 
 .btn-nano:hover {
   background: var(--accent-primary);
-  color: #000;
+  color: var(--bg-primary);
 }
 
 .btn-sm {

@@ -334,7 +334,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({
                 </span>
                 <div className="flex gap-1.5">
                   <button
-                    className="cursor-grab touch-none rounded bg-transparent p-1 text-base text-ink-soft hover:text-white active:cursor-grabbing"
+                    className="cursor-grab touch-none rounded bg-transparent p-1 text-base text-ink-soft hover:text-accent active:cursor-grabbing"
                     type="button"
                     draggable
                     aria-label={`Drag to reorder ${chord.name}`}
@@ -363,7 +363,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({
                     <Icon name="grip" />
                   </button>
                   <button
-                    className="rounded bg-transparent p-1 text-base text-ink-soft hover:text-white"
+                    className="rounded bg-transparent p-1 text-base text-ink-soft hover:text-accent"
                     type="button"
                     aria-label={`Duplicate ${chord.name}`}
                     data-tip="Duplicate this card"
@@ -372,7 +372,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({
                     <Icon name="copy" />
                   </button>
                   <button
-                    className="rounded bg-transparent p-1 text-base text-ink-soft hover:text-white"
+                    className="rounded bg-transparent p-1 text-base text-ink-soft hover:text-accent"
                     data-tip={isMuted ? 'Unmute — let this card play again' : 'Mute — skip this card during playback'}
                     type="button"
                     onClick={() =>
@@ -404,7 +404,7 @@ export const ChordWorkbench: React.FC<ChordWorkbenchProps> = ({
                   {asSafeChord(chord).notes.map((note: NoteName, idx: number) => (
                     <span
                       key={idx}
-                      className="rounded-xl px-2.5 py-1 text-[13px] font-bold text-white shadow-[0_2px_8px_rgba(var(--inset-rgb),0.3)]"
+                      className="rounded-xl px-2.5 py-1 text-[13px] font-bold text-black shadow-[0_2px_8px_rgba(var(--inset-rgb),0.3)]"
                       style={{ backgroundColor: noteColorFor(note) }}
                     >
                       {note} <small>({asSafeChord(chord).intervals[idx] ?? ''})</small>
