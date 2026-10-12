@@ -20,6 +20,7 @@ Do **not** rewrite every doc on every change. The rule from here on:
 | 5 | `bebfafe`, `5decd5d`, `9e45dc2`, `cc5ef5a` | this file only (Tailwind migration starts) |
 | 6 | `b958f41` + this run | `COMPONENTS.md` (tuner + `useLivePitch` sections, index.html, musicTheory table), `CAPABILITIES.md` (tuner technical, stylesheet-once, Song-Follower gap), `BUGS.md` (F6/F7/D2/D3 closed, P2 narrowed), this file |
 | 7 | `233d2d5` follow-up (this run) | `BUGS.md` (A5 added, test counts), this file |
+| 8 | multi-instrument tuner (this run) | `COMPONENTS.md` (tuner + new `tunings.ts` section), `CAPABILITIES.md` (tuner), this file |
 
 ### Deferred doc edits (sweep up in the next batch)
 
@@ -31,8 +32,8 @@ Do **not** rewrite every doc on every change. The rule from here on:
   song now persist.
 - `public/metronome.js` being gone, the helper aliases being collapsed into `noteNameAt` /
   `stringInfoAt`, and `detectPitch` now living only in `musicTheory.ts`.
-- `src/utils/preferences.test.ts` and `src/utils/chordVoicing.test.ts` (test counts are now
-  148 across 10 files).
+- `src/utils/preferences.test.ts`, `src/utils/chordVoicing.test.ts`, and
+  `src/utils/tunings.test.ts` (test counts are now 168 across 11 files).
 - The live note finder (`src/utils/useLivePitch.ts`, `fretPositionsForMidi`), the Song
   Follower's print stylesheet and button, its mic follow-along, the rail active-state fix,
   the final de-emoji pass, and the closed class-drift item.
@@ -47,7 +48,7 @@ match the code (fonts, single stylesheet import, collapsed aliases, `fretPositio
 `CAPABILITIES.md` describes the shared `useLivePitch` path and the chord studio's cards as
 the remaining unpersisted state, and `BUGS.md` closed F6/F7/D2/D3 while narrowing P2 to
 the per-call buffers that still exist. Still owed: the scripts/CI/preferences mentions and
-the current test count (161 across 10 files).
+the current test count (168 across 11 files).
 
 Batch 4 (this run) still owes the other docs:
 
@@ -386,5 +387,16 @@ Ordered by value; none block the phases above.
   per hue through a new `inkOnNoteColor` in `musicTheory.ts`. The audit gained two guards
   so this cannot silently regress: every theme's gradient-button stops are checked
   against the page-background ink (and the rules are checked to still carry that ink),
-  and all twelve `NOTE_COLORS` hues are checked against the ink `inkOnNoteColor` picks —
-  161 tests across 10 files.
+  and all twelve `NOTE_COLORS` hues are checked against the ink `inkOnNoteColor` picks.
+- [x] **Multi-instrument tuner** (this run). The screen was guitar-only with three
+  hand-typed presets. It now serves eleven tunings across four families — guitar
+  (Standard, Drop D, Half Step Down, Open G, DADGAD), bass (4- and 5-string), ukulele
+  (reentrant and Low-G), and violin standard — through one grouped picker, with the
+  headstock columns adapting to 4, 5, or 6 strings. The preset table moved to
+  `src/utils/tunings.ts`, where every string derives its note, octave, and Hz from a MIDI
+  number (the old table hand-typed all eighteen frequencies) and is tested against
+  reference pitches in `tunings.test.ts` — 168 tests across 11 files. The view gained a
+  cents readout and a “Tuning to string N (D3)” target line; auto-match resolves to the
+  *nearest* string within tolerance (the ukulele's g/A pair sits two semitones apart);
+  reference tones play in the instrument's own voice; clicking a peg locks the meter to
+  that string, and switching tunings clears a stale lock.

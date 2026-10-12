@@ -87,18 +87,24 @@ capability that makes it work.
 
 **User-facing**
 
-- Three tuning presets: **Standard (E A D G B E)**, **Drop D (D A D G B E)**, and
-  **Half Step Down (E♭ A♭ D♭ G♭ B♭ E♭)**.
+- **Eleven tunings across four instruments**, grouped in one picker: five guitar
+  tunings (Standard, Drop D, Half Step Down, Open G, DADGAD), two bass tunings
+  (standard 4-string, 5-string), two ukulele tunings (reentrant standard, Low-G), and
+  violin standard (G D A E).
 - **Auto String Detection** finds the nearest string automatically; **Manual Lock String**
-  pins detection to a chosen string.
-- Live microphone pitch detection with a note readout (`E2`, `A4`, …) and Hz value.
+  pins detection to a chosen string — and clicking a peg locks to it as well.
+- Live microphone pitch detection with a note readout (`E2`, `A4`, …), Hz value, and the
+  exact cents offset (`+12 ¢`, `−3 ¢`).
+- A “Tuning to string N (D3) · 146.8 Hz” target line names what the needle is comparing
+  against, so manual mode always says which string is locked.
 - A curved arc gauge with a needle that swings ±45° across ±50 cents.
 - Accuracy badges: **IN TUNE** (within 4 cents), **TOO LOW (tune up)**, or
-  **TOO HIGH (tune down)**.
+  **TOO HIGH (tune down)**; the matched peg also gets a success ring while in tune.
 - A success chime plays when a string lands in tune (rate-limited to once per 2 s).
-- Clicking any tuning peg plays a 2.5 s reference tone for that string.
-- Visual headstock with the three low strings (6, 5, 4) on the left and the three high
-  strings (3, 2, 1) on the right; the detected string's peg lights up.
+- Clicking any tuning peg plays a 2.5 s reference tone in that instrument's voice (bass
+  strings sound like a bass, ukulele like a ukulele).
+- Visual headstock with peg columns that adapt to the preset (4, 5, or 6 strings); the
+  detected string's wire and peg light up.
 - Clear, actionable banner if the microphone is denied or unavailable.
 
 **Technical**
@@ -113,7 +119,15 @@ capability that makes it work.
 - Cents are measured against the matched string's real pitch (nearest chromatic note as
   the fallback for off-target strings); the needle clamps at ±45° over ±50 cents, and
   **IN TUNE** requires a detected pitch within 4 cents — silence no longer reads as in
-  tune. String match tolerance is < 1.8 semitones of error.
+  tune. String match tolerance is < 1.8 semitones of error, resolved to the *nearest*
+  string inside that window (a plain first-match would misfire on the ukulele's g/A
+  pair, two semitones apart).
+- Tuning data lives in `src/utils/tunings.ts`: each string is stored as a MIDI number
+  and its note, octave, and Hz derive from it, so no frequency is hand-typed. The table
+  is unit tested (`tunings.test.ts`) against reference pitches — low E = 82.41 Hz,
+  ukulele A = 440 Hz, violin G = 196 Hz — including the reentrant ukulele keeping
+  physical string order (4→1) even though its pitches are not monotonic. Switching
+  tunings clears any stale manual lock.
 - On insecure origins (no `navigator.mediaDevices`) the screen shows an explanatory
   banner instead of throwing; cleanup stops all mic tracks and closes the audio context
   on stop/unmount.
