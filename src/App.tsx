@@ -23,7 +23,7 @@ import {
 } from './utils/preferences';
 import { soundEngine, type InstrumentType } from './utils/audio';
 import { INSTRUMENT_IDS } from './data/instruments';
-import { ChipRow, type ChipOption } from './components/ChipRow';
+import { type ChipOption } from './components/ChipRow';
 
 const isVisualizer = isOneOf('piano', 'guitar');
 const isInstrumentChoice = isOneOf<InstrumentType | 'auto'>('auto', ...INSTRUMENT_IDS);
@@ -38,13 +38,9 @@ function ScreenLoading({ title }: { title: string }) {
   );
 }
 
-/** The six practice keys offered in the hero, shared with the chip row below. */
-const HERO_KEYS: readonly NoteName[] = ['C', 'G', 'D', 'A', 'E', 'F'];
-const HERO_KEY_OPTIONS: readonly ChipOption<NoteName>[] = HERO_KEYS.map((key) => ({
-  value: key,
-  label: key,
-  tip: `Practise in the key of ${key} — every tool follows it`,
-}));
+/** The six practice keys offered on the screens that change the key. */
+const PRACTICE_KEYS: readonly NoteName[] = ['C', 'G', 'D', 'A', 'E', 'F'];
+
 
 export function App() {
   const [activeTab, setActiveTabState] = useState<string>(() =>
@@ -200,12 +196,6 @@ export function App() {
               >
                 Start with the basics
               </button>
-              <ChipRow
-                label="Key"
-                options={HERO_KEY_OPTIONS}
-                value={selectedRoot}
-                onChange={setSelectedRoot}
-              />
             </div>
           </section>
 

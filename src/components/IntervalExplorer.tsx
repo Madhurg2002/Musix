@@ -5,6 +5,8 @@ import { ALL_NOTES, midiToFrequency } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 import { NotePicker } from './NotePicker';
 import { Icon } from './Icon';
+import { KeyChipRow } from './KeyChipRow';
+import { type ScreenContext } from '../routes';
 
 /** Quality → palette token, replacing the four `.quality-tag.*` rules. */
 const QUALITY_COLORS: Record<string, string> = {
@@ -14,7 +16,7 @@ const QUALITY_COLORS: Record<string, string> = {
   tritone: 'text-alert',
 };
 
-export const IntervalExplorer: React.FC = () => {
+export const IntervalExplorer: React.FC<{ context?: ScreenContext }> = ({ context }) => {
   const [note1, setNote1] = useState<NoteName>('C');
   const [note2, setNote2] = useState<NoteName>('G');
 
@@ -109,6 +111,12 @@ export const IntervalExplorer: React.FC = () => {
           />
         </div>
       </div>
+
+      {context && (
+        <div className="flex flex-wrap items-center gap-4 pt-1">
+          <KeyChipRow context={context} />
+        </div>
+      )}
     </div>
   );
 };

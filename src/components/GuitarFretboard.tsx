@@ -14,12 +14,15 @@ import { soundEngine } from '../utils/audio';
 import { useLivePitch } from '../utils/useLivePitch';
 import { asSafeChord } from '../data/chordsData';
 import { Icon } from './Icon';
+import { KeyChipRow } from './KeyChipRow';
+import { type ScreenContext } from '../routes';
 
 interface GuitarFretboardProps {
   activeChord?: ChordShape | null;
   activeScaleNotes?: NoteName[];
   rootNote?: NoteName;
   fretsCount?: number;
+  context?: ScreenContext;
 }
 
 export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
@@ -27,6 +30,7 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
   activeScaleNotes = [],
   rootNote = 'C',
   fretsCount = 12,
+  context,
 }) => {
   const [hoveredNote, setHoveredNote] = useState<{ stringIdx: number; fret: number; note: NoteName } | null>(null);
 
@@ -112,6 +116,12 @@ export const GuitarFretboard: React.FC<GuitarFretboardProps> = ({
             {live.listening ? 'Stop listening' : 'Find my note'}
           </button>
         </div>
+
+        {context && (
+          <div className="flex flex-wrap items-center gap-3">
+            <KeyChipRow context={context} />
+          </div>
+        )}
       </div>
 
       {/* Live note finder readout: what the mic hears right now, and where it lives. */}
