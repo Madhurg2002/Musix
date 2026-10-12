@@ -1,8 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { NoteName } from '../types';
 import { noteNameAt } from '../utils/musicTheory';
 import { soundEngine } from '../utils/audio';
 import { useLivePitch } from '../utils/useLivePitch';
+import {
+  TUNING_FAMILIES,
+  TUNING_PRESETS,
+  resolveTuning,
+  TuningStringInfo,
+} from '../utils/tunings';
 import { Icon } from './Icon';
 
 /** Base card chrome for a tuning peg; the active state is chosen at render. */
@@ -10,72 +15,32 @@ const PEG_CARD_BASE =
   'flex w-[132px] cursor-pointer flex-col items-center gap-1 rounded-xl border p-2.5 transition duration-200 hover:-translate-y-0.5 hover:border-[rgba(var(--accent-primary),0.6)]';
 const PEG_CARD_ACTIVE =
   'border-accent bg-[rgba(var(--accent-rgb),0.14)] shadow-[0_0_0_3px_rgba(var(--accent-rgb),0.18)]';
-const PEG_CARD_IDLE =
-  'border-[rgba(var(--overlay-rgb),0.14)] bg-[rgba(var(--inset-rgb),0.22)]';
-
-export interface StringInfo {
-  index: number;
-  note: NoteName;
-  octave: number;
-  frequency: number;
-  stringName: string;
-  side: 'left' | 'right';
-}
-
-export interface TuningPreset {
-  name: string;
-  strings: StringInfo[];
-}
-
-export const TUNING_PRESETS: TuningPreset[] = [
-  {
-    name: 'Standard Guitar (E A D G B E)',
-    strings: [
-      { index: 6, note: 'E', octave: 2, frequency: 82.41, stringName: '6 (Low E)', side: 'left' },
-      { index: 5, note: 'A', octave: 2, frequency: 110.0, stringName: '5 (A)', side: 'left' },
-      { index: 4, note: 'D', octave: 3, frequency: 146.83, stringName: '4 (D)', side: 'left' },
-      { index: 3, note: 'G', octave: 3, frequency: 196.0, stringName: '3 (G)', side: 'right' },
-      { index: 2, note: 'B', octave: 3, frequency: 246.94, stringName: '2 (B)', side: 'right' },
-      { index: 1, note: 'E', octave: 4, frequency: 329.63, stringName: '1 (High E)', side: 'right' },
-    ],
-  },
-  {
-    name: 'Drop D (D A D G B E)',
-    strings: [
-      { index: 6, note: 'D', octave: 2, frequency: 73.42, stringName: '6 (Low D)', side: 'left' },
-      { index: 5, note: 'A', octave: 2, frequency: 110.0, stringName: '5 (A)', side: 'left' },
-      { index: 4, note: 'D', octave: 3, frequency: 146.83, stringName: '4 (D)', side: 'left' },
-      { index: 3, note: 'G', octave: 3, frequency: 196.0, stringName: '3 (G)', side: 'right' },
-      { index: 2, note: 'B', octave: 3, frequency: 246.94, stringName: '2 (B)', side: 'right' },
-      { index: 1, note: 'E', octave: 4, frequency: 329.63, stringName: '1 (High E)', side: 'right' },
-    ],
-  },
-  {
-    name: 'Half Step Down (E♭ A♭ D♭ G♭ B♭ E♭)',
-    strings: [
-      { index: 6, note: 'D♯', octave: 2, frequency: 77.78, stringName: '6 (E♭)', side: 'left' },
-      { index: 5, note: 'G♯', octave: 2, frequency: 103.83, stringName: '5 (A♭)', side: 'left' },
-      { index: 4, note: 'C♯', octave: 3, frequency: 138.59, stringName: '4 (D♭)', side: 'left' },
-      { index: 3, note: 'F♯', octave: 3, frequency: 185.0, stringName: '3 (G♭)', side: 'right' },
-      { index: 2, note: 'A♯', octave: 3, frequency: 233.08, stringName: '2 (B♭)', side: 'right' },
-      { index: 1, note: 'D♯', octave: 4, frequency: 311.13, stringName: '1 (E♭)', side: 'right' },
-    ],
-  },
-];
+const PEG_CARD_IDLE = 'border-[rgba(var(--overlay-rgb),0.14)] bg-[rgba(var(--inset-rgb),0.22)]';
 
 /** Cents (+ sharp, − flat) of `frequency` against a target pitch. */
 function centsBetween(frequency: number, target: number): number {
   return Math.round(1200 * Math.log2(frequency / target));
 }
 
+/** Display form for a cents offset: `+12 ¢`, `−3 ¢`, or `0 ¢` (U+2212 is the real minus). */
+function centsLabel(cents: number): string {
+  if (cents === 0) return '0 ¢';
+  return `${cents > 0 ? '+' : '−'}${Math.abs(cents)} ¢`;
+}
+
+/** How far from a string's pitch the detector may be and still count as that string. */
+const MATCH_TOLERANCE_SEMITONES = 1.8;
+
 /**
- * GuitarTuna-style tuner. The microphone runs through the shared `useLivePitch` hook —
- * the same detector the fretboard note finder and the Song Follower use — so this
- * component owns only the tuning UI: which string the needle is tuning to, the peg
- * headstock, and the reference tones.
+ * Instrument tuner. The microphone runs through the shared `useLivePitch` hook — the
+ * same detector the fretboard note finder and the Song Follower use — so this component
+ * owns only the tuning UI: which string the needle is tuning to, the peg headstock, and
+ * the reference tones. The preset table (guitar, bass, ukulele, violin) lives in
+ * `src/utils/tunings.ts`; every string's note, octave, and frequency derive from its MIDI
+ * number there.
  */
 export const GuitarTuner: React.FC = () => {
-  const [selectedPresetIndex, setSelectedPresetIndex] = useState<number>(0);
+  const [presetIndex, setPresetIndex] = useState<number>(0);
   const [autoDetectMode, setAutoDetectMode] = useState<boolean>(true);
   const [selectedStringIndex, setSelectedStringIndex] = useState<number | null>(null);
   const [activePegIndex, setActivePegIndex] = useState<number | null>(null);
@@ -84,26 +49,38 @@ export const GuitarTuner: React.FC = () => {
   const live = useLivePitch();
   const { listening, error: micError, start, stop } = live;
 
-  const preset = TUNING_PRESETS[selectedPresetIndex] ?? TUNING_PRESETS[0]!;
-  const currentTuningStrings = preset.strings;
+  const preset = TUNING_PRESETS[presetIndex] ?? TUNING_PRESETS[0]!;
+  const strings: TuningStringInfo[] = resolveTuning(preset);
 
   // The needle retunes to whichever string the pitch belongs to: auto mode matches the
-  // nearest string within ~1.8 semitones (strings sit ~5 apart, so no ambiguity), manual
-  // mode follows the locked peg. Derived each render so a preset change re-resolves it.
+  // nearest string within ~1.8 semitones, manual mode follows the locked peg. Derived
+  // each render so a preset change re-resolves it.
   const frequency = live.frequency;
-  const matchedString: StringInfo | undefined =
-    live.midi === null || frequency === null
-      ? undefined
-      : autoDetectMode
-        ? currentTuningStrings.find(
-            (string) => Math.abs(12 * Math.log2(frequency / string.frequency)) < 1.8
-          )
-        : currentTuningStrings.find((string) => string.index === selectedStringIndex);
+  let matchedString: TuningStringInfo | undefined;
+  if (live.midi !== null && frequency !== null) {
+    if (autoDetectMode) {
+      // Nearest string within tolerance — a plain `find` would return the first of two
+      // equally close strings (the ukulele's g and A sit two semitones apart).
+      let bestDistance = Infinity;
+      for (const candidate of strings) {
+        const distance = Math.abs(12 * Math.log2(frequency / candidate.frequency));
+        if (distance < MATCH_TOLERANCE_SEMITONES && distance < bestDistance) {
+          bestDistance = distance;
+          matchedString = candidate;
+        }
+      }
+    } else {
+      matchedString = strings.find((candidate) => candidate.index === selectedStringIndex);
+    }
+  }
 
   // Off-target strings still need a needle: against the matched string's real pitch when
   // one is known, otherwise against the nearest chromatic note the detector reported.
-  const centsOff =
-    frequency === null ? 0 : matchedString ? centsBetween(frequency, matchedString.frequency) : live.cents;
+  const centsOff = frequency === null
+    ? 0
+    : matchedString
+      ? centsBetween(frequency, matchedString.frequency)
+      : live.cents;
   const needleAngle = Math.min(Math.max((centsOff / 50) * 45, -45), 45);
   const detected = live.midi !== null && frequency !== null;
   const inTune = detected && Math.abs(centsOff) <= 4;
@@ -124,14 +101,23 @@ export const GuitarTuner: React.FC = () => {
     }
   }, [inTune, matchedString]);
 
-  const handlePegClick = (string: StringInfo) => {
+  const handlePegClick = (string: TuningStringInfo) => {
     setSelectedStringIndex(string.index);
     setActivePegIndex(string.index);
-    soundEngine.playNote(string.frequency, 2.5, 'acoustic-guitar');
+    // Manual picking always locks to the clicked string.
+    setAutoDetectMode(false);
+    soundEngine.playNote(string.frequency, 2.5, preset.voice);
   };
 
-  const renderPeg = (string: StringInfo) => {
+  const handlePresetChange = (index: number) => {
+    setPresetIndex(index);
+    // A locked string number from the previous instrument means nothing on the new one.
+    setSelectedStringIndex(null);
+  };
+
+  const renderPeg = (string: TuningStringInfo) => {
     const isActive = activePegIndex === string.index;
+    const isTarget = matchedString?.index === string.index;
     const label = (
       <div className="flex flex-col text-center text-[0.72rem] leading-[1.3] text-ink-muted">
         <span className="text-xs font-bold text-ink">String {string.index}</span>
@@ -147,10 +133,14 @@ export const GuitarTuner: React.FC = () => {
       <div
         key={string.index}
         className={`${PEG_CARD_BASE} ${isActive ? PEG_CARD_ACTIVE : PEG_CARD_IDLE}`}
-        data-tip={`Play the reference tone — string ${string.index} (${string.note}${string.octave}) at ${string.frequency} Hz`}
+        // In tune gets the success ring inline: two competing border utilities would
+        // resolve by Tailwind's alphabetical compile order, not by intent.
+        style={isTarget && inTune ? { borderColor: 'var(--accent-success)' } : undefined}
+        data-tip={`${preset.family} · string ${string.index} (${string.note}${string.octave}) — plays the reference tone at ${string.frequency} Hz and locks the meter to this string`}
         role="button"
         tabIndex={0}
         aria-label={`Play the reference tone for string ${string.index}, ${string.note}${string.octave}`}
+        aria-pressed={selectedStringIndex === string.index}
         onClick={() => handlePegClick(string)}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
@@ -174,8 +164,8 @@ export const GuitarTuner: React.FC = () => {
     );
   };
 
-  const leftPegs = currentTuningStrings.filter((string) => string.side === 'left');
-  const rightPegs = currentTuningStrings.filter((string) => string.side === 'right');
+  const leftPegs = strings.filter((string) => string.side === 'left');
+  const rightPegs = strings.filter((string) => string.side === 'right');
 
   return (
     <div className="glass-card flex flex-col gap-6">
@@ -183,23 +173,32 @@ export const GuitarTuner: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <span className="section-badge inline-flex items-center gap-1.5 bg-[rgba(var(--accent-rgb),0.16)] text-accent">
-            <Icon name="target" /> GuitarTuna Style Visual Pitch Engine
+            <Icon name="target" /> Visual Pitch Engine
           </span>
-          <h2>Interactive Guitar Headstock Tuner</h2>
-          <p>Automatic pitch detection with visual tuning pegs and curved arc meter.</p>
+          <h2>Instrument Tuner</h2>
+          <p>
+            Tune guitar, bass, ukulele, or violin — pick a tuning, then follow the needle.
+            Click any string to hear its reference tone.
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <select
             className="select-input font-bold text-accent"
-            value={selectedPresetIndex}
-            title="Tuning preset — sets the pitch every string should match"
-            onChange={(event) => setSelectedPresetIndex(Number(event.target.value))}
+            value={presetIndex}
+            title="Instrument and tuning — sets the pitch every string should match"
+            onChange={(event) => handlePresetChange(Number(event.target.value))}
           >
-            {TUNING_PRESETS.map((candidate, index) => (
-              <option key={index} value={index}>
-                {candidate.name}
-              </option>
+            {TUNING_FAMILIES.map((family) => (
+              <optgroup key={family} label={family}>
+                {TUNING_PRESETS.map((candidate, index) =>
+                  candidate.family === family ? (
+                    <option key={candidate.name} value={index}>
+                      {candidate.name}
+                    </option>
+                  ) : null
+                )}
+              </optgroup>
             ))}
           </select>
 
@@ -250,7 +249,7 @@ export const GuitarTuner: React.FC = () => {
         </div>
       )}
 
-      {/* Main GuitarTuna Layout: Arc Meter Top + Headstock Below */}
+      {/* Main Layout: Arc Meter Top + Headstock Below */}
       <div className="flex flex-col items-center gap-8 py-4">
         {/* 1. Curved Arc Meter Gauge */}
         <div className="tuna-arc-gauge">
@@ -328,7 +327,13 @@ export const GuitarTuner: React.FC = () => {
             </div>
             {detected && (
               <div className="mt-0.5 font-display text-sm text-ink-soft">
-                {frequency.toFixed(1)} Hz
+                {frequency.toFixed(1)} Hz · {centsLabel(centsOff)}
+              </div>
+            )}
+            {matchedString && (
+              <div className="mt-0.5 text-[11px] font-semibold text-ink-muted">
+                Tuning to string {matchedString.index} ({matchedString.note}
+                {matchedString.octave}) · {matchedString.frequency} Hz
               </div>
             )}
             <div className="mt-2 min-h-[30px]">
@@ -353,9 +358,10 @@ export const GuitarTuner: React.FC = () => {
           </div>
         </div>
 
-        {/* 2. Visual Guitar Headstock with 6 Interactive Tuning Pegs flanking the wood */}
+        {/* 2. Visual Headstock with interactive tuning pegs flanking the wood — the
+            columns adapt to the preset's string count (4, 5, or 6). */}
         <div className="flex w-full flex-wrap items-center justify-center gap-x-5 gap-y-3 px-0.5 pt-1.5 pb-2">
-          {/* Left peg column (Low E, A, D) */}
+          {/* Left peg column */}
           <div className="flex flex-col items-center gap-3">{leftPegs.map(renderPeg)}</div>
 
           {/* Headstock Graphic Body */}
@@ -366,7 +372,7 @@ export const GuitarTuner: React.FC = () => {
               <div className="nut-bar" />
               {/* String Lines running down */}
               <div className="headstock-strings-layer">
-                {currentTuningStrings.map((string) => (
+                {strings.map((string) => (
                   <div
                     key={string.index}
                     className={`headstock-string-wire ${activePegIndex === string.index ? 'active-wire' : ''}`}
@@ -376,7 +382,7 @@ export const GuitarTuner: React.FC = () => {
             </div>
           </div>
 
-          {/* Right peg column (G, B, High E) */}
+          {/* Right peg column */}
           <div className="flex flex-col items-center gap-3">{rightPegs.map(renderPeg)}</div>
         </div>
       </div>

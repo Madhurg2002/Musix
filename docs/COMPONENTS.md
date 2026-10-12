@@ -253,18 +253,17 @@ Interactive fretboard with chord press visualization.
 
 ## `src/components/GuitarTuner.tsx` — `GuitarTuner`
 
-GuitarTuna-style microphone tuner with a visual headstock and an arc gauge. The component
-owns only the tuning UI — the microphone itself is the shared `useLivePitch` hook (below),
-so this screen and the other two mic paths cannot drift apart.
+Microphone tuner for guitar, bass, ukulele, and violin, with a visual headstock and an
+arc gauge. The component owns only the tuning UI — the microphone itself is the shared
+`useLivePitch` hook (below), and the preset table lives in `src/utils/tunings.ts`
+(next), so this screen and the other two mic paths cannot drift apart.
 
 **Exports**
 
 - `GuitarTuner` — the component.
-- `TUNING_PRESETS: TuningPreset[]` — Standard, Drop D, Half Step Down.
-- Types `StringInfo` and `TuningPreset`.
 
 **State**
-- `selectedPresetIndex`, `autoDetectMode` (auto vs manual string lock),
+- `presetIndex`, `autoDetectMode` (auto vs manual string lock),
   `selectedStringIndex`, `activePegIndex`.
 
 **Refs:** `lastChimeTimeRef` (2 s chime cooldown).
@@ -273,17 +272,42 @@ so this screen and the other two mic paths cannot drift apart.
 
 - `useLivePitch()` supplies `{ midi, cents, frequency, listening, error, start, stop }`;
   the mic error banner and the enable/stop button read straight from it.
-- The needle retunes to whichever string the pitch belongs to: auto mode matches the
-  nearest string within ~1.8 semitones (strings sit ~5 apart, so no ambiguity), manual
-  mode follows the locked peg. Off-target pitches fall back to cents against the nearest
-  chromatic note so the needle still moves.
+- The needle retunes to whichever string the pitch belongs to: auto mode resolves the
+  *nearest* string within ~1.8 semitones (first-match would misfire on the ukulele's
+  g/A pair), manual mode follows the locked peg. Off-target pitches fall back to cents
+  against the nearest chromatic note so the needle still moves.
 - **IN TUNE** (≤ 4 cents) requires an actually detected pitch — silence no longer reads
-  as "0 cents, in tune". A success chime fires on tune with the 2 s cooldown.
-- Peg click plays a 2.5 s reference tone and locks manual mode to that string.
+  as "0 cents, in tune". A success chime fires on tune with the 2 s cooldown, and the
+  matched peg gets a success ring (applied inline: two competing border utilities would
+  resolve by Tailwind's alphabetical compile order, not intent).
+- Peg click plays a 2.5 s reference tone in the preset's instrument voice and locks the
+  meter to that string; changing the tuning clears any stale lock.
+- The center readout shows note + octave, `Hz · ±cents`, and a "Tuning to string N"
+  target line naming what the needle compares against.
 - Gauge needle angle = `clamp((cents / 50) * 45, −45, 45)`; the arc ticks are degrees
   from straight up and stay signed (masking them with `& 255` used to fling the flat-side
   ticks below the arc).
-- The preset selector and both peg columns re-render from `TUNING_PRESETS`.
+- The grouped preset picker (one `<optgroup>` per family) and both peg columns re-render
+  from `TUNING_PRESETS`; the columns split `ceil(n/2)` strings each, so the headstock
+  adapts to 4-, 5-, and 6-string instruments.
+
+---
+
+## `src/utils/tunings.ts` — `TUNING_PRESETS`, `resolveTuning`
+
+The tuner's preset table: eleven tunings across Guitar, Bass, Ukulele, and Violin.
+
+- Each `TuningString` stores only a player-facing string number and the open string's
+  MIDI note; `resolveTuning` derives the note, octave, and `midiToFrequency` Hz, so no
+  frequency is hand-typed (the old table carried eighteen of them by hand).
+- Strings run low to high down each headstock column; the left column takes `ceil(n/2)`
+  entries — 3/3 on guitar, 3/2 on five-string bass, 2/2 on ukulele and violin.
+- The ukulele's reentrant standard keeps physical order (4 → 1: g, C, E, A) even though
+  the g string sits above C and E in pitch.
+- Each preset carries the sound-engine voice its reference tone plays with; violin
+  falls back to the acoustic guitar voice (no dedicated violin voice exists).
+- Exports `TUNING_FAMILIES` (picker group order) and is covered by
+  `src/utils/tunings.test.ts`.
 
 ---
 
