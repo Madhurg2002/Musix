@@ -1,0 +1,441 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { soundEngine } from '../utils/audio';
+import { Icon } from './Icon';
+
+const TEMPO_NAMES: { min: number; max: number; name: string }[] = [
+  { min: 20,  max: 39,  name: 'Larghissimo' },
+  { min: 40,  max: 59,  name: 'Grave' },
+  { min: 60,  max: 65,  name: 'Largo' },
+  { min: 66,  max: 75,  name: 'Larghetto' },
+  { min: 76,  max: 107, name: 'Andante' },
+  { min: 108, max: 119, name: 'Moderato' },
+  { min: 120, max: 155, name: 'Allegro' },
+  { min: 156, max: 175, name: 'Vivace' },
+  { min: 176, max: 199, name: 'Presto' },
+  { min: 200, max: 240, name: 'Prestissimo' },
+];
+
+function getTempoName(bpm: number) {
+  return TEMPO_NAMES.find((t) => bpm >= t.min && bpm <= t.max)?.name ?? 'Moderato';
+}
+
+export const RhythmMetronome: React.FC = () => {
+  const [bpm, setBpm] = useState<number>(100);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [currentBeat, setCurrentBeat] = useState<number>(1);
+  const [beatsPerMeasure, setBeatsPerMeasure] = useState<number>(4);
+  const [pendulumAngle, setPendulumAngle] = useState<number>(-30);
+  const [flashBeat, setFlashBeat] = useState<boolean>(false);
+  const [accent, setAccent] = useState<boolean>(false); // true = downbeat flash
+
+  const tapTimesRef = useRef<number[]>([]);
+  const timerRef = useRef<number | null>(null);
+  const pendulumAnimRef = useRef<number | null>(null);
+  const pendulumStartRef = useRef<number | null>(null);
+  const pendulumFromRef = useRef<number>(-30);
+  const pendulumToRef = useRef<number>(30);
+
+  // Eased pendulum swing between two angles
+  const animatePendulum = useCallback((timestamp: number) => {
+    if (!pendulumStartRef.current) pendulumStartRef.current = timestamp;
+    const intervalMs = (60 / bpm) * 1000;
+    const elapsed = timestamp - pendulumStartRef.current;
+    const progress = Math.min(elapsed / intervalMs, 1);
+    // Ease in-out sine for natural swing
+    const eased = 0.5 - 0.5 * Math.cos(progress * Math.PI);
+    const from = pendulumFromRef.current;
+    const to = pendulumToRef.current;
+    setPendulumAngle(from + (to - from) * eased);
+
+    if (progress < 1) {
+      pendulumAnimRef.current = requestAnimationFrame(animatePendulum);
+    }
+  }, [bpm]);
+
+  const triggerBeat = useCallback((isDownbeat: boolean) => {
+    soundEngine.playClick(isDownbeat);
+    setFlashBeat(true);
+    setAccent(isDownbeat);
+    setTimeout(() => setFlashBeat(false), 120);
+
+    // Swap pendulum direction & animate
+    const fromVal = pendulumFromRef.current;
+    const toVal = pendulumToRef.current;
+    if (fromVal != null && toVal != null) {
+      pendulumFromRef.current = toVal;
+      pendulumToRef.current = fromVal;
+    }
+    pendulumStartRef.current = null;
+    if (pendulumAnimRef.current) cancelAnimationFrame(pendulumAnimRef.current);
+    pendulumAnimRef.current = requestAnimationFrame(animatePendulum);
+  }, [animatePendulum]);
+
+  useEffect(() => {
+    if (isPlaying) {
+      let beat = 1;
+
+      // Fire immediately on start
+      triggerBeat(beat === 1);
+      setCurrentBeat(beat);
+
+      const intervalMs = (60 / bpm) * 1000;
+      timerRef.current = window.setInterval(() => {
+        beat = (beat % beatsPerMeasure) + 1;
+        setCurrentBeat(beat);
+        triggerBeat(beat === 1);
+      }, intervalMs);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (pendulumAnimRef.current) cancelAnimationFrame(pendulumAnimRef.current);
+      setPendulumAngle(-30);
+      setCurrentBeat(1);
+    }
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (pendulumAnimRef.current) cancelAnimationFrame(pendulumAnimRef.current);
+    };
+  }, [isPlaying, bpm, beatsPerMeasure]);
+
+  const handleTapTempo = () => {
+    const now = performance.now();
+    const times = [...tapTimesRef.current, now].slice(-6);
+    tapTimesRef.current = times;
+
+    if (times.length > 1) {
+      const intervals: number[] = [];
+      for (let i = 1; i < times.length; i++) {
+        const current = times[i];
+        const previous = times[i - 1];
+        if (current != null && previous != null) {
+          intervals.push(current - previous);
+        }
+      }
+      const avgMs = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+      const calculated = Math.round(60000 / avgMs);
+      if (calculated >= 40 && calculated <= 240) {
+        setBpm(calculated);
+      }
+    }
+    soundEngine.playClick(false);
+  };
+
+  const tempoName = getTempoName(bpm);
+  const swingDuration = ((60 / bpm) * 1000).toFixed(0);
+
+  // Weight position on pendulum rod: higher BPM = weight closer to pivot
+  // Range: 40bpm → weight at 85% down, 220bpm → weight at 20% down
+  const weightPos: number = 85 - ((bpm - 40) / 180) * 65; // 20-85%
+
+  return (
+    <div className="glass-card flex flex-col gap-3.5 p-4 max-[720px]:p-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <span className="section-badge inline-flex items-center gap-1.5">
+            <Icon name="clock" /> Rhythm & Pulse
+          </span>
+          <h2 className="mt-2 mb-1">Visual Metronome</h2>
+          <p className="max-w-[60ch] leading-[1.6] text-ink-soft">
+            Practice time-keeping with an animated pendulum, beat flash, and tap tempo.
+          </p>
+        </div>
+        <button
+          className={`btn ${isPlaying ? 'btn-danger' : 'btn-primary'}`}
+          data-tip={
+            isPlaying
+              ? 'Stop the click and settle the pendulum'
+              : `Start clicking at ${bpm} BPM`
+          }
+          onClick={() => setIsPlaying(!isPlaying)}
+          id="metronome-play-btn"
+        >
+          {isPlaying ? (
+            <>
+              <Icon name="stop" /> Stop
+            </>
+          ) : (
+            <>
+              <Icon name="play" /> Start
+            </>
+          )}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-[280px_1fr] items-start gap-12 max-[700px]:grid-cols-1">
+
+        {/* ── LEFT: Animated Pendulum Figure ── */}
+        <div
+          className={`relative flex flex-col items-center transition-[filter] duration-100 ${
+            flashBeat
+              ? accent
+                ? '[filter:drop-shadow(0_0_28px_var(--accent-highlight))]'
+                : '[filter:drop-shadow(0_0_20px_var(--accent-primary))]'
+              : ''
+          }`}
+        >
+          <svg
+            className="metronome-svg"
+            viewBox="0 0 200 340"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Cabinet Body */}
+            <defs>
+              <linearGradient id="woodGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%"   stopColor="#3d2b1f" />
+                <stop offset="40%"  stopColor="#6b3f28" />
+                <stop offset="70%"  stopColor="#4a2e1a" />
+                <stop offset="100%" stopColor="#2e1a0e" />
+              </linearGradient>
+              <linearGradient id="faceGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="#241a12" />
+                <stop offset="100%" stopColor="#14100c" />
+              </linearGradient>
+            </defs>
+
+            {/* Cabinet outer shape (trapezoid) */}
+            <polygon
+              points="30,320 170,320 155,60 45,60"
+              fill="url(#woodGrad)"
+              stroke="rgba(255,255,255,0.1)"
+              strokeWidth="1"
+            />
+            {/* Cabinet face (inner panel) */}
+            <polygon
+              points="45,310 155,310 143,72 57,72"
+              fill="url(#faceGrad)"
+            />
+            {/* Top cap */}
+            <polygon points="45,60 155,60 145,45 55,45" fill="#4a2e1a" />
+            <polygon points="55,45 145,45 140,38 60,38" fill="#6b3f28" />
+
+            {/* Tick scale marks on face */}
+            {Array.from({ length: 9 }).map((_, i) => {
+              const y = 85 + i * 24;
+              const halfW = 28 - i * 1.5;
+              return (
+                <line
+                  key={i}
+                  x1={100 - halfW} y1={y}
+                  x2={100 + halfW} y2={y}
+                  stroke="rgba(255,255,255,0.12)"
+                  strokeWidth={i === 4 ? '1.5' : '0.8'}
+                />
+              );
+            })}
+
+            {/* BPM number on face */}
+            <text
+              x="100" y="280"
+              textAnchor="middle"
+              fontSize="28"
+              fontWeight="700"
+              fontFamily="'Space Grotesk', monospace"
+              fill={accent && flashBeat ? '#86b06b' : '#f6efe4'}
+              className="metro-bpm-svg"
+            >
+              {bpm ?? 0}
+            </text>
+            <text
+              x="100" y="296"
+              textAnchor="middle"
+              fontSize="10"
+              fontFamily="'Outfit', sans-serif"
+              fill="rgba(255,255,255,0.4)"
+              letterSpacing="2"
+            >
+              BPM
+            </text>
+
+            {/* Pivot point */}
+            <circle cx="100" cy="75" r="4" fill="#aaa" />
+
+            {/* Pendulum arm — rotates around pivot (100, 75) */}
+            <g
+              className="pendulum-arm-group"
+              style={{
+                transform: `rotate(${pendulumAngle}deg)`,
+                transformOrigin: '100px 75px',
+                transition: isPlaying ? 'none' : 'transform 0.4s ease',
+              }}
+            >
+              {/* Rod */}
+              <line
+                x1="100" y1="75"
+                x2="100" y2="295"
+                stroke="#c0a882"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+              {/* Sliding weight diamond — position based on BPM */}
+              <rect
+                x="86"
+                y={75 + ((weightPos / 100) * 220 - 12)}
+                width="28"
+                height="24"
+                rx="4"
+                fill={accent && flashBeat ? '#86b06b' : '#e8c07d'}
+                stroke="#fff"
+                strokeWidth="1"
+                className="metro-weight"
+              />
+              {/* Weight notch */}
+              <line
+                x1="86"
+                y1={75 + (weightPos / 100) * 220}
+                x2="114"
+                y2={75 + (weightPos / 100) * 220}
+                stroke="rgba(0,0,0,0.3)"
+                strokeWidth="1.5"
+              />
+              {/* Bob at bottom */}
+              <polygon
+                points={`100,${295 - 6} 90,${295 + 14} 110,${295 + 14}`}
+                fill="#c0a882"
+              />
+            </g>
+          </svg>
+
+          {/* Glow pulse ring under metronome */}
+          <div className={`metro-pulse-ring ${flashBeat ? (accent ? 'ring-accent' : 'ring-beat') : ''}`} />
+        </div>
+
+        {/* ── RIGHT: Controls ── */}
+        <div className="flex flex-col gap-7">
+
+          {/* Beat dots */}
+          <div className="grid grid-cols-7 gap-2">
+            {Array.from({ length: beatsPerMeasure }).map((_, i) => {
+              const beatNum = (i + 1) || 1;
+              const isActive = isPlaying && currentBeat === beatNum;
+              // The four states mirror the stylesheet's cascade: the downbeat+active
+              // combination keeps the pale-brass glow it always had.
+              const state = isActive
+                ? beatNum === 1
+                  ? 'scale-115 border-highlight bg-highlight shadow-[0_0_24px_rgba(var(--highlight-rgb),0.7)]'
+                  : 'scale-115 border-accent bg-accent text-[color:var(--bg-primary)] shadow-[0_0_0_3px_rgba(var(--accent-rgb),0.25)]'
+                : beatNum === 1
+                  ? 'border-[rgb(var(--accent-2-rgb))] bg-[rgba(var(--accent-2-rgb),0.18)] text-[rgb(var(--accent-2-rgb))]'
+                  : 'border-[rgba(var(--overlay-rgb),0.14)] bg-[rgba(var(--inset-rgb),0.24)] text-ink-muted';
+              return (
+                <div
+                  key={beatNum}
+                  className={`relative flex h-[46px] w-[52px] flex-col items-center justify-center rounded-xl border text-center text-[0.7rem] font-semibold transition-[background-color,border-color,color] duration-[120ms] ${state}`}
+                  data-tip={
+                    beatNum === 1
+                      ? `Beat 1 — the downbeat, accented (beat ${beatNum} of ${beatsPerMeasure})`
+                      : `Beat ${beatNum} of ${beatsPerMeasure}`
+                  }
+                >
+                  <span
+                    className={`text-[15px] font-bold leading-none ${
+                      beatNum === 1 ? 'text-[rgb(var(--accent-2-rgb))]' : 'text-ink'
+                    }`}
+                  >
+                    {beatNum}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* BPM display + slider */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-baseline gap-2.5">
+              <span className="font-[family-name:Georgia,serif] text-[2.1rem] font-bold leading-none text-accent">
+                {bpm}
+              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[0.7rem] uppercase tracking-[0.08em] text-ink-muted">
+                  BPM
+                </span>
+                <span className="text-[0.82rem] text-ink-soft">{tempoName}</span>
+              </div>
+            </div>
+
+            <input
+              type="range"
+              min="40" max="220" step="1"
+              value={bpm}
+              className="bpm-slider w-[150px] accent-[var(--accent-primary)] max-[720px]:w-full"
+              title="Drag to set the tempo (40–220 BPM)"
+              // CSS custom properties are not part of React's CSSProperties type.
+              style={{ '--v': bpm } as unknown as React.CSSProperties}
+              onChange={(e) => setBpm(Number(e.target.value))}
+              id="bpm-slider"
+            />
+
+            <div className="flex w-full items-center justify-between gap-1.5 text-[0.78rem] text-ink-muted max-[720px]:justify-between max-[720px]:w-full">
+              <span>40</span>
+              <span>Slow ←→ Fast</span>
+              <span>220</span>
+            </div>
+          </div>
+
+          {/* Quick BPM presets */}
+          <div className="flex flex-wrap gap-2 max-[720px]:justify-center">
+            {[60, 80, 100, 120, 140, 160].map((t) => (
+              <button
+                key={t}
+                className={`cursor-pointer rounded-full border px-3 py-1.5 text-[0.82rem] transition-[background-color,border-color,color] duration-150 hover:border-[rgba(var(--accent-primary),0.5)] hover:bg-[rgba(var(--accent-rgb),0.1)] hover:text-accent ${
+                  bpm === t
+                    ? 'border-accent bg-accent text-[color:var(--bg-primary)] shadow-[0_0_12px_rgba(var(--accent-rgb),0.3)]'
+                    : 'border-[rgba(var(--overlay-rgb),0.16)] bg-[rgba(var(--inset-rgb),0.22)] text-ink'
+                }`}
+                data-tip={`Jump to ${t} BPM (${getTempoName(t)})`}
+                onClick={() => setBpm(t)}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          {/* Time signature + tap */}
+          <div className="flex flex-wrap items-center gap-3.5 max-[720px]:justify-center">
+            <div className="flex items-center gap-2.5 rounded-xl border border-[rgba(var(--overlay-rgb),0.14)] bg-[rgba(var(--inset-rgb),0.22)] px-3 py-2">
+              <label className="text-[0.72rem] uppercase tracking-[0.08em] text-ink-muted">
+                Time Signature
+              </label>
+              <select
+                className="select-input text-[0.9rem]"
+                value={beatsPerMeasure}
+                title="Beats per measure — how many clicks before the pattern repeats"
+                onChange={(e) => { setBeatsPerMeasure(Number(e.target.value)); setCurrentBeat(1); }}
+                id="time-signature-select"
+              >
+                <option value={2}>2 / 4</option>
+                <option value={3}>3 / 4</option>
+                <option value={4}>4 / 4</option>
+                <option value={6}>6 / 8</option>
+                <option value={5}>5 / 4</option>
+                <option value={7}>7 / 8</option>
+                <option value={1}>1 / 8</option>
+              </select>
+            </div>
+
+            <button
+              className="cursor-pointer select-none rounded-2xl border-2 border-copper bg-[rgba(var(--accent-2-rgb),0.12)] px-7 py-3.5 text-[0.9rem] font-bold tracking-[0.5px] text-copper transition-all duration-[120ms] hover:scale-[1.02] hover:bg-[rgba(var(--accent-2-rgb),0.25)] active:scale-[0.97] active:bg-[rgba(var(--accent-2-rgb),0.4)] active:shadow-[0_0_20px_rgba(var(--accent-2-rgb),0.5)]"
+              data-tip="Tap this in time — the tempo follows your last six taps"
+              onPointerDown={handleTapTempo}
+              id="tap-tempo-btn"
+            >
+              <Icon name="tap" /> Tap Tempo
+            </button>
+          </div>
+
+          {/* Live interval info */}
+          <div className="mb-5 flex flex-col gap-2.5 text-[0.82rem] text-ink-muted">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(var(--overlay-rgb),0.12)] bg-[rgba(var(--inset-rgb),0.24)] px-2.5 py-1 text-[13px] font-medium text-ink-soft">
+              <Icon name="zap" /> {swingDuration}ms / beat
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(var(--overlay-rgb),0.12)] bg-[rgba(var(--inset-rgb),0.24)] px-2.5 py-1 text-[13px] font-medium text-ink-soft">
+              <Icon name="notes" /> {tempoName}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(var(--overlay-rgb),0.12)] bg-[rgba(var(--inset-rgb),0.24)] px-2.5 py-1 text-[13px] font-medium text-ink-soft">
+              <Icon name="clock" /> {beatsPerMeasure}/4&#8201;&#8212;&#8201;{beatsPerMeasure === 1 ? '1' : beatsPerMeasure}/8
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
