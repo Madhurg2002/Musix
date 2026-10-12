@@ -138,6 +138,7 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
           activeChord={context.activeChord}
           activeScaleNotes={context.activeScaleNotes}
           rootNote={context.selectedRoot}
+          context={context}
         />
       </>
     ),
@@ -154,10 +155,15 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
           selectedRoot={context.selectedRoot}
           onRootChange={context.setSelectedRoot}
           onScaleNotesChange={context.setActiveScaleNotes}
+          context={context}
         />
         <div className="dual-visualizers-grid">
           {context.visualizer === 'guitar' ? (
-            <GuitarFretboard activeScaleNotes={context.activeScaleNotes} rootNote={context.selectedRoot} />
+            <GuitarFretboard
+              activeScaleNotes={context.activeScaleNotes}
+              rootNote={context.selectedRoot}
+              context={context}
+            />
           ) : (
             <PianoKeyboard activeNotes={context.activeScaleNotes} rootNote={context.selectedRoot} />
           )}
@@ -171,7 +177,7 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     group: 'Fretboard',
     label: 'Intervals',
     instrument: 'piano',
-    render: () => <IntervalExplorer />,
+    render: (context) => <IntervalExplorer context={context} />,
   },
   {
     id: 'workbench',

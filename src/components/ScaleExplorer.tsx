@@ -5,6 +5,8 @@ import { ALL_NOTES, transposeNote, NOTE_COLORS, midiToFrequency } from '../utils
 import { soundEngine } from '../utils/audio';
 import { PREFERENCE_KEYS, isOneOf, readPreference, writePreference } from '../utils/preferences';
 import { Icon } from './Icon';
+import { KeyChipRow } from './KeyChipRow';
+import { type ScreenContext } from '../routes';
 
 // Validating against the real scale ids means a saved scale that no longer exists (or a
 // hand-edited value) falls back to Major instead of rendering an empty selector.
@@ -22,12 +24,14 @@ interface ScaleExplorerProps {
   selectedRoot: NoteName;
   onRootChange: (root: NoteName) => void;
   onScaleNotesChange?: (notes: NoteName[]) => void;
+  context?: ScreenContext;
 }
 
 export const ScaleExplorer: React.FC<ScaleExplorerProps> = ({
   selectedRoot,
   onRootChange,
   onScaleNotesChange,
+  context,
 }) => {
   const [selectedScaleId, setSelectedScaleId] = useState<string>(() =>
     readPreference(PREFERENCE_KEYS.scaleId, SCALE_IDS[0] ?? 'major', isScaleId)
@@ -149,6 +153,12 @@ export const ScaleExplorer: React.FC<ScaleExplorerProps> = ({
           </div>
         ))}
       </div>
+
+      {context && (
+        <div className="flex flex-wrap items-center gap-4 pt-1">
+          <KeyChipRow context={context} />
+        </div>
+      )}
     </div>
   );
 };
