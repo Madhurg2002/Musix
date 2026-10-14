@@ -1,0 +1,109 @@
+{
+  "chords": [
+    {
+      "id": "maj-triad",
+      "name": "Major Triad",
+      "formula": ["1", "3", "5"],
+      "semitones": [0, 4, 7],
+      "stack": ["M3", "m3"],
+      "quality": "major",
+      "diatonicInMajor": "I",
+      "diatonicInMinor": "i (with raised 3rd in harmonic/melodic minor context)"
+    },
+    {
+      "id": "min-triad",
+      "name": "Minor Triad",
+      "formula": ["1", "b3", "5"],
+      "semitones": [0, 3, 7],
+      "stack": ["m3", "M3"],
+      "quality": "minor",
+      "diatonicInMajor": "vi, ii, iii",
+      "diatonicInMinor": "i"
+    },
+    {
+      "id": "dim-triad",
+      "name": "Diminished Triad",
+      "formula": ["1", "b3", "b5"],
+      "semitones": [0, 3, 6],
+      "stack": ["m3", "m3"],
+      "quality": "diminished",
+      "diatonicInMajor": "vii°",
+      "diatonicInMinor": "vii° (harmonic minor)"
+    },
+    {
+      "id": "aug-triad",
+      "name": "Augmented Triad",
+      "formula": ["1", "3", "#5"],
+      "semitones": [0, 4, 8],
+      "stack": ["M3", "M3"],
+      "quality": "augmented",
+      "diatonicInMajor": "not diatonic",
+      "diatonicInMinor": "not diatonic"
+    },
+    {
+      "id": "maj7",
+      "name": "Major Seventh Chord",
+      "formula": ["1", "3", "5", "7"],
+      "semitones": [0, 4, 7, 11],
+      "stack": ["M3", "m3", "M3"],
+      "quality": "major",
+      "diatonicInMajor": "Imaj7, IVmaj7",
+      "diatonicInMinor": "not diatonic as major 7"
+    },
+    {
+      "id": "dom7",
+      "name": "Dominant Seventh Chord",
+      "formula": ["1", "3", "5", "b7"],
+      "semitones": [0, 4, 7, 10],
+      "stack": ["M3", "m3", "m3"],
+      "quality": "dominant",
+      "diatonicInMajor": "V7",
+      "diatonicInMinor": "V7 (harmonic minor)"
+    },
+    {
+      "id": "min7",
+      "name": "Minor Seventh Chord",
+      "formula": ["1", "b3", "5", "b7"],
+      "semitones": [0, 3, 7, 10],
+      "stack": ["m3", "M3", "m3"],
+      "quality": "minor",
+      "diatonicInMajor": "ii7, iii7, vi7",
+      "diatonicInMinor": "i7 (if natural minor 7th)"
+    },
+    {
+      "id": "mMaj7",
+      "name": "Minor Major Seventh Chord",
+      "formula": ["1", "b3", "5", "7"],
+      "semitones": [0, 3, 7, 11],
+      "stack": ["m3", "M3", "M3"],
+      "quality": "minor",
+      "diatonicInMajor": "not diatonic",
+      "diatonicInMinor": "i maj7 (melodic/harmonic minor context)"
+    },
+    {
+      "id": "dim7",
+      "name": "Diminished Seventh Chord",
+      "formula": ["1", "b3", "b5", "bb7"],
+      "semitones": [0, 3, 6, 9],
+      "stack": ["m3", "m3", "m3"],
+      "quality": "diminished",
+      "diatonicInMajor": "not diatonic",
+      "diatonicInMinor": "vii°7 (harmonic minor)"
+    },
+    {
+      "id": "half-dim7",
+      "name": "Half-Diminished Seventh Chord",
+      "formula": ["1", "b3", "b5", "b7"],
+      "semitones": [0, 3, 6, 10],
+      "stack": ["m3", "m3", "M3"],
+      "quality": "half-diminished",
+      "diatonicInMajor": "viiø7 not diatonic in major; iiø7 in minor",
+      "diatonicInMinor": "iiø7 (harmonic minor, as vii of iv)"
+    }
+  ],
+  "notes": {
+    "diatonicStackingLogic": "Chords are built by stacking thirds on a root using scale degrees 1, 3, 5, 7... Each successive note moves by a letter name. Accidentals indicate alterations relative to the diatonic expectation of the parent scale or key.",
+    "extensionLogic": "Extensions continue the third-stack: 9 = an additional third above 7, 11 above 9, 13 above 11. In practice, extensions are often voiced selectively and brought into playable range by octave displacement.",
+    "alterationLogic": "Altered chords modify upper extensions from the diatonic expectation: b9, #9, b5/#11, b13. Altered dominants typically imply heightened tension and strong resolution."
+  }
+}
