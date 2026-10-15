@@ -1,0 +1,402 @@
+# Musix — Reimagining Plan & Follow-ups
+
+Status legend: `[x]` done and committed · `[ ]` planned · `[~]` in progress
+
+## Documentation sync policy
+
+Do **not** rewrite every doc on every change. The rule from here on:
+
+- `docs/PLAN.md` (this file) is the only doc updated on every run.
+- The rest are refreshed in batches, and the batch is recorded below.
+- Anything a reader of the other docs would get *wrong* is listed under "Deferred doc
+  edits" so it can be swept up in the next batch rather than forgotten.
+
+| Batch | Commits | Docs refreshed |
+| --- | --- | --- |
+| 1 | `6073dfb` | `CAPABILITIES.md`, `COMPONENTS.md` (Song Follower) |
+| 2 | `f919b4f`, `84ca95f` | `ARCHITECTURE.md`, `COMPONENTS.md`, `DEVELOPMENT.md`, `BUGS.md`, `README.md`, `README-docs.md`, docs index |
+| 3 | `938fd47`, `c5ce232`, `07483ff`, `975ae19` | **this file only** |
+| 4 | `93d7acc`, `42398c9`, `de04710`, `22954b4`, `d6dcf4a` | `CAPABILITIES.md` (tooltips), `CONTRIBUTING.md` (new), this file |
+| 5 | `bebfafe`, `5decd5d`, `9e45dc2`, `cc5ef5a` | this file only (Tailwind migration starts) |
+| 6 | `b958f41` + this run | `COMPONENTS.md` (tuner + `useLivePitch` sections, index.html, musicTheory table), `CAPABILITIES.md` (tuner technical, stylesheet-once, Song-Follower gap), `BUGS.md` (F6/F7/D2/D3 closed, P2 narrowed), this file |
+| 7 | `233d2d5` follow-up (this run) | `BUGS.md` (A5 added, test counts), this file |
+| 8 | multi-instrument tuner (this run) | `COMPONENTS.md` (tuner + new `tunings.ts` section), `CAPABILITIES.md` (tuner), this file |
+
+### Deferred doc edits (sweep up in the next batch)
+
+`docs/CAPABILITIES.md`, `docs/COMPONENTS.md`, and `docs/DEVELOPMENT.md` do not yet mention:
+
+- `bun run typecheck` / `bun run test` scripts and the pinned `typescript` devDependency.
+- The CI workflow at `.github/workflows/ci.yml`.
+- `src/utils/preferences.ts` and the fact that the key, instrument, visualizer, scale, and
+  song now persist.
+- `public/metronome.js` being gone, the helper aliases being collapsed into `noteNameAt` /
+  `stringInfoAt`, and `detectPitch` now living only in `musicTheory.ts`.
+- `src/utils/preferences.test.ts`, `src/utils/chordVoicing.test.ts`, and
+  `src/utils/tunings.test.ts` (test counts are now 168 across 11 files).
+- The live note finder (`src/utils/useLivePitch.ts`, `fretPositionsForMidi`), the Song
+  Follower's print stylesheet and button, its mic follow-along, the rail active-state fix,
+  the final de-emoji pass, and the closed class-drift item.
+- `src/utils/chordVoicing.ts` — the chord studio's voicing maths moved out of the component,
+  and `findChord` was added to `chordsData.ts`.
+
+`docs/BUGS.md` has the statuses updated in the same sweep.
+
+Batch 6 (this run) swept the tuner rewrite's stale claims: `COMPONENTS.md` no longer
+advertises the tuner's deleted private detectors, its `index.html`/`musicTheory` sections
+match the code (fonts, single stylesheet import, collapsed aliases, `fretPositionsForMidi`),
+`CAPABILITIES.md` describes the shared `useLivePitch` path and the chord studio's cards as
+the remaining unpersisted state, and `BUGS.md` closed F6/F7/D2/D3 while narrowing P2 to
+the per-call buffers that still exist. Still owed: the scripts/CI/preferences mentions and
+the current test count (168 across 11 files).
+
+Batch 4 (this run) still owes the other docs:
+
+- The preference-cookie permission flow (`src/utils/consent.ts`, `src/utils/cookies.ts`,
+  `src/components/CookieConsent.tsx`, and the `title`/`data-tip` convention).
+- The stylesheet truncation regression, its guard (`src/style.test.ts`), and the test count
+  (114 across 8 files).
+- The issue forms, pull request template, and `CONTRIBUTING.md`.
+- The footer no longer links `robots.txt`, and `/LICENSE` is served from `public/LICENSE`.
+
+**Progress:** Phase 1 (design language), Phase 2 (shell), the user-selectable theme system,
+the repository bug audit (`docs/BUGS.md`), the mobile audio fixes, the Song Follower, the
+route table with lazy loading, the licence/contact work, the CI gate, the dead-code cleanup
+(Phase 4), preference persistence, and Phase 3 (screen-level craft plus the tooltip layer)
+are implemented, verified, and committed.
+
+One incident and its fix belong in the record: commit `5846cf8` replaced `src/style.css`
+with the Phase 3 fragment instead of appending to it, silently dropping 2,750 lines (type
+check and tests stayed green because nothing read the stylesheet). `93d7acc` restored it,
+and `42398c9` added `src/style.test.ts`, which fails the build if the sheet is ever
+truncated again.
+
+## The reimagining in one line
+
+Turn Musix from a **neon cyber dashboard** (glassmorphism, cyan/purple glows, 8 tabs crammed
+into a top bar) into a **warm analog studio**: an instrument-craft visual language, a
+navigation rail that gives the tools room, and a learning flow a beginner can follow.
+
+## Why change it
+
+The current build works, but it reads as generic:
+
+1. **Generic palette.** Cyan + purple on near-black is the default "tech product" look and
+   says nothing about music or instruments.
+2. **Crowded navigation.** Eight labelled tabs plus a sound selector and a visualizer toggle
+   compete in one horizontal strip that wraps on smaller screens.
+3. **Flat hierarchy.** The hero, the tools, and the chrome all sit at similar visual weight,
+   so there is no obvious "start here".
+4. **Emoji as iconography.** Emoji are inconsistent across platforms and undermine the
+   craft feel.
+5. **Inconsistent accents.** Component-level hardcoded colors (metronome cyan, tuner green,
+   `#00a8ff` gradients) drift from the token palette.
+
+## Design direction: "Analog Studio"
+
+A warm, tactile identity drawn from instruments and studio hardware.
+
+| Token | Old | New | Role |
+| --- | --- | --- | --- |
+| canvas | `#0a0d14` | `#0f0c0a` | Page background (deep espresso) |
+| surface | `#121824` | `#171310` | Raised panels |
+| card | `rgba(20,28,44,.7)` | `rgba(28,22,18,.78)` | Glass panels |
+| border | `rgba(255,255,255,.1)` | `rgba(232,200,150,.14)` | Warm hairline |
+| accent primary | `#00f0ff` | `#e0a458` | Brass / amber |
+| accent secondary | `#9d4edd` | `#b8672f` | Copper |
+| accent tertiary | `#ff2a85` | `#c9552f` | Terracotta |
+| accent highlight | `#ffb703` | `#e8c07d` | Pale brass |
+| success | `#00f5d4` | `#86b06b` | Sage / olive |
+| alert | `#ff4d4d` | `#e06c5a` | Warm red |
+| text primary | `#f8fafc` | `#f6efe4` | Cream |
+| text secondary | `#94a3b8` | `#b8a894` | Warm gray |
+| text muted | `#64748b` | `#8c7d6c` | Muted warm gray |
+
+Rules that keep it coherent:
+
+- **No neon glow.** Replace glow shadows with warm, low-opacity elevation.
+- **Warm, low-saturation surfaces** with a paper-cream text ramp.
+- **Brass is the single accent**; copper/terracotta are supporting, sage means "in tune".
+- **Note colors stay as-is.** `NOTE_COLORS` in `src/utils/musicTheory.ts` is asserted by the
+  test suite (`#FF5733`, `#FF8D33`, `#E74C3C`), and it is functional data, not decoration.
+- **Keep the static, browser-only architecture.** This is a redesign, not a rewrite.
+
+## Phases
+
+### Phase 1 — Design language (theme + tokens) — done
+
+- [x] Replace the `:root` token block with the Analog Studio palette and add tokens for
+      radii, elevation, motion, and focus rings.
+- [x] Remap every hardcoded legacy accent in `src/style.css` (33 × `rgba(0,240,255,…)`,
+      10 × `rgba(157,78,221,…)`, `#00a8ff`, `#00f5d4`, `#ffb703`, `#ff2a85`, …) to the new
+      palette so no neon remains. (Re-verified during the rail cleanup: the only neon left
+      is the Arcade theme's own tokens, which is by design.)
+- [x] Replace glow-based shadows with warm elevation; add visible `:focus-visible` rings.
+- [x] De-neon the inline component colors (metronome `#00f5d4`, tuner arc colors).
+
+**Verify:** `bunx tsc -b --noEmit`, `bun test`, preview renders on every tab with no leftover
+cyan/purple.
+
+### Phase 2 — Shell reimagining (navigation + hero) — done
+
+- [x] Replace the crowded top tab bar with a **left navigation rail** (desktop) that collapses
+      to an icon-free, horizontally scrollable bar on small screens.
+- [x] Add a **top bar** that owns the sound/instrument control and the visualizer toggle,
+      freeing the nav.
+- [x] Redesign the hero: a real headline, one sentence of orientation, and a clear primary
+      action, with the key selector as a secondary control.
+- [x] Give each screen a consistent header pattern (eyebrow, title, one-line purpose).
+
+**Verify:** all 8 tabs reachable, hash routing and back/forward still work, instrument lock
+still follows tabs, responsive at ≤720px.
+
+### Cross-cutting — shipped alongside the phases
+
+- [x] **Bug audit** (`docs/BUGS.md`) — systematic pass using the compiler's unused-code
+      checks as a probe, plus manual review of logic, config, data, and accessibility.
+- [x] **Mobile audio** — one-shot pointer/touch/key unlock plus a `visibilitychange` resume,
+      so iOS no longer plays nothing after the tab is backgrounded.
+- [x] **Instrument-specific sounds everywhere** — Auto mode no longer pins a concrete voice,
+      so per-tool overrides win again (the piano keys on Scales used to play guitar).
+- [x] **Selectable themes** — four palettes behind channel tokens, chosen in the rail and
+      remembered across reloads.
+- [x] **Song Follower** — paste a chord chart and follow it chord by chord, with tempo,
+      beats-per-chord, transpose, and sound on/off. Parser is pure and unit tested.
+- [x] **Route table + lazy loading** — one `ROUTES` entry per screen drives the rail, the
+      title, the deep link, and the Auto-mode instrument; each screen is a separate chunk.
+- [x] **Licence, robots, and contact** — MIT `LICENSE`, `public/robots.txt`, a Contact screen,
+      and a footer that links to both.
+- [x] **`.gitignore` reconciled** — the tracked-but-ignored paths were untracked or
+      un-ignored, and the stale build cache was purged.
+- [~] **Tailwind.** Previously declined ("if not using already"), then explicitly requested
+  as a complete migration, so it is now work in progress rather than a no. The approach:
+  Tailwind v4 through `@tailwindcss/vite` with **preflight off**, so the existing look does
+  not change while markup moves over; design tokens stay in `:root` and are exposed to
+  Tailwind as theme colours so the four themes keep working; screens migrate one commit at
+  a time, and `src/style.test.ts` guards the stylesheet until each layer has moved.
+
+  Done so far: setup (`5decd5d` — layer order declared so `utilities` beats `components`,
+  whole sheet wrapped in `@layer components`, tints exposed as `--color-*`), footer
+  (`9e45dc2`), top bar (`cc5ef5a`), the screen hero + key chips (`4e2f6f2`), and the
+  navigation rail — so the whole shell is utilities now. Each area's rules are deleted from
+  `src/style.css` when its markup moves, and the guard test marker is swapped to a rule that
+  still exists.
+
+  Remaining, in order: Chord Studio, Song Follower, Fretboard, Scales, Intervals, Tuner,
+  Metronome, Piano, Guide, Contact — and finally the leftovers utilities do not reach (SVG
+  internals, fretboard grid, keyframes, print), which stay as CSS.
+
+### Phase 3 — Screen-level craft
+
+- [ ] Chord Studio: clearer card hierarchy, obvious add/compare affordances, better empty state.
+- [ ] Fretboard + Piano: shared visual language, legible legend, consistent note badges.
+- [~] Tuner: the in-tune state and the meter shipped in the mic rewrite (below) — the
+      badge no longer fires on silence, cents measure against the matched string's real
+      pitch, and the arc ticks stop being masked into the wrong quadrant. A warmer gauge
+      skin is still open if a visual pass is wanted.
+- [ ] Metronome: unify the pendulum and controls on one grid.
+- [ ] Scales/Intervals: tighten the degree/card readouts.
+
+**Verify:** each screen checked in the preview, then committed on its own.
+
+### Phase 4 — Consistency, accessibility, and hardening — partly done
+
+- [~] Full pass for `:focus-visible`, keyboard reachability, and `aria-*` on toggles.
+      (Focus rings and `aria-pressed` on the toggles are in; the emoji sweep below is not.)
+- [ ] Remove emoji-as-iconography in favour of a small, consistent inline icon set.
+- [x] Delete or reconcile dead code: the three duplicate pitch detectors collapsed into one
+      exported `detectPitch`, the overlapping helper aliases collapsed into `noteNameAt` /
+      `stringInfoAt`, and the comment-only `public/metronome.js` stub deleted.
+- [x] Extend `bun test` coverage: 82 tests across 5 files (theory, chart parser, router,
+      route table, preferences), including synthetic-sine coverage for the pitch detector.
+- [x] Add a `test` script and a CI gate (`.github/workflows/ci.yml`) so both checks run on
+      every push and pull request.
+
+**Verify:** `bun test` green, `bun run typecheck` green, preview boots on every screen.
+
+## Commit strategy
+
+One commit per working change, pushed after verification:
+
+1. Docs set + typecheck/test repair.
+2. This plan.
+3. Phase 1 theme.
+4. Phase 2 shell.
+5. Bug audit fixes and `.gitignore` reconciliation.
+6. Selectable themes.
+7. Mobile audio and the per-tool instrument fix.
+8. Song Follower (parser + screen + tests).
+9. Song Follower docs.
+10. MIT licence and robots policy.
+11. Route table, lazy loading, Contact screen, and footer.
+12. The docs this invalidated.
+
+Each was verified with `bunx tsc -b --noEmit` and `bun test` (and a preview check) before
+being committed.
+
+Files that are pure build artefacts (`tsconfig.tsbuildinfo`) are intentionally left
+uncommitted to keep the history about source changes.
+
+## Follow-ups
+
+Ordered by value; none block the phases above.
+
+- [x] **Test the chord voicing logic** — `chordVoicing.ts` holds `getChordPosition`,
+      `fretWindow`, and `transposeChordShape` with 18 tests. Writing those tests surfaced and
+      fixed T3 (a transposed card drew and played its original shape), which is exactly the
+      failure the plan predicted the tests would catch.
+- [x] **Add a `test` script** — `bun run test` and `bun run typecheck`, with `typescript`
+      pinned as a devDependency (it was previously downloaded on demand by `bunx`).
+- [x] **Add CI** running the type check and the tests on every push and pull request.
+- [x] **De-duplicate pitch detection** — one exported `detectPitch` in `musicTheory.ts`, the
+      tuner imports it, and the synthetic-sine tests cover it.
+- [x] **Collapse helper aliases** — `noteNameAt` and `stringInfoAt` are the only survivors.
+- [x] **Fix the stale card comment** — the studio now resolves its starting cards by name
+      (`findOrCreateChord('B', 'Minor')`) instead of by array index, so the copy and the data
+      cannot drift again.
+- [x] **Persist learner state.** `src/utils/preferences.ts` remembers the key, instrument,
+      visualizer, scale, and the Song Follower's chart, tempo, beats-per-chord, transpose,
+      and sound setting. Remaining: the chord-studio cards themselves.
+- [x] **Finish de-emoji-ing the screens.** The rail and top bar went text-only first; this
+      run replaced the last emoji — the guide's 📚🎸🎹🎼 glyphs, the piano heading, and the
+      consent bar's ✓ — with `Icon` glyphs. Musical notation (♯ ♭ ♪ ✕) stays as text by
+      design (`src/components/Icon.tsx`).
+- [x] **Close the CSS/component class drift.** Verified closed: the named examples are gone
+      from the markup or keep a rule (`dual-visualizers-grid`), and a scan of every
+      `className` token — including classes inside template ternaries — finds no styled
+      class without a rule. The bare identifiers without one are element `id`s
+      (`bpm-slider`, `tap-tempo-btn`, `song-chart-input`), which never had styling.
+- [x] **Live note finder on the fretboard.** The screen listens through the mic
+      (`src/utils/useLivePitch.ts` on top of the shared `detectPitch`), names the note with
+      octave and cents, and lights up every (string, fret) that sounds it via the tested
+      `fretPositionsForMidi` — the inverse of `getFretMidi` — plus an open-string ring at
+      the nut. One detector still serves both the tuner and this screen.
+- [x] **Fix the left rail's active states.** Tailwind compiles same-family utilities in
+      alphabetical order, so the rail's base classes (`border-l-transparent`,
+      `text-ink-soft`, `bg-transparent`, `font-semibold`) always beat the conditional
+      active-state ones — the highlight bar, brighter label, and visualizer toggle never
+      showed. Active and inactive now pick mutually exclusive class strings, and the
+      wordmark gradient is guarded with `@supports` so browsers without
+      `background-clip: text` get solid text instead of a gradient rectangle.
+- [x] **Song Follower follow-along.** A **Play along** toggle listens through the mic
+      (reusing `useLivePitch`): a coaching strip names the pitch classes just played and
+      checks them against the chord under the playhead — green when they fit, a direct
+      correction (`The chart says Am (A · C · E) — you played F♯, which is not in it`)
+      when they do not. While the follower is paused, the highlight snaps to the chart
+      position that actually fits, so the follower works out where the learner is. The
+      matching maths (`chordPitchClasses`, `chordFitScore`, `findBestChartPosition`) is
+      pure and tested in `chordChart.test.ts`; the heard window is 2 s and a new position
+      must hold 1.2 s before the snap.
+- [x] **Resolve `public/metronome.js`** — deleted; the real metronome is the React
+      component.
+- [x] **Reconcile `.gitignore`** — the tracked-but-ignored paths were reconciled and the
+      stale `tsconfig.tsbuildinfo` was purged.
+- [x] **Align `tsconfig.json` include** with the real config filename.
+- [~] **Migrate to Tailwind.** Set up Tailwind v4 (preflight off) and move the markup off
+  hand-written classes screen by screen, keeping `src/style.css` for tokens, keyframes,
+  and the pieces utilities do not reach (SVG, fretboard grid, print). Each screen is its own
+  commit; the guard test keeps the sheet honest until the last layer moves. Progress: the
+  Contact screen moved to utilities and its `.contact-*` block was deleted; what remains in
+  the sheet are the deliberate carve-outs (fretboard neck grid, headstock/pendulum SVG
+  graphics, print re-theme) plus the shared systems (tooltips, consent bar, keyframes,
+  tokens).
+- [x] **Preference-cookie permission.** First-visit bar, writes held until allowed, refusal
+  clears everything, and `Cookie settings` in the footer reopens the choice. Cookies are
+  first-party, one per preference, with local-storage overflow for pasted charts.
+- [x] **Issue forms, PR template, `CONTRIBUTING.md`** — `.github/ISSUE_TEMPLATE/` (bug and
+  feature forms, blank issues off) plus `.github/PULL_REQUEST_TEMPLATE.md`.
+- [x] **Guard the stylesheet.** `src/style.test.ts` fails if `src/style.css` is truncated,
+  loses a layer marker, or ends up with unbalanced braces.- [x] **Decide on `package-lock.json`.** Decided: the project installs with bun, so a
+  stale npm lock next to `bun.lock` is drift. Deleted in its own commit and gitignored so
+  an accidental `npm install` cannot bring it back.
+- [~] **Accessibility audit.** Contrast: shipped — an audit in `src/style.test.ts` parses
+      the token blocks out of the sheet and asserts every theme's three text tiers at
+      WCAG AA (4.5:1) against both page backgrounds. It immediately caught Paper's and
+      Arcade's muted greys below the bar (3.69:1 / 3.73:1); they were retuned to `#7a6b58`
+      and `#7b8598`. Remaining: keyboard flows for the chord card drag-and-drop (which
+      currently has Alt+↑/↓ as the keyboard fallback).
+- [x] **Progressions.** Shipped earlier than the tick: `src/utils/progressions.ts`
+      resolves the named presets (I–V–vi–IV, ii–V–I, 12-bar blues) against any key with
+      tests — the box was simply left unticked when they landed.
+- [x] **Save a followed song.** The pasted chart and its practice settings persist, and a
+      **Share** button copies a `?song=…` link that opens the chart for whoever clicks it
+      (the URL cleans itself up after loading; charts whose encoded text would exceed a
+      URL get a clear "Too long to link" instead of a link that silently fails).
+- [x] **Render a PDF/page export of the follower.** A `Print chart` button calls
+      `window.print()`; `@media print` in `src/style.css` re-themes `.print-sheet` for paper
+      (near-black ink, no dark chrome, it runs past the scroll box and keeps each line
+      whole) and every piece of shell chrome hides with `print:hidden`.- [x] **Serve `LICENSE` from the built site.** `public/LICENSE` ships with the build, the
+  footer links to `/LICENSE`, and `/robots.txt` stays published but is no longer linked from
+  the footer — a crawler policy is not a button a learner needs.
+- [x] **Rail cleanup pass.** Four header bugs from a user report, all fixed: the wordmark
+  no longer uses `background-clip: text` at all (the gradient painted as a rectangle on
+  some browsers — now it is plain cream text next to the brass ♫); the rail hides its
+  internal scrollbar on desktop (`rail-scroll`, wheel and touch still scroll it, phones
+  keep the thumb because the rail is a chip strip there); the rail's `data-tip` tooltips
+  are gone; and Contact left the rail
+  (footer only, still routable via `#contact`, `railHidden` in the route table).
+  `html { overflow-x: clip }` also kills the window-level sideways scrollbar that stray
+  tooltip overhang used to create, and the fretboard's horizontal scroller got
+  `-webkit-overflow-scrolling: touch` for iOS momentum.
+- [x] **Drop the rail hint line.** The one-line hint under each rail label ("Follow a
+  chord chart", …) read as clutter beside the label itself, so the rail now shows labels
+  only. The `hint` field left the route table, its assertion left the router test, and the
+  docs that described it were updated.
+- [x] **Strip the rail's borders.** The entries drew full outlines because Tailwind's
+  `border-l-2` emits `border-style: solid` on every side, letting the browser's default
+  button border through on the other three (the same leak is why the footer toggles carry
+  `border-0`). The entries now zero the other three widths explicitly and keep only the
+  brass left rule on the active screen, and the rail itself no longer draws an outer edge.
+- [x] **Scales page declutter.** The `W - W - H …` "step pattern" box went the way of the
+  rail hints — the degree/semitone cards already carry that information per note. The
+  twelve-chip root picker became a standard key dropdown (matching the theme and
+  instrument pickers), and the scale picker is one dropdown grouped Scales then Modes
+  with clean option text; `NotePicker` stays on the interval explorer.
+- [x] **Fix the dead tuner microphone** (`b958f41`). The pitch loop never ran:
+  `hasLiveAudio` was captured at render time while the AudioContext/Analyser refs were
+  still null, so the first `updatePitch()` returned without scheduling a frame and the
+  meter sat at "--" forever. The tuner also kept a private copy of the mic plumbing (and
+  two alias detectors) that the rest of the app had long since shared through
+  `useLivePitch` — which is how the paths drifted apart. It now runs on the shared hook
+  (plus an insecure-origin guard where `navigator.mediaDevices` is missing): cents are
+  measured against the matched string's real pitch, the IN TUNE badge no longer shows on
+  silence, the arc ticks stop being masked into the wrong quadrant (`deg & 255` turned
+  −40 into 216), and the pegs sit in real headstock order. `useLivePitch` gained a
+  `frequency` field for all three mic consumers.
+- [x] **Close the theme-drift ink bugs.** Several controls hardcoded white or black text
+  that only worked on the default palette and went invisible on Sheet Paper (and other
+  themes): `.select-input` and `.btn-nano` drew white text on the overlay tint (a dark
+  wash on Paper), `.btn-primary` drew black text on Paper's dark brass (3.9:1), and
+  `.btn-danger` used a hardcoded red with white text (3.26:1) instead of the alert token.
+  All four now follow the page-background ink convention the chips already used
+  (`var(--bg-primary)` on accent fills, `var(--text-primary)` on tints),
+  `.btn-primary`'s gradient both stops ride the accent ramp (the hardcoded tan ended up
+  blue-to-tan on Nocturne), and the chord studio's `hover:text-white` icon buttons were
+  folded into the same convention. The note pills needed per-hue ink rather than one
+  dark colour — fixed in the next entry.
+- [x] **Finish the contrast verification on the accent fills** (this run). Measuring the
+  theme-drift fix against the real tokens surfaced what the audit could not yet see:
+  `.btn-accent` still carried `color: #fff` over its ramp (3.36:1 on Nocturne's violet),
+  `.btn-primary`'s new end stops missed AA on Nocturne (4.42:1) and Arcade (4.23:1),
+  Studio's terracotta stop sat at 4.48:1 under the page-background ink, and the pills'
+  uniform black ink fell to 2.03:1 on G♯'s indigo — white wins on exactly the three dark
+  hues and black on the nine bright ones, so every hue clears AA with the better of the
+  two. `.btn-accent` now uses the page-background ink like the other buttons, three
+  accent tokens were nudged within their hue (`--accent-secondary` on Nocturne/Arcade,
+  `--accent-tertiary` on Studio, RGB triplets kept in step), and the pills pick their ink
+  per hue through a new `inkOnNoteColor` in `musicTheory.ts`. The audit gained two guards
+  so this cannot silently regress: every theme's gradient-button stops are checked
+  against the page-background ink (and the rules are checked to still carry that ink),
+  and all twelve `NOTE_COLORS` hues are checked against the ink `inkOnNoteColor` picks.
+- [x] **Multi-instrument tuner** (this run). The screen was guitar-only with three
+  hand-typed presets. It now serves eleven tunings across four families — guitar
+  (Standard, Drop D, Half Step Down, Open G, DADGAD), bass (4- and 5-string), ukulele
+  (reentrant and Low-G), and violin standard — through one grouped picker, with the
+  headstock columns adapting to 4, 5, or 6 strings. The preset table moved to
+  `src/utils/tunings.ts`, where every string derives its note, octave, and Hz from a MIDI
+  number (the old table hand-typed all eighteen frequencies) and is tested against
+  reference pitches in `tunings.test.ts` — 168 tests across 11 files. The view gained a
+  cents readout and a “Tuning to string N (D3)” target line; auto-match resolves to the
+  *nearest* string within tolerance (the ukulele's g/A pair sits two semitones apart);
+  reference tones play in the instrument's own voice; clicking a peg locks the meter to
+  that string, and switching tunings clears a stale lock.
