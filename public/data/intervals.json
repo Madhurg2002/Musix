@@ -1,0 +1,134 @@
+{
+  "intervals": [
+    {
+      "name": "Perfect Unison",
+      "shortCode": "P1",
+      "semitones": 0,
+      "quantity": 1,
+      "quality": "perfect",
+      "frequencyRatioJust": "1:1",
+      "frequencyRatio12Tet": 1.0,
+      "cents12Tet": 0
+    },
+    {
+      "name": "Minor Second",
+      "shortCode": "m2",
+      "semitones": 1,
+      "quantity": 2,
+      "quality": "minor",
+      "frequencyRatioJust": "16:15",
+      "frequencyRatio12Tet": 1.059463094,
+      "cents12Tet": 100
+    },
+    {
+      "name": "Major Second",
+      "shortCode": "M2",
+      "semitones": 2,
+      "quantity": 2,
+      "quality": "major",
+      "frequencyRatioJust": "9:8",
+      "frequencyRatio12Tet": 1.122462048,
+      "cents12Tet": 200
+    },
+    {
+      "name": "Minor Third",
+      "shortCode": "m3",
+      "semitones": 3,
+      "quantity": 3,
+      "quality": "minor",
+      "frequencyRatioJust": "6:5",
+      "frequencyRatio12Tet": 1.189207115,
+      "cents12Tet": 300
+    },
+    {
+      "name": "Major Third",
+      "shortCode": "M3",
+      "semitones": 4,
+      "quantity": 3,
+      "quality": "major",
+      "frequencyRatioJust": "5:4",
+      "frequencyRatio12Tet": 1.25992105,
+      "cents12Tet": 400
+    },
+    {
+      "name": "Perfect Fourth",
+      "shortCode": "P4",
+      "semitones": 5,
+      "quantity": 4,
+      "quality": "perfect",
+      "frequencyRatioJust": "4:3",
+      "frequencyRatio12Tet": 1.334839854,
+      "cents12Tet": 500
+    },
+    {
+      "name": "Tritone",
+      "shortCode": "TT",
+      "semitones": 6,
+      "quantity": 4,
+      "quality": "augmented/diminished",
+      "frequencyRatioJust": "45:32",
+      "frequencyRatio12Tet": 1.414213562,
+      "cents12Tet": 600
+    },
+    {
+      "name": "Perfect Fifth",
+      "shortCode": "P5",
+      "semitones": 7,
+      "quantity": 5,
+      "quality": "perfect",
+      "frequencyRatioJust": "3:2",
+      "frequencyRatio12Tet": 1.498307077,
+      "cents12Tet": 700
+    },
+    {
+      "name": "Minor Sixth",
+      "shortCode": "m6",
+      "semitones": 8,
+      "quantity": 6,
+      "quality": "minor",
+      "frequencyRatioJust": "8:5",
+      "frequencyRatio12Tet": 1.587401052,
+      "cents12Tet": 800
+    },
+    {
+      "name": "Major Sixth",
+      "shortCode": "M6",
+      "semitones": 9,
+      "quantity": 6,
+      "quality": "major",
+      "frequencyRatioJust": "5:3",
+      "frequencyRatio12Tet": 1.681792831,
+      "cents12Tet": 900
+    },
+    {
+      "name": "Minor Seventh",
+      "shortCode": "m7",
+      "semitones": 10,
+      "quantity": 7,
+      "quality": "minor",
+      "frequencyRatioJust": "16:9",
+      "frequencyRatio12Tet": 1.781797436,
+      "cents12Tet": 1000
+    },
+    {
+      "name": "Major Seventh",
+      "shortCode": "M7",
+      "semitones": 11,
+      "quantity": 7,
+      "quality": "major",
+      "frequencyRatioJust": "15:8",
+      "frequencyRatio12Tet": 1.887748625,
+      "cents12Tet": 1100
+    },
+    {
+      "name": "Perfect Octave",
+      "shortCode": "P8",
+      "semitones": 12,
+      "quantity": 8,
+      "quality": "perfect",
+      "frequencyRatioJust": "2:1",
+      "frequencyRatio12Tet": 2.0,
+      "cents12Tet": 1200
+    }
+  ]
+}
