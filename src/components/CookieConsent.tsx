@@ -48,10 +48,12 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ forceOpen = false,
         <strong className="consent-bar__title" id="consent-title">
           Remember my settings?
         </strong>
+        {/* Kept to two sentences: the panel is deliberately small, and every claim the bar
+            makes about storage has to stay in it. */}
         <p className="consent-bar__copy">
-          Musix can keep your key, instrument, theme, scale, and practice settings on this
-          device between visits. First-party cookies only — no analytics, no ads, no third
-          parties, and nothing ever leaves your browser.
+          Musix can remember your key, instrument, theme, scale, and practice settings on this
+          device between visits. First-party cookies only — no analytics, no ads, nothing
+          leaves your browser.
         </p>
       </div>
 
@@ -76,7 +78,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ forceOpen = false,
       </div>
 
       <p className="consent-bar__note">
-        Declining keeps settings for this visit only. Change your mind any time from
+        Declining keeps settings for this visit only. Change your mind any time under
         <strong> Cookie settings</strong> in the footer.
       </p>
     </aside>

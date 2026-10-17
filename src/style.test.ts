@@ -139,6 +139,99 @@ describe('accent-gradient button contrast (docs/PLAN.md, accessibility audit)', 
 // theme-independent NOTE_COLORS hues is asserted in src/utils/musicTheory.test.ts
 // (inkOnNoteColor), since those fills live in the data module, not the sheet.
 
+// The permission bar is the one surface that is deliberately translucent, so its text does
+// not sit on a token — it sits on the panel's own fill blended with whatever is behind it.
+// The palette audit above only covers opaque pairs, so this composites the bar over both
+// page backgrounds (the lightest and darkest things it can float above) and holds every
+// text tier inside it to the same AA bar. Making the panel more transparent is then a
+// checked colour decision rather than a guess at how it will look.
+const CONSENT_TIERS = ['--text-primary', '--text-secondary', '--text-muted'] as const;
+
+/** The channel triplet behind a `rgba(var(--…-rgb), a)` fill. */
+function tripletFrom(selector: string, token: string): [number, number, number] {
+  const start = css.indexOf(`${selector} {`);
+  if (start === -1) throw new Error(`missing block ${selector} in src/style.css`);
+  const block = css.slice(start, css.indexOf('}', start));
+  const value = block.match(new RegExp(`${token}:\\s*(\\d+),\\s*(\\d+),\\s*(\\d+)`));
+  if (!value) throw new Error(`missing ${token} in ${selector}`);
+  return [Number(value[1]), Number(value[2]), Number(value[3])];
+}
+
+const hex = ([r, g, b]: [number, number, number]): string =>
+  `#${[r, g, b].map((channel) => Math.round(channel).toString(16).padStart(2, '0')).join('')}`;
+
+describe('translucent consent bar (docs/PLAN.md, accessibility audit)', () => {
+  const panelStart = css.indexOf('.consent-bar {');
+  const panelRule = css.slice(panelStart, css.indexOf('}', panelStart));
+  const fill = panelRule.match(/background: rgba\(var\(--bg-secondary-rgb\), ([\d.]+)\)/);
+
+  test('the bar keeps a themed fill with a backdrop blur, not a hardcoded colour', () => {
+    // A hardcoded fill would stop tracking the theme, and transparency without a blur is
+    // unreadable text over whatever happens to be behind it.
+    expect(fill).not.toBeNull();
+    expect(panelRule).toContain('backdrop-filter: blur(');
+  });
+
+  test('the fill stays translucent without giving up being a surface', () => {
+    // The AA check below cannot fail on its own however low the alpha goes: compositing two
+    // backdrops that each clear AA against the same ink always clears it, so contrast is
+    // monotone and no blend can dip under the endpoints. What can go wrong is drifting so
+    // transparent that the panel is no longer a surface — text over unblurred, moving page
+    // content — so the design floor is pinned here instead: at least half the panel's own
+    // colour, and never fully opaque (this bar is meant to be seen through).
+    const alpha = Number(fill![1]);
+    expect(alpha).toBeGreaterThanOrEqual(0.5);
+    expect(alpha).toBeLessThan(1);
+  });
+
+  test('every text tier in the bar clears AA over the page and over a card behind it', () => {
+    const alpha = Number(fill![1]);
+
+    const failures: string[] = [];
+    for (const [theme, selector] of Object.entries(THEME_SELECTORS)) {
+      const panel = tripletFrom(selector, '--bg-secondary-rgb');
+
+      // The card fill is the other surface the bar can float over (every `.glass-card` in
+      // the studio), so it is composited too — over both page backgrounds.
+      const card: [number, number, number] = tripletFrom(selector, '--card-rgb');
+      const backdrops: Array<[string, [number, number, number]]> = [
+        ...PAGE_BACKGROUNDS.map((token): [string, [number, number, number]] => {
+          const value = tokenFrom(selector, token);
+          return [
+            token,
+            [
+              parseInt(value.slice(1, 3), 16),
+              parseInt(value.slice(3, 5), 16),
+              parseInt(value.slice(5, 7), 16),
+            ],
+          ];
+        }),
+        ['--card-rgb', card],
+      ];
+
+      for (const [backdropName, backdrop] of backdrops) {
+        const blended = hex(
+          panel.map((channel, i) => channel * alpha + backdrop[i]! * (1 - alpha)) as [
+            number,
+            number,
+            number,
+          ]
+        );
+
+        for (const tier of CONSENT_TIERS) {
+          const ratio = contrastRatio(tokenFrom(selector, tier), blended);
+          if (ratio < AA_SMALL_TEXT) {
+            failures.push(
+              `${theme}: ${tier} on the bar over ${backdropName} is ${ratio.toFixed(2)}:1 (alpha ${alpha})`
+            );
+          }
+        }
+      }
+    }
+    expect(failures).toEqual([]);
+  });
+});
+
 describe('src/style.css', () => {
   test('is still a full stylesheet, not a fragment', () => {
     // The intact sheet was ~3,800 lines before the Tailwind migration started deleting
