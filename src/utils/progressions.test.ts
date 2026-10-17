@@ -1,7 +1,16 @@
 // The progression builder replaces the whole card set at once, so a wrong offset here
 // means every card in a loaded progression is wrong — these lock down the numerals.
 
-import { PROGRESSION_PRESETS, resolveProgression, rotateRoot } from './progressions';
+import {
+  PROGRESSION_PRESETS,
+  advanceRun,
+  nextPlaybackBeat,
+  resolveProgression,
+  romanNumeralFor,
+  rotateRoot,
+  startRun,
+  toggleRunPause,
+} from './progressions';
 
 const presetNamed = (name: string) => PROGRESSION_PRESETS.find((p) => p.name === name)!;
 
@@ -25,8 +34,8 @@ describe('rotateRoot', () => {
 describe('resolveProgression', () => {
   test('I–V–vi–IV in C resolves to C, G, Am, F', () => {
     const cards = resolveProgression(presetNamed('I–V–vi–IV'), 'C');
-    // Root + type rather than `name`: F's stored display name is "F Major (Barre)",
-    // and the builder cares that the right chord lands in the slot, not how it is titled.
+    // Root + type rather than `name`: the builder cares that the right chord lands in the
+    // slot, not how it is titled (names come from `chordDisplayName`).
     expect(cards.map((card) => `${card.chord.root} ${card.chord.type}`)).toEqual([
       'C Major',
       'G Major',
@@ -78,5 +87,118 @@ describe('resolveProgression', () => {
         expect(card.isMuted).toBe(undefined);
       }
     }
+  });
+});
+
+describe('nextPlaybackBeat', () => {
+  test('walks one beat at a time', () => {
+    expect(nextPlaybackBeat(0, 4)).toBe(1);
+    expect(nextPlaybackBeat(2, 4)).toBe(3);
+  });
+
+  test('ends the run after the last beat', () => {
+    // Null is what stops playback: returning the length itself would index past the cards.
+    expect(nextPlaybackBeat(3, 4)).toBe(null);
+    expect(nextPlaybackBeat(11, 12)).toBe(null);
+  });
+
+  test('ends rather than starts on an empty or invalid run', () => {
+    expect(nextPlaybackBeat(0, 0)).toBe(null);
+    expect(nextPlaybackBeat(0, -3)).toBe(null);
+    expect(nextPlaybackBeat(Number.NaN, 4)).toBe(null);
+  });
+
+  test('every step of a twelve-bar run stays inside the cards, then stops', () => {
+    let index: number | null = 0;
+    const visited: number[] = [];
+    while (index !== null) {
+      visited.push(index);
+      index = nextPlaybackBeat(index, 12);
+    }
+    expect(visited).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+  });
+});
+
+describe('progression run', () => {
+  test('starts on the first beat', () => {
+    expect(startRun(8)).toEqual({ index: 0, paused: false });
+  });
+
+  test('refuses to start on an empty board', () => {
+    // A run with no beats would end on its first tick; the button is disabled instead.
+    expect(startRun(0)).toBe(null);
+  });
+
+  test('pause and resume keep the position', () => {
+    const running = { index: 3, paused: false };
+    const paused = toggleRunPause(running)!;
+    expect(paused).toEqual({ index: 3, paused: true });
+    // Resume replays the chord it stopped on, so the index must not move either way.
+    expect(toggleRunPause(paused)).toEqual({ index: 3, paused: false });
+  });
+
+  test('pausing an idle run does nothing', () => {
+    expect(toggleRunPause(null)).toBe(null);
+  });
+
+  test('advancing carries the paused flag with it', () => {
+    expect(advanceRun({ index: 0, paused: true }, 4)).toEqual({ index: 1, paused: true });
+  });
+
+  test('the run ends after the last beat and cannot be advanced past it', () => {
+    expect(advanceRun({ index: 3, paused: false }, 4)).toBe(null);
+    expect(advanceRun(null, 4)).toBe(null);
+  });
+
+  test('pause → resume → play out a four-bar run reaches every beat once', () => {
+    let run = startRun(4);
+    const heard: number[] = [];
+    while (run) {
+      heard.push(run.index);
+      if (run.index === 1) {
+        run = toggleRunPause(run);
+        expect(run).toEqual({ index: 1, paused: true });
+        run = toggleRunPause(run);
+        expect(run).toEqual({ index: 1, paused: false });
+      }
+      run = advanceRun(run, 4);
+    }
+    expect(heard).toEqual([0, 1, 2, 3]);
+  });
+});
+
+describe('romanNumeralFor', () => {
+  test('names each preset chord by what it is doing in the key', () => {
+    // The chart view labels every card this way, so a wrong numeral would mislabel the
+    // whole progression at once.
+    expect(romanNumeralFor('C', 'Major', 'C')).toBe('I');
+    expect(romanNumeralFor('D', 'Minor', 'C')).toBe('ii');
+    expect(romanNumeralFor('E', 'Minor', 'C')).toBe('iii');
+    expect(romanNumeralFor('F', 'Major', 'C')).toBe('IV');
+    expect(romanNumeralFor('G', 'Major', 'C')).toBe('V');
+    expect(romanNumeralFor('A', 'Minor', 'C')).toBe('vi');
+  });
+
+  test('follows the key the progression was resolved in', () => {
+    expect(romanNumeralFor('G', 'Major', 'G')).toBe('I');
+    expect(romanNumeralFor('D', 'Major', 'G')).toBe('V');
+    expect(romanNumeralFor('A', 'Minor', 'G')).toBe('ii');
+    expect(romanNumeralFor('D', 'Major', 'D')).toBe('I');
+  });
+
+  test('spells chromatic degrees and extensions', () => {
+    expect(romanNumeralFor('A♯', 'Major', 'C')).toBe('♭VII');
+    expect(romanNumeralFor('B', 'Major', 'C')).toBe('VII');
+    expect(romanNumeralFor('F♯', 'Major', 'C')).toBe('♯IV');
+    expect(romanNumeralFor('C', '7th', 'C')).toBe('I7');
+    expect(romanNumeralFor('G', '7th', 'C')).toBe('V7');
+    expect(romanNumeralFor('C', 'Major 7th', 'C')).toBe('Imaj7');
+  });
+
+  test('a twelve-bar blues in C reads I I I I IV IV I I V IV I V', () => {
+    const blues = resolveProgression(presetNamed('12-bar blues'), 'C');
+    expect(blues.map((card) => romanNumeralFor(card.chord.root, card.chord.type, 'C'))).toEqual([
+      'I', 'I', 'I', 'I', 'IV', 'IV', 'I', 'I', 'V', 'IV', 'I', 'V',
+    ]);
   });
 });

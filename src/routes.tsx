@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import type { ReactNode } from 'react';
 import type { ChordShape, NoteName } from './types';
 import { COMPREHENSIVE_CHORDS } from './data/chordsData';
+import { ALL_NOTES } from './utils/musicTheory';
 import type { InstrumentType } from './utils/audio';
 
 // Every screen is imported lazily, so the first paint only carries the shell plus the screen
@@ -92,6 +93,61 @@ export interface ScreenIntro {
  * from it, and `TopBar` titles the screen from it. Adding a screen means adding one entry
  * here plus a lazily imported component.
  */
+interface FretboardChordPickerProps {
+  activeChord: ChordShape | null;
+  onSelect: (chord: ChordShape) => void;
+}
+
+/**
+ * Every stored chord, grouped by root so the list reads chromatically — one row per root,
+ * its shapes in quality order, and the button labelled with only the quality because the
+ * root is already on the row.
+ *
+ * The buttons used to be one flat wrap in the data file's storage order, which read
+ * "C♯ Major → C7 → A♯ Major → G": storage leaking into the interface.
+ */
+export function FretboardChordPicker({ activeChord, onSelect }: FretboardChordPickerProps) {
+  return (
+    <div className="glass-card">
+      <label className="text-sm font-bold text-ink-soft">Select Chord to view on Fretboard:</label>
+      {/* Grouped by root so the list reads chromatically: one row per root, its shapes
+          in quality order. The old flat wrap ran C♯ Major → C7 → A♯ Major → G, which is
+          the table's storage order leaking into the interface. */}
+      <div className="flex flex-col gap-2">
+        {ALL_NOTES.map((root) => {
+          const chords = COMPREHENSIVE_CHORDS.filter((chord) => chord.root === root);
+          if (chords.length === 0) return null;
+
+          return (
+            <div key={root} className="flex flex-wrap items-center gap-2">
+              <span className="w-6 shrink-0 font-display text-[13px] font-bold text-accent">
+                {root}
+              </span>
+              {chords.map((chord) => (
+                <button
+                  key={chord.id}
+                  className={`rounded-xl border px-4 py-2 font-sans text-[13px] transition-all duration-200 ${
+                    activeChord?.id === chord.id
+                      ? 'border-accent bg-[linear-gradient(135deg,var(--accent-primary)_0%,#c98a3f_100%)] font-bold text-black shadow-[0_0_16px_var(--accent-primary)]'
+                      : 'border-hairline bg-[rgba(var(--overlay-rgb),0.05)] font-semibold text-ink hover:border-[rgba(var(--accent-rgb),0.4)] hover:bg-[rgba(var(--overlay-rgb),0.12)]'
+                  }`}
+                  data-tip={`Show ${chord.name} pressed on the neck`}
+                  aria-label={chord.name}
+                  onClick={() => onSelect(chord)}
+                >
+                  {/* The root is on the row, so the button only needs the quality. */}
+                  {chord.name.startsWith(root) ? chord.name.slice(root.length).trim() || 'Major' : chord.name}
+                </button>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+
 export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
   {
     id: 'songs',
@@ -147,23 +203,10 @@ export const ROUTES: [RouteDefinition, ...RouteDefinition[]] = [
     render: (context) => (
       <>
         <div className="glass-card">
-          <label className="text-sm font-bold text-ink-soft">Select Chord to view on Fretboard:</label>
-          <div className="flex flex-wrap gap-2">
-            {COMPREHENSIVE_CHORDS.map((chord) => (
-              <button
-                key={chord.id}
-                className={`rounded-xl border px-4 py-2 font-sans text-[13px] transition-all duration-200 ${
-                  context.activeChord?.id === chord.id
-                    ? 'border-accent bg-[linear-gradient(135deg,var(--accent-primary)_0%,#c98a3f_100%)] font-bold text-black shadow-[0_0_16px_var(--accent-primary)]'
-                    : 'border-hairline bg-[rgba(var(--overlay-rgb),0.05)] font-semibold text-ink hover:border-[rgba(var(--accent-rgb),0.4)] hover:bg-[rgba(var(--overlay-rgb),0.12)]'
-                }`}
-                data-tip={`Show ${chord.name} pressed on the neck`}
-                onClick={() => context.setActiveChord(chord)}
-              >
-                {chord.name}
-              </button>
-            ))}
-          </div>
+          <FretboardChordPicker
+            activeChord={context.activeChord}
+            onSelect={context.setActiveChord}
+          />
         </div>
 
         <GuitarFretboard

@@ -23,6 +23,7 @@ export type IconName =
   | 'lock'
   | 'mic'
   | 'notes'
+  | 'pause'
   | 'pencil'
   | 'piano'
   | 'play'
@@ -128,6 +129,12 @@ const ICONS: Record<IconName, ReactNode> = {
       <rect x="3" y="5.5" width="18" height="13" rx="1.6" />
       <path d="M9 5.5v13M15 5.5v13" />
       <path d="M7.4 5.5v5.6M13.4 5.5v5.6" />
+    </>
+  ),
+  pause: (
+    <>
+      <rect x="7.6" y="5.4" width="3.4" height="13.2" rx="1.2" fill="currentColor" stroke="none" />
+      <rect x="13" y="5.4" width="3.4" height="13.2" rx="1.2" fill="currentColor" stroke="none" />
     </>
   ),
   play: <path d="M8 5.4v13.2L19 12z" fill="currentColor" stroke="none" />,

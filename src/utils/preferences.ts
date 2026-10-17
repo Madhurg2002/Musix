@@ -36,6 +36,11 @@ export const PREFERENCE_KEYS = {
   songTranspose: 'songTranspose',
   songSoundOn: 'songSoundOn',
   guideProgress: 'guideProgress',
+  // The chord studio's own library, plus the board it is holding right now. Kept as
+  // separate slots: opening a saved progression must not overwrite the library, and
+  // clearing the library must not throw away the board being edited.
+  savedProgressions: 'savedProgressions',
+  studioBoard: 'studioBoard',
 } as const;
 
 function storageKey(key: string): string {

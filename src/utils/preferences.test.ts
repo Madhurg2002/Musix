@@ -19,6 +19,12 @@ import {
   writePreference,
 } from './preferences';
 import { grantConsent } from './consent';
+import {
+  isSavedProgressionList,
+  isStudioBoard,
+  type SavedProgression,
+  type StudioBoard,
+} from './savedProgressions';
 
 const store = new Map<string, string>();
 
@@ -181,6 +187,73 @@ describe('cookie-backed preference storage', () => {
     clearPreference(PREFERENCE_KEYS.songTranspose);
     expect(document.cookie).not.toContain('musix.pref.songTranspose=');
     expect(readPreference(PREFERENCE_KEYS.songTranspose, 0, isIntegerInRange(-11, 11))).toBe(0);
+  });
+});
+
+describe('saved studio data', () => {
+  const library: SavedProgression[] = [
+    {
+      id: 'p1',
+      name: '12-bar blues in C',
+      key: 'C',
+      cards: [
+        { root: 'C', type: 'Major' },
+        { root: 'F', type: 'Major' },
+        { root: 'G', type: '7th', fretPosition: 3, isMuted: true },
+      ],
+      savedAt: 1700000000000,
+    },
+  ];
+
+  test('a saved progression library survives a reload', () => {
+    writePreference(PREFERENCE_KEYS.savedProgressions, library);
+    expect(
+      readPreference<SavedProgression[]>(
+        PREFERENCE_KEYS.savedProgressions,
+        [],
+        isSavedProgressionList
+      )
+    ).toEqual(library);
+  });
+
+  test('the working board survives a reload', () => {
+    const board: StudioBoard = {
+      key: 'G',
+      cards: [{ root: 'G', type: 'Major' }, { root: 'D', type: 'Major' }],
+    };
+    writePreference(PREFERENCE_KEYS.studioBoard, board);
+    expect(
+      readPreference<StudioBoard | null>(PREFERENCE_KEYS.studioBoard, null, isStudioBoard)
+    ).toEqual(board);
+  });
+
+  test('a library too big for a cookie still round-trips through local storage', () => {
+    const big: SavedProgression[] = Array.from({ length: 24 }, (_, n) => ({
+      id: `p${n}`,
+      name: `Song number ${n}`,
+      key: 'C',
+      cards: Array.from({ length: 12 }, () => ({ root: 'C' as const, type: 'Major' })),
+      savedAt: n,
+    }));
+
+    writePreference(PREFERENCE_KEYS.savedProgressions, big);
+    expect(store.has('musix.pref.savedProgressions')).toBe(true);
+    expect(document.cookie).not.toContain('musix.pref.savedProgressions=');
+    expect(
+      readPreference<SavedProgression[]>(
+        PREFERENCE_KEYS.savedProgressions,
+        [],
+        isSavedProgressionList
+      )
+    ).toHaveLength(24);
+  });
+
+  test('a stored library from another build falls back to empty instead of half-loading', () => {
+    // An entry from an older format: cards carried frets instead of roots.
+    store.set('musix.pref.savedProgressions', JSON.stringify([{ id: 'old', name: 'Old', cards: [] }]));
+    expect(
+      readPreference<SavedProgression[]>(PREFERENCE_KEYS.savedProgressions, [], isSavedProgressionList)
+    ).toEqual([]);
   });
 });
 
