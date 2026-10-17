@@ -163,6 +163,8 @@ describe('chordFrequencies', () => {
   const piano = instrumentFor('piano');
 
   const midiOf = (frequency: number) => Math.round(12 * Math.log2(frequency / 440) + 69);
+  // C♯, E♯/F, G♯ — the tones of the chord a C Major card becomes when it steps up one.
+  const cSharpMajorTones = new Set([1, 5, 8]);
 
   test('guitar plays the stored frets', () => {
     const frequencies = chordFrequencies(cMajor, 0, 0, guitar);
@@ -183,16 +185,19 @@ describe('chordFrequencies', () => {
     expect(frequencies[2]).toBeCloseTo(midiToFrequency(67), 5);
   });
 
-  test('an offset applies to stored shapes, which have not moved with the key', () => {
-    const shifted = transposeChordShape(cMajor, 1); // no stored F♯ shape → offset 1
-    expect(shifted.usedStoredShape).toBe(false);
-    expect(shifted.transposeOffset).toBe(1);
+  test('a transposed card plays the frets it draws, with no offset left over', () => {
+    const shifted = transposeChordShape(cMajor, 1); // C Major +1 → the C♯ barre, x46664
+    expect(shifted.usedStoredShape).toBe(true);
+    expect(shifted.transposeOffset).toBe(0);
 
     const frequencies = chordFrequencies(
       shifted.chord, 0, shifted.transposeOffset, guitar
     );
-    // The C shape keeps its frets; the offset moves every pitch up one semitone.
+    // A string, fourth fret — the transposed card's own shape, not C Major's frets moved.
     expect(midiOf(frequencies[0]!)).toBe(49);
+    for (const frequency of frequencies) {
+      expect(cSharpMajorTones.has(((midiOf(frequency) % 12) + 12) % 12)).toBe(true);
+    }
   });
 
   test('a searched voicing never double-transposes', () => {
@@ -201,9 +206,8 @@ describe('chordFrequencies', () => {
       shifted.chord, 5, shifted.transposeOffset, guitar
     );
     // The frets were built from the already-transposed notes — C Major +1 is C♯ Major
-    // (C♯, E♯/F, G♯) — so every sounding pitch must be one of those. Adding the offset a
+    // (C♯, E♯/F, G♯) — so every sounding pitch must be one of those. Adding an offset a
     // second time would land on D major instead.
-    const cSharpMajorTones = new Set([1, 5, 8]);
     expect(frequencies.length).toBeGreaterThan(0);
     for (const frequency of frequencies) {
       expect(cSharpMajorTones.has(((midiOf(frequency) % 12) + 12) % 12)).toBe(true);

@@ -11,7 +11,7 @@
 
 import type { ChordShape, NoteName, SafeChordShape } from '../types';
 import { ALL_NOTES, GUITAR_STRINGS, midiToFrequency, transposeNote } from './musicTheory';
-import { asSafeChord, findChord } from '../data/chordsData';
+import { asSafeChord, chordDisplayName, findChord } from '../data/chordsData';
 import type { InstrumentDefinition, InstrumentString } from '../data/instruments';
 
 /** Tuning table — the same shape as the registry's `strings` and as `GUITAR_STRINGS`. */
@@ -96,12 +96,47 @@ export function chordPositionForStrings(
     return bestFret;
   });
 
-  const pressedFrets = [...new Set(frets.filter((fret) => fret > 0))].sort(
+  // Finger numbers for a searched voicing, worked out the way a player would read it: one
+  // finger per fret group, starting at the index, and a new finger for each *adjacent*
+  // string at that fret. Keeping the finger across a gap is a partial barre, which is how
+  // B Minor's x24432 turns into index on strings 5 and 1 — the same reading the diagram
+  // and `detectBarre` then draw and label. Numbering by "which distinct fret" instead put
+  // one finger on every string at a fret, so three adjacent strings all claimed finger 1.
+  const fingers: number[] = frets.map(() => 0);
+  const fretsAscending = [...new Set(frets.filter((fret) => fret > 0))].sort(
     (left, right) => left - right
   );
-  const fingers = frets.map((fret) =>
-    fret <= 0 ? 0 : Math.min(pressedFrets.indexOf(fret) + 1, 4)
-  );
+
+  let nextFinger = 1;
+  for (const fret of fretsAscending) {
+    let finger = nextFinger;
+    let previousString = -2;
+
+    for (let stringIndex = 0; stringIndex < frets.length; stringIndex += 1) {
+      if (frets[stringIndex] !== fret) continue;
+
+      // Two adjacent strings at one fret take two fingers — that is a chord grip, not a
+      // barre. The same finger may only serve two strings when it is genuinely lying
+      // across them, which means a gap in the strings with everything between stopped at
+      // this fret or higher. Otherwise the next string needs another finger.
+      const liesAcrossStrings =
+        previousString >= 0 &&
+        stringIndex - previousString > 1 &&
+        frets
+          .slice(previousString + 1, stringIndex)
+          .every((inner) => inner >= fret);
+      if (previousString >= 0 && !liesAcrossStrings) finger += 1;
+
+      // Past the pinky there is no finger left, so the string is drawn unnumbered rather
+      // than reusing a number — a repeat reads as a barre the shape does not have, and one
+      // finger cannot be at two frets anyway. Such a grip is playable by a rearranged hand;
+      // the search does not claim to know how.
+      fingers[stringIndex] = finger <= 4 ? finger : 0;
+      previousString = stringIndex;
+    }
+
+    nextFinger = finger + 1;
+  }
 
   return { frets, fingers, usedStoredShape: false };
 }
@@ -109,6 +144,66 @@ export function chordPositionForStrings(
 /** Standard-guitar wrapper kept for existing callers and tests. */
 export function getChordPosition(chord: ChordShape, position: number): ChordPosition {
   return chordPositionForStrings(chord, position, GUITAR_STRINGS, 20);
+}
+
+export interface Barre {
+  /** Fret the index finger lies across. Always 1 or higher. */
+  fret: number;
+  /** Lowest string index the barre covers (0 = lowest-pitched string). */
+  from: number;
+  /** Highest string index the barre covers, inclusive. */
+  to: number;
+  /** Which finger is doing it — almost always the index (1). */
+  finger: number;
+}
+
+/**
+ * Find the barre in a fingering, or `null` when there is not one.
+ *
+ * A barre cannot be read from frets alone: in F Major (133211) only two strings show
+ * fret 1, because the index finger lies *underneath* the fingers that stop 2, 3 and 4. So
+ * the rule is the physical one — the same finger stops the same fret on two strings, and
+ * every string in between is stopped at that fret or higher. An open or muted string in
+ * between means the finger is not lying across it, so that is not a barre (which is why
+ * A7's x02020 does not count).
+ *
+ * The lowest matching fret wins, and among equals the widest span.
+ */
+export function detectBarre(
+  frets: readonly number[],
+  fingers?: readonly (number | string | undefined)[]
+): Barre | null {
+  if (!fingers || fingers.length !== frets.length) return null;
+
+  let found: Barre | null = null;
+
+  for (let from = 0; from < frets.length; from += 1) {
+    const fret = frets[from];
+    const finger = fingers[from];
+    if (fret == null || fret <= 0) continue;
+    if (typeof finger !== 'number' || finger <= 0) continue;
+
+    for (let to = from + 1; to < frets.length; to += 1) {
+      if (frets[to] !== fret || fingers[to] !== finger) continue;
+
+      let spans = true;
+      for (let string = from + 1; string < to; string += 1) {
+        const inner = frets[string];
+        if (inner == null || inner < fret) {
+          spans = false;
+          break;
+        }
+      }
+      if (!spans) continue;
+
+      const wider = found ? to - from > found.to - found.from : true;
+      if (!found || fret < found.fret || (fret === found.fret && wider)) {
+        found = { fret, from, to, finger };
+      }
+    }
+  }
+
+  return found;
 }
 
 export interface FretWindow {
@@ -216,27 +311,42 @@ export function chordFrequencies(
 export interface TransposedChord {
   /** The chord to render on the card. */
   chord: ChordShape;
-  /** Semitones still to shift at playback time (0 when a real shape was found). */
+  /**
+   * Semitones still to shift at playback time. Always 0 today: every branch below puts
+   * frets for the new chord on the card, so the drawing and the sound can never disagree.
+   * Kept in the shape because the studio's card items carry it.
+   */
   transposeOffset: number;
-  /** True when a stored shape for the new root was found and used. */
+  /** True when the card's frets belong to the transposed chord (so no offset is needed). */
   usedStoredShape: boolean;
 }
 
 /**
- * Shift a chord card by `delta` semitones.
- *
- * The bug this replaces transposed only the name and notes, leaving the original frets in
- * place, so a transposed card showed the wrong shape and played the wrong voicing. When the
- * table has a shape for the new root, that shape is used and the playback offset resets;
- * when it does not, the notes are transposed and the offset is kept so playback still
- * matches what the card says.
+ * Highest fret a movable shape may be shifted to before a searched voicing is used
+ * instead — past this the grip is no longer one anyone plays.
  */
-export function transposeChordShape(
-  chord: ChordShape,
-  delta: number,
-  currentOffset = 0
-): TransposedChord {
-  const nextOffset = currentOffset + delta;
+const MOVABLE_SHAPE_MAX_FRET = 15;
+
+/**
+ * Shift a chord card by `delta` semitones, keeping the drawn shape and the name in step.
+ *
+ * Two earlier versions got this wrong in the same way. The original transposed only the
+ * name and notes and left the frets alone; the follow-up fix looked the new root up in the
+ * stored table, which is correct for the roots the table holds but silently kept the old
+ * frets for the five major roots (C♯, D♯, F♯, G♯, A♯) it does not — so a card read
+ * "D♯ Major" while drawing C Major, and only playback was corrected by an offset. Now:
+ *
+ * 1. A stored shape for the new root wins (the table's shapes are the idiomatic ones).
+ * 2. Otherwise a shape with no open string simply moves with the key — the same grip with
+ *    the same finger numbers. This is what a player does, and it keeps the textbook grip
+ *    for combinations the table has no entry for (B Minor −1 is exactly the A♯ Minor
+ *    barre, x13321).
+ * 3. Otherwise an open shape cannot move at all — its open strings are not fingers — so a
+ *    voicing for the transposed notes is searched and drawn, instead of leaving the old
+ *    chord's frets under the new name. The search runs on standard guitar; other tunings
+ *    already search from the transposed notes, so they ignore these frets.
+ */
+export function transposeChordShape(chord: ChordShape, delta: number): TransposedChord {
   const newRoot: NoteName = transposeNote(chord.root, delta);
 
   const stored = findChord(newRoot, chord.type);
@@ -245,14 +355,46 @@ export function transposeChordShape(
   }
 
   const safeChord: SafeChordShape = asSafeChord(chord);
+  const transposed: ChordShape = {
+    ...chord,
+    root: newRoot,
+    name: chordDisplayName(newRoot, chord.type),
+    notes: safeChord.notes.map((note) => transposeNote(note, delta)),
+  };
+
+  const canMove =
+    safeChord.frets.length > 0 &&
+    safeChord.frets.every((fret) => fret !== 0) &&
+    safeChord.frets.every(
+      (fret) => fret < 0 || (fret + delta >= 1 && fret + delta <= MOVABLE_SHAPE_MAX_FRET)
+    );
+
+  if (canMove) {
+    return {
+      // Same grip, same finger numbers — only the frets move.
+      chord: {
+        ...transposed,
+        frets: safeChord.frets.map((fret) => (fret < 0 ? -1 : fret + delta)),
+      },
+      transposeOffset: 0,
+      usedStoredShape: true,
+    };
+  }
+
+  const voicing = chordPositionForStrings(
+    { ...transposed, frets: [], fingers: [] },
+    0,
+    GUITAR_STRINGS,
+    20
+  );
+
   return {
     chord: {
-      ...chord,
-      root: newRoot,
-      name: `${newRoot} ${chord.type}`,
-      notes: safeChord.notes.map((note) => transposeNote(note, delta)),
+      ...transposed,
+      frets: voicing.frets,
+      fingers: voicing.fingers.map((finger) => finger ?? 0),
     },
-    transposeOffset: nextOffset,
-    usedStoredShape: false,
+    transposeOffset: 0,
+    usedStoredShape: true,
   };
 }
