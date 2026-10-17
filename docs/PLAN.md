@@ -242,9 +242,11 @@ uncommitted to keep the history about source changes.
 Ordered by value; none block the phases above.
 
 - [x] **Test the chord voicing logic** — `chordVoicing.ts` holds `getChordPosition`,
-      `fretWindow`, and `transposeChordShape` with 18 tests. Writing those tests surfaced and
+      `fretWindow`, and `transposeChordShape` with 23 tests. Writing those tests surfaced and
       fixed T3 (a transposed card drew and played its original shape), which is exactly the
-      failure the plan predicted the tests would catch.
+      failure the plan predicted the tests would catch. Widening them to every root later
+      surfaced T4 and T5: the five major roots the shape table never held, and the
+      transpositions that kept drawing the old chord under the new name.
 - [x] **Add a `test` script** — `bun run test` and `bun run typecheck`, with `typescript`
       pinned as a devDependency (it was previously downloaded on demand by `bunx`).
 - [x] **Add CI** running the type check and the tests on every push and pull request.

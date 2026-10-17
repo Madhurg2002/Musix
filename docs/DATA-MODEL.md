@@ -89,38 +89,102 @@ interface ChordCardItem {
 
 This is the per-card state held by `ChordWorkbench`.
 
+### Saved progressions (`src/utils/savedProgressions.ts`)
+
+What the studio writes so a set survives a reload. Only the **choices** are stored — never
+frets, fingers, note names or difficulty — so a saved progression picks up a corrected shape
+from the table when it is reopened.
+
+```ts
+interface SavedCardItem {
+  root: NoteName;
+  type: string;              // 'Major' | 'Minor' | '7th' | 'Major 7th'
+  fretPosition?: number;     // omitted at the written position
+  isMuted?: boolean;         // omitted when false
+}
+
+interface SavedProgression {
+  id: string;
+  name: string;              // trimmed, 1..40 characters, unique case-insensitively
+  key: NoteName;             // the key its chart numerals are read in
+  cards: SavedCardItem[];    // order preserved, 1..64
+  savedAt: number;           // epoch ms
+}
+
+interface StudioBoard { key: NoteName; cards: SavedCardItem[] }  // may be empty
+```
+
+Both live in the preference store (`PREFERENCE_KEYS.savedProgressions` and
+`.studioBoard`), so they follow the same consent gate as every other preference: nothing is
+written before the learner allows storage. A library too big for a cookie moves to
+`localStorage` automatically. `saveProgression` overwrites an entry with the same name
+(case-insensitively) rather than duplicating it, and the library is capped at
+`MAX_SAVED_PROGRESSIONS`.
+
 ---
 
 ## TypeScript data files (bundled by Vite)
 
 ### `src/data/chordsData.ts`
 
-`COMPREHENSIVE_CHORDS` — 17 chords in this order:
+`COMPREHENSIVE_CHORDS` — 22 chords in this order. All twelve major roots are present; the
+five added barres (C♯, D♯, F♯, G♯, A♯) are the A-shape or E-shape moved to the root's fret,
+which is what makes transposing a card a lookup instead of a guess.
 
-| # | id | name | root | type | difficulty |
-| --- | --- | --- | --- | --- | --- |
-| 0 | `c-major` | C Major | C | Major | Beginner |
-| 1 | `c-minor` | C Minor | C | Minor | Intermediate |
-| 2 | `c-dom7` | C7 (Dominant 7th) | C | 7th | Beginner |
-| 3 | `c-maj7` | Cmaj7 | C | Major 7th | Beginner |
-| 4 | `a-major` | A Major | A | Major | Beginner |
-| 5 | `a-minor` | A Minor | A | Minor | Beginner |
-| 6 | `a-dom7` | A7 | A | 7th | Beginner |
-| 7 | `g-major` | G Major | G | Major | Beginner |
-| 8 | `g-minor` | G Minor | G | Minor | Intermediate |
-| 9 | `g-dom7` | G7 | G | 7th | Beginner |
-| 10 | `e-major` | E Major | E | Major | Beginner |
-| 11 | `e-minor` | E Minor | E | Minor | Beginner |
-| 12 | `d-major` | D Major | D | Major | Beginner |
-| 13 | `d-minor` | D Minor | D | Minor | Beginner |
-| 14 | `f-major` | F Major (Barre / Easy) | F | Major | Intermediate |
-| 15 | `b-minor` | B Minor | B | Minor | Intermediate |
-| 16 | `b-major` | B Major | B | Major | Intermediate |
+**Ordering rule:** chromatically by root (C, C♯, D … B), and inside a root
+Major → Minor → 7th → Major 7th. The Fretboard picker renders this array, so the storage
+order *is* what a learner reads; it used to run C Major, C Minor, C♯ Major, C7, A … which
+made the picker look shuffled. `chordVoicing.test.ts` pins the order with the expected list
+of names, so a new chord has to be inserted in the right place.
+
+**Verification:** every entry was re-checked against its own name — the frets sound the
+chord's tones and nothing else, the declared `notes` match the frets, the pressed span is
+never more than four frets, finger numbers rise with the frets, ids/root+type pairs are
+unique, and the difficulty badge agrees with whether the shape is barred. One shape
+intentionally omits a tone: `c-dom7` (`x32310`) drops the fifth, the standard lean C7 grip.
+
+**Naming rule:** every `name` is `chordDisplayName(root, type)` — `C Major`, `C Minor`,
+`C7`, `Cmaj7` — and never carries the grip. "Barre" is a property of the fingering, not the
+chord, so it is detected from `frets` + `fingers` by `detectBarre` and shown as a chip on the
+diagram. Before this, five stored shapes said "(Barre)" and B Major's did not, so the same
+chord was titled two ways depending on whether it came from the table or a transpose.
+
+| # | id | name | root | type | frets | difficulty |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | `c-major` | C Major | C | Major | `-1 3 2 0 1 0` | Beginner |
+| 1 | `c-minor` | C Minor | C | Minor | `-1 3 5 5 4 3` | Intermediate |
+| 2 | `c-dom7` | C7 | C | 7th | `-1 3 2 3 1 0` | Beginner |
+| 3 | `c-maj7` | Cmaj7 | C | Major 7th | `-1 3 2 0 0 0` | Beginner |
+| 4 | `c-sharp-major` | C♯ Major | C♯ | Major | `-1 4 6 6 6 4` | Intermediate |
+| 5 | `d-major` | D Major | D | Major | `-1 -1 0 2 3 2` | Beginner |
+| 6 | `d-minor` | D Minor | D | Minor | `-1 -1 0 2 3 1` | Beginner |
+| 7 | `d-sharp-major` | D♯ Major | D♯ | Major | `-1 6 8 8 8 6` | Intermediate |
+| 8 | `e-major` | E Major | E | Major | `0 2 2 1 0 0` | Beginner |
+| 9 | `e-minor` | E Minor | E | Minor | `0 2 2 0 0 0` | Beginner |
+| 10 | `f-major` | F Major | F | Major | `1 3 3 2 1 1` | Intermediate |
+| 11 | `f-sharp-major` | F♯ Major | F♯ | Major | `2 4 4 3 2 2` | Intermediate |
+| 12 | `g-major` | G Major | G | Major | `3 2 0 0 0 3` | Beginner |
+| 13 | `g-minor` | G Minor | G | Minor | `3 5 5 3 3 3` | Intermediate |
+| 14 | `g-dom7` | G7 | G | 7th | `3 2 0 0 0 1` | Beginner |
+| 15 | `g-sharp-major` | G♯ Major | G♯ | Major | `4 6 6 5 4 4` | Intermediate |
+| 16 | `a-major` | A Major | A | Major | `-1 0 2 2 2 0` | Beginner |
+| 17 | `a-minor` | A Minor | A | Minor | `-1 0 2 2 1 0` | Beginner |
+| 18 | `a-dom7` | A7 | A | 7th | `-1 0 2 0 2 0` | Beginner |
+| 19 | `a-sharp-major` | A♯ Major | A♯ | Major | `-1 1 3 3 3 1` | Intermediate |
+| 20 | `b-major` | B Major | B | Major | `-1 2 4 4 4 2` | Intermediate |
+| 21 | `b-minor` | B Minor | B | Minor | `-1 2 4 4 3 2` | Intermediate |
 
 Helpers:
 
-- `findOrCreateChord(root, type)` — returns a matching entry (case-insensitive on `type`)
-  or a generic `Major`-shaped fallback named `${root} ${type}`.
+- `chordDisplayName(root, type)` — the single spelling of a chord name, used by the stored
+  table, the derived fallback, and `transposeChordShape`, so a chord cannot be titled one way
+  in the data and another on a card.
+- `findChord(root, type)` — a stored shape, or `undefined` (case-insensitive on `type`).
+- `findOrCreateChord(root, type)` — a stored shape when there is one; otherwise a chord whose
+  notes and interval labels are derived from the quality stack in `QUALITY_STACKS`
+  (Major, Minor, 7th, Major 7th) and whose `frets` stay **empty**, so the fret grid voices
+  those notes instead of drawing a grip that belongs to a different chord. An unknown type
+  keeps the single-note `[root]` placeholder.
 - `asSafeChord(chord)` — normalizes `undefined`/`null` into a C Major shape.
 
 ### `src/data/scalesData.ts`

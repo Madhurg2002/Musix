@@ -73,7 +73,10 @@ src/
     Footer.tsx        # Contact, GitHub, and licence links
     Contact.tsx       # Contact screen
     SongFollower.tsx  # Follow a pasted chord chart
-    ChordWorkbench.tsx
+    ChordWorkbench.tsx # Chord studio: cards, chart view, playback, saved library
+    AddChordDialog.tsx # Add-a-chord popup, with a preview of the grip
+    SaveProgressionDialog.tsx # Name a progression so it can be reopened later
+    Modal.tsx         # Shared popup shell (portal, scrim, Escape, scroll lock)
     GuitarFretboard.tsx
     GuitarTuner.tsx
     PianoKeyboard.tsx

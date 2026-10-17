@@ -200,7 +200,10 @@ capability that makes it work.
 - Click any fret to hear it; the footer shows the hovered note, string number and name,
   fret, and exact frequency in Hz.
 - A **Strum Chord** button plays the whole chord with a 60 ms arpeggio.
-- A chord picker bar above the neck lets you jump between all 17 built-in chords.
+- A chord picker bar above the neck lets you jump between all 22 built-in chords. It is
+  grouped by root — one row per root, chromatically, with the shapes in quality order — and
+  each button is labelled with just the quality (`Major`, `Minor`, `7`, `maj7`) because the
+  root is already on the row. The full name stays as the button's accessible label.
 - A **Find my note** toggle listens through the microphone and turns the neck into a live
   answer: the note you are playing is named with its octave and cents, and every
   (string, fret) that sounds it pulses on the neck — including a ring around the open
@@ -226,23 +229,83 @@ capability that makes it work.
 **User-facing**
 
 - Independent chord cards you can compare next to each other (start state: C Major,
-  A Major, and the chord at index 12 of the data file — currently D Major).
+  A Major and B Minor, resolved by name so a data-file reorder cannot change it).
 - Add a card by choosing any root (12 notes) and type (Major, Minor, 7th, Major 7th).
 - Per-card controls: transpose ±1 semitone, mute/unmute, duplicate, remove, reorder.
 - Reorder by dragging the ⠿ handle or with **Alt+↑ / Alt+↓**.
-- Each card shows a mini fretboard with a **Fret position** slider (Original → Fret 20)
-  that generates a new voicing near that position and shifts the displayed fret window.
-- Play a single card, or **Play Progression** to hear every unmuted card in sequence
-  (1.2 s apart).
+- Each card shows a mini fretboard with a **Fret position** slider (0 → Fret 20) that
+  generates a new voicing near that position and shifts the displayed fret window. The
+  slider says **As written** only when the frets really are the stored shape; a chord with
+  no stored grip (D♯ Minor, most sevenths) reads **Open** at 0 and **Searched voicing** below.
+- A detected barre is drawn as one bar across the strings the finger covers, with a
+  `Barre · fret N` chip — not as one dot per string (which read as several index fingers).
+- Play a single card, or **Play Progression** to hear the audible cards in sequence
+  (1.2 s apart). Muted cards are skipped *before* the beat is counted, so muting one closes
+  the gap instead of leaving 1.2 s of silence; the card being played is highlighted.
+- The run is **controllable**: once it starts, the button becomes **Pause**, a **Stop** sits
+  beside it, and the readout says `Playing chord 3 of 8`. Pause holds the position and
+  clears the highlight, **Resume** carries on from the chord it stopped on (re-strumming
+  it), and **Stop** ends the run and returns to the first chord. Runs still cannot stack and
+  a card removed mid-run still cannot sound.
+- **Save and reopen progressions.** A **My progressions** row keeps the learner's own sets:
+  **Save** names the board on screen (prefilled `12-bar blues in C`, or the next free
+  `My progression N`) and keeps it in this browser; the picker opens any saved set in its
+  own key; **Delete** is two-step and only removes the entry the picker is showing. Saving
+  under an existing name replaces that entry instead of piling up duplicates. The working
+  board is also kept, so reopening the studio resumes the set you were building — not the
+  three demo cards. Saved data follows the same permission rule as every other preference:
+  nothing is stored until storage is allowed, and withdrawing it clears the library too.
+- **Add Chord** opens a popup rather than a row of selects in the toolbar: a twelve-note
+  root grid, quality chips (Major · Minor · 7th · maj7), and a live preview of the chord
+  with its notes and grip before it is added. Cancel discards the draft; Escape or a click
+  on the scrim closes it.
 - **Open Fretboard** sends any card's chord to the full fretboard tab.
+- A **View: Cards · Chart** toggle switches between the cards and the **Progression
+  Chart** — every chord of the set on one screen, in order, as a chart writes it: position,
+  numeral in the current key, name, notes with interval labels, the shape, and a Play
+  button. Changing the key re-numbers the chart (`I–V–vi–IV` in C is `I–V–vi–IV` in G).
+  A twelve-bar blues is twelve full cards tall, which is what made this worth having.
 
 **Technical**
 
-- `src/components/ChordWorkbench.tsx` (with an internal `CardFretboard` renderer).
-- Transposition uses `transposeNote` on the root and every chord tone.
-- `getChordPosition(chord, position)` searches ±2 frets around the target position for
-  the best chord-tone fret per string, then derives finger numbers from the sorted
-  pressed frets.
+- `src/components/ChordWorkbench.tsx`, drawing each card with `ChordFretGrid`, plus
+  `ProgressionChart` and `ProgressionPlaybackControls` exported from the same file for the
+  chart view and the play/pause/stop toolbar. The chart renders `ChordFretGrid compact` (no
+  per-row slider) so one drawing implementation serves both. The add-chord popup is
+  `src/components/AddChordDialog.tsx`.
+- Playback walks one beat at a time through a single timer, which is what makes pausing
+  possible: `nextPlaybackBeat(index, total)` in `src/utils/progressions.ts` returns the next
+  index or `null` at the end, and `progressions.test.ts` walks a twelve-bar run with it.
+- Saved progressions are `src/utils/savedProgressions.ts` (pure: serialise, rebuild, save,
+  delete, validate) over the existing preference store, so consent, the cookie cap and the
+  `localStorage` overflow are not reimplemented. `savedProgressions.test.ts` covers the
+  round trip and the validator; the studio's Save dialog is
+  `src/components/SaveProgressionDialog.tsx`.
+- `romanNumeralFor(root, type, key)` in `src/utils/progressions.ts` names each degree
+  (`I`, `ii`, `V7`, `♭VII`); `progressions.test.ts` reads the 12-bar blues back as
+  `I I I I IV IV I I V IV I V` in any key.
+- Transposition (`transposeChordShape`) keeps the drawing and the name in step: the new
+  root's stored shape if the table has one, otherwise a shape with no open string moves
+  with the key (F's barre +1 is the F♯ barre), otherwise a voicing is searched for the
+  transposed notes. The returned card never needs a playback offset, because its frets
+  already belong to it.
+- Searched voicings get real finger numbers: one finger per fret group, a new finger for
+  each adjacent string at that fret, and the same finger only where it genuinely lies
+  across a gap (so B Minor placed at fret 3 comes out `2 2 4 4 3 2` with the index across
+  strings 5→1, matching the stored grip). Past the pinky a string is drawn unnumbered
+  instead of repeating a number, because a repeat reads as a barre the shape does not have.
+  `chordVoicing.test.ts` asserts, across every root, quality and position 1–12, that a
+  shared finger is always a detected barre.
+- `detectBarre(frets, fingers)` reads the barre off the fingering: the same finger stops the
+  same fret on two strings with nothing open underneath, which is why F Major's `133211`
+  counts (the index lies *under* the other fingers) and A7's `x02020` does not. The diagram
+  uses it both for the chip and for the bar it draws.
+- Card names all come from `chordDisplayName`, so a transposed card and the stored shape it
+  lands on read the same; the grip (barre) is never part of the name.
+- `chordPositionForStrings(chord, position, strings, maxFret)` hands back the stored shape
+  at position 0 on standard guitar, and otherwise searches ±2 frets around the target
+  position for the best chord-tone fret per string, then derives finger numbers from the
+  sorted pressed frets.
 - Audio: `soundEngine.strumChord(freqs, 0.07, 'acoustic-guitar')`, with a synthetic
   fallback if the voicing produces no playable notes.
 - Cards are ordered by an array of `ChordCardItem`; drag-and-drop uses the HTML5
@@ -475,6 +538,10 @@ capability that makes it work.
   side of the anchor), while `select` and range inputs fall back to the native `title`
   attribute because form controls cannot render pseudo-elements. The rules live at the end of
   `src/style.css`.
+- Preference storage is asked for, not assumed: a small translucent permission bar (a
+  glass panel at the bottom of the viewport, not a full-width banner) appears on a first
+  visit, can be reopened from the footer, and everything Musix remembers — key, instrument,
+  theme, scale, song settings, saved progressions — rides that one choice.
 - Fully static — works as a plain static site with no server or database.
 - Responsive layout and hover states across every tool.
 
@@ -499,6 +566,13 @@ Documented so the docs stay honest about the current state:
   stylesheet guard with its WCAG contrast audit — but every screen component is verified by
   hand in the preview. That includes the microphone paths (tuner, fretboard note finder,
   Song Follower play-along), which also need real hardware and a permission prompt.
+- **The chord table holds shapes unevenly.** All twelve major roots are stored, but most
+  minor/seventh combinations are not, so those cards derive their notes and get a searched
+  voicing. The notes are always right (`chordVoicing.test.ts` asserts a card only ever
+  sounds its own chord), but the grip can be an unusual one — D♯ Minor searches a shape at
+  frets 2-1-1-3-4-2 rather than the familiar x68876 barre. Storing the movable minor and
+  seventh shapes from the E-shape and A-shape templates would give those cards textbook
+  fingerings.
 - **Chord-card drag-and-drop has a thin keyboard flow.** Alt+↑/↓ is the only keyboard
   fallback; a fuller keyboard reordering flow stays open (`docs/PLAN.md`, accessibility
   audit).
@@ -509,9 +583,10 @@ Documented so the docs stay honest about the current state:
   ids, titles, rail groups, and per-screen instrument defaults, so adding a screen is one
   `RouteDefinition` entry plus a lazily imported component — but it does mean that file
   grows with the app.
-- **The chord studio's cards are not persisted.** The Song Follower's chart, tempo,
-  beats-per-chord, transpose, and sound setting all survive a reload
-  (`src/utils/preferences.ts`), but the chord-studio cards reset — persisting them is on
-  the follow-up list in `docs/PLAN.md`.
+- **Saved progressions live in this browser only.** The studio's working board and its
+  library survive a reload (`src/utils/savedProgressions.ts` over
+  `src/utils/preferences.ts`), but there is no account, export, or share link, and the
+  library is capped at `MAX_SAVED_PROGRESSIONS` (24). Clearing site data, or declining the
+  permission bar, removes them.
 - **There is no URL import for songs.** Ultimate Guitar pages are not fetchable from a
   browser and their terms disallow scraping, so chart text is pasted by hand.

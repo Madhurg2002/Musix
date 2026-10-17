@@ -126,6 +126,10 @@ Screen shell and the only owner of cross-screen state.
   from that route's `intro` field, so every screen orients the learner differently and
   the default route additionally shows the two shortcut buttons.
 
+**Also exports:** `FretboardChordPicker` — the chord bar above the neck, grouped by root so
+it reads chromatically (one row per root, quality-order buttons labelled with the quality
+only, full names kept as accessible labels). Exported so it can be rendered on its own.
+
 **Renders:** `Header` + `TopBar`, then exactly one of `GuitarTuner`, `ChordWorkbench`,
 `GuitarFretboard`, `PianoKeyboard`, `ScaleExplorer`, `IntervalExplorer`,
 `RhythmMetronome`, `TheoryCheatSheet`.
@@ -217,41 +221,146 @@ The control strip above the screen content.
 
 ---
 
-## `src/components/ChordWorkbench.tsx` — `ChordWorkbench` + `CardFretboard`
+## `src/components/ChordWorkbench.tsx` — `ChordWorkbench` + `ProgressionChart` + `ProgressionPlaybackControls`
 
 The side-by-side chord studio.
 
 **`ChordWorkbench` props:** `onSelectChordForFretboard?(chord)`, `onOpenTuner?()`.
 
+**Views:** `View: Cards · Chart`. The chart is `ProgressionChart` (also exported from this
+file) — one `<ol>` row per card with the degree numeral from `romanNumeralFor`, the name,
+note pills, `ChordFretGrid compact` (no slider) and a Play button, so a twelve-bar blues
+reads on one screen.
+
+**Card diagram:** each card renders `ChordFretGrid`, which reads the voicing from
+`chordPositionForStrings`, the window from `fretWindow`, and the barre from `detectBarre`.
+A barre is drawn as a single bar over the rows it covers, and the slider's source label says
+**As written** only when `usedStoredShape` is true (otherwise **Open** / **Searched voicing**).
+
+**Playback:** `ProgressionPlaybackControls` (exported from this file) owns the toolbar
+controls. The run walks **one beat at a time** through a single tracked `setTimeout`: each
+beat highlights and strums the current card, then schedules the next one
+(`nextPlaybackBeat` returns `null` after the last beat, and the run ends there). Because
+there is one pending timer instead of a queue, the run can be **paused** — the timer is
+cancelled, the position is kept, and Resume replays the chord it stopped on. **Stop** ends
+the run and goes back to the first chord. Muted cards are filtered out before the beat is
+counted, so muting one closes the gap. A preset load, a card removal, or unmount stops the
+run; the card being played is highlighted via `playingCardId`.
+
+**Add Chord:** the toolbar's `Add Chord` button opens `AddChordDialog` (its own file) — a
+portalled popup with a twelve-note root grid, four quality chips, and a live preview of the
+chord (name, note pills, and the grip on the studio's instrument). The draft lives in the
+popup, so Cancel leaves the board untouched; Add submits the form, closes, and returns
+focus to the button.
+
 **State**
 
-- `cards: ChordCardItem[]` — default C Major, A Major, and `COMPREHENSIVE_CHORDS[12]`.
-- `selectedRootToAdd`, `selectedTypeToAdd` — the "add card" selectors.
+- `cards: ChordCardItem[]` — default C Major, A Major and B Minor, resolved by name with
+  `findOrCreateChord`, never by a data-file index.
+- `addChordOpen`, `selectedRootToAdd`, `selectedTypeToAdd` — the popup's open flag and the
+  last chord added, which the popup starts from next time.
+- `playback: { index, paused } | null` — which audible beat is sounding, and whether the run
+  is held. `null` means idle.
+- `savedProgressions`, `activeSavedId`, `saveDialogOpen`, `confirmingDelete` — the learner's
+  library, the entry the picker is showing, and the Save/Delete flow. `cards` and
+  `progressionKey` start from `PREFERENCE_KEYS.studioBoard`, so the studio reopens on the
+  board that was last on screen.
 - `draggedCardId`, `dropTargetCardId` — drag-and-drop feedback.
 
 **Handlers**
 
-- `handleAddCard` → `findOrCreateChord(root, type)`.
+- `handleAddCard(root, quality)` → `findOrCreateChord(root, quality)`, then closes the popup.
+  Refused at `MAX_SAVED_CARDS` (the button is disabled there), because the board is stored
+  whole and clipping it on write would lose cards silently.
+- `handleSaveProgression(name)`, `handleOpenSaved(id)`, `handleDeleteSaved()` — the library.
+  Saving writes `savedProgressions`; opening rebuilds the cards from roots and qualities and
+  restores the saved key; delete is two-step (armed for 5 s).
+- `markEdited()` — clears `activeSavedId` and `activePresetId` on every hand edit, so the
+  picker never claims the board is the saved set once it has changed.
+- `handleStartProgression()`, `handleToggleProgressionPause()`, `stopPlayback()` — the run's
+  start / pause / resume / stop.
+- A `playback` effect plays the current beat and schedules the next one; it is keyed on
+  `playback`, `cards` and the instrument, so a card that disappears under the run ends it.
 - `handleRemoveCard`, `handleDuplicateCard` (uses `crypto.randomUUID()`).
 - `handleMoveCard(id, ±1)` (keyboard) and `handleReorderCard(source, target)` (drag).
 - `handleCardPositionChange(id, position)` — per-card fret position slider.
-- `handleTranspose(id, ±1)` — transposes root and all notes by a semitone.
+- `handleTranspose(id, ±1)` — delegates to `transposeChordShape`, which moves the drawn
+  shape with the name (stored shape → movable shape shifted → searched voicing) and resets
+  the card's fret position to 0 (**As written** when the table has the shape).
 - `handlePlayChord(card)` — strums the card's voicing; falls back to a synthetic voicing
   if no frets are playable.
-- `handlePlayProgression()` — plays each unmuted card 1200 ms apart.
 
-**Internal `CardFretboard`** (props: `chord`, `cardId`, `position`, `onPositionChange`)
+---
 
-- Uses `getChordPosition(chord, position)` to compute frets/fingers for a voicing near
-  the chosen position.
-- Computes the visible fret window: `firstFret` clamps to the highest pressed fret minus
-  four when a voicing sits high on the neck; `fretCount` is at least 5.
-- Renders a numbers row, then one row per string (high E first) with a marker on the
-  pressed fret showing the finger number, plus `×`/`○` state in the string label.
-- The Fret position range input shows `Original` at 0 and `Fret N` otherwise.
+## `src/components/CookieConsent.tsx` — `CookieConsent`
 
-**Also renders:** the chord picker bar is provided by `App` on the fretboard tab, not
-here.
+The permission bar for preference storage.
+
+**Props:** `forceOpen?` (the footer's "Cookie settings" button), `onClose?()`.
+
+**Renders:** `.consent-bar`, a `role="dialog"` panel — a small translucent glass panel at
+the bottom of the viewport (min(430px, viewport − 24px), `--radius-md`, a 0.55-alpha
+`--bg-secondary-rgb` fill behind a 14px backdrop blur), not a full-width banner. It is a
+permission nudge, so it stays out of the way of the screen behind it; the alpha is bounded
+by the contrast audit in `src/style.test.ts`.
+
+**Content:** the title, two sentences of copy, `Allow preferences` / `Not now`, and the
+footnote pointing at the footer's settings entry. Every claim the app makes about what it
+stores has to stay inside those two sentences, which is why the copy is what it is.
+
+**Behaviour:** visible while no choice is stored, or whenever `forceOpen` is set. `Allow`
+calls `grantConsent()` and releases the writes made while deciding; declining records the
+refusal and calls `clearAllPreferences()` so nothing already stored is left behind.
+
+---
+
+## `src/components/Modal.tsx` — `Modal`
+
+The popup shell both studio dialogs sit in: scrim, panel, dismissal rules, written once.
+
+**Props:** `open`, `onClose()`, `labelledBy`, `widthClassName?`, `children`.
+
+Portals into `document.body` so no card, sticky rail or `overflow: hidden` ancestor can clip
+the panel. Escape and a press on the scrim itself close it (a drag that starts inside the
+panel does not), page scroll is locked while open and restored on close, and focus moves
+into the panel. The close handler is carried in a ref so the effect is keyed on `open`
+alone — a re-render while the popup is up must not steal focus back.
+
+---
+
+## `src/components/SaveProgressionDialog.tsx` — `SaveProgressionDialog` + `SaveProgressionPanel`
+
+Naming a progression so it can be reopened later.
+
+**Props:** `open`, `initialName`, `cardCount`, `existingNames`, `onSave(name)`, `onClose()`.
+
+The panel (split out for render checks) is a one-field form: the name, prefilled by
+`suggestProgressionName` (`12-bar blues in C`, then `(2)` if that is taken, or
+`My progression N`), capped at `MAX_PROGRESSION_NAME`, with a hint that says **Saving
+replaces it** once the typed name matches an entry. A blank name cannot be submitted — a
+nameless entry would be indistinguishable in the picker. The button reads **Save** or
+**Replace** accordingly.
+
+---
+
+## `src/components/AddChordDialog.tsx` — `AddChordDialog` + `AddChordPanel`
+
+The chord picker that used to be two `<select>`s and a button in the studio header.
+
+**Props:** `open`, `initialRoot`, `initialQuality`, `instrument`, `onAdd(root, quality)`,
+`onClose()`.
+
+**`AddChordPanel`** is the body, split out so it can be rendered without a portal target
+(the SSR render check asserts the root grid, the chips and the preview from it). It holds
+no state: `root`/`quality` come in, changes go out. It shows **twelve root buttons**
+(`aria-pressed` on the chosen one), the four `ADD_CHORD_QUALITIES` chips, and a preview of
+`findOrCreateChord(root, quality)` — name, note pills, and `ChordFretGrid compact` or
+`PianoKeyboard` for the studio's instrument, captioned **As written** or **Derived voicing**
+so the popup cannot promise a stored grip the card will not draw.
+
+**`AddChordDialog`** owns the draft and renders the panel inside `Modal`, which supplies the
+portal, the scrim, Escape/scrim dismissal, the scroll lock and the focus move. The caller
+returns focus to the trigger on close.
 
 ---
 
@@ -594,6 +703,26 @@ and each quality maps to a semitone stack in `QUALITY_INTERVALS`.
 
 ---
 
+## `src/utils/chordVoicing.ts` — the voicing maths
+
+- `chordPositionForStrings(chord, position, strings, maxFret)` → `{ frets, fingers,
+  usedStoredShape }`: the stored shape at position 0 on standard guitar, otherwise a
+  voicing searched around the position. Searched fingerings take one finger per adjacent
+  string and repeat one only where it genuinely lies across a gap, so the numbers and the
+  drawn barre can never disagree; past the pinky a string is left unnumbered.
+- `getChordPosition(chord, position)` — standard-guitar wrapper.
+- `fretWindow(frets)` → the five-fret slice a diagram draws.
+- `detectBarre(frets, fingers)` → `{ fret, from, to, finger }` or `null`. Reads the grip the
+  way a hand does: F Major's `133211` is barred under fingers 2–3–4, A7's `x02020` is not.
+- `keyboardMidis(chord)`, `chordFrequencies(chord, position, transposeOffset, instrument)`.
+- `transposeChordShape(chord, delta)` → `{ chord, transposeOffset, usedStoredShape }`.
+
+## `src/utils/progressions.ts`
+
+- `PROGRESSION_PRESETS` — `I–V–vi–IV`, `ii–V–I`, `12-bar blues` as degree offsets.
+- `resolveProgression(preset, key)` → `ChordCardItem[]` with stable ids.
+- `rotateRoot(key, offset)`; `romanNumeralFor(root, type, key)` — the chart's degree labels.
+
 ## `src/utils/theme.ts`
 
 The selectable-theme registry.
@@ -656,8 +785,12 @@ color per pitch class).
 
 ## `src/data/chordsData.ts`
 
-- `COMPREHENSIVE_CHORDS: ChordShape[]` — 17 chords (C, A, G, E, D, F, B families).
-- `findOrCreateChord(root, type)` — case-insensitive lookup, else a generic fallback.
+- `COMPREHENSIVE_CHORDS: ChordShape[]` — 22 chords (C, A, G, E, D, F, B families plus the
+  five sharp-root barres). Names never include the grip.
+- `chordDisplayName(root, type)` — the one spelling of a chord name (`C Major`, `C7`,
+  `Cmaj7`), shared by the stored table, the fallback and transposition.
+- `findOrCreateChord(root, type)` — case-insensitive lookup, else a fallback that derives its
+  notes from `QUALITY_STACKS` and leaves `frets` empty for the grid to voice.
 - `asSafeChord(chord)` — returns a guaranteed `SafeChordShape`, defaulting to a C Major
   shape when given null/undefined.
 
